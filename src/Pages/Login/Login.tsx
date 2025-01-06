@@ -6,7 +6,7 @@ const { Content } = Layout;
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 
-const Home: React.FC = () => {
+const Login: React.FC = () => {
   const [form] = Form.useForm();
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
@@ -19,14 +19,15 @@ const Home: React.FC = () => {
   }, [form, values]);
 
   type FieldType = {
-    username?: string;
+    email?: string;
     password?: string;
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    if (values.username && values.password) {
+    console.log("Login values:", values);
+    if (values.email && values.password) {
       try {
-        const data = await login(values.username, values.password);
+        const data = await login(values.email, values.password);
         console.log("Login successful:", data);
         // You can handle login success, store tokens, etc.
       } catch (error) {
@@ -43,78 +44,77 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-page-content-container">
-        <h1>Welcome back! Glad to see you, Again!</h1>
-        <Content
+    <div className="full-page login-page-container">
+      <h1>Welcome back! Glad to see you, Again!</h1>
+      <Content
+        style={{
+          margin: "0 auto",
+          padding: "16px",
+          maxWidth: "630px",
+          width: "100%",
+        }}
+      >
+        <Form
+          form={form}
+          name="basic"
+          layout="vertical"
           style={{
-            margin: "0 auto",
-            padding: "16px",
-            maxWidth: "630px",
-            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            marginTop: "2rem",
           }}
+          labelCol={{ span: 124 }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
         >
-          <Form
-            form={form}
-            name="basic"
-            layout="vertical"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginTop: "2rem",
-            }}
-            labelCol={{ span: 124 }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete="off"
+          <Form.Item<FieldType>
+            name="email"
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: "Please input your email",
+              },
+            ]}
           >
-            <Form.Item<FieldType>
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your username!",
-                },
-              ]}
-            >
-              <Input className="login-input" placeholder="Email" />
-            </Form.Item>
+            <Input className="login-input" type="email" placeholder="Email" />
+          </Form.Item>
 
-            <Form.Item<FieldType>
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-              ]}
-            >
-              <Input.Password className="login-input" placeholder="Password " />
-            </Form.Item>
+          <Form.Item<FieldType>
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password",
+              },
+            ]}
+          >
+            <Input.Password className="login-input" placeholder="Password " />
+          </Form.Item>
 
-            <Form.Item style={{ marginTop: "3rem" }}>
-              <Button
-                style={{ margin: "auto", width: "100%" }}
-                color="default"
-                variant="solid"
-                htmlType="submit"
-                disabled={!submittable}
-              >
-                Login
-              </Button>
-            </Form.Item>
-          </Form>
-        </Content>
-        <div className="register-link">
-          <span>
-            Don’t have an account?{" "}
-            <a href={`${CLIENT_URL}/register`}>Register Now</a>
-          </span>
-        </div>
+          <Form.Item style={{ marginTop: "3rem" }}>
+            <Button
+              style={{ margin: "auto", width: "100%" }}
+              color="default"
+              variant="solid"
+              htmlType="submit"
+              disabled={!submittable}
+            >
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </Content>
+      <div className="register-link">
+        <span>
+          Don’t have an account?{" "}
+          <a href={`${CLIENT_URL}/register`}>Register Now</a>
+        </span>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default Login;

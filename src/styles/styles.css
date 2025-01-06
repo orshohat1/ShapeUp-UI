@@ -1,3 +1,7 @@
+.full-page {
+    flex: 1;
+}
+
 .center {
     position: absolute;
     top: 50%;

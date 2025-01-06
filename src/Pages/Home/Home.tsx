@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   return (
-    <div className="home-page-container">
+    <div className="full-page home-page-container">
       <div className="home-logo-container">
         <img src={shapeUpLogo} alt="logo" />
       </div>
       <Flex
-        className="home-button-container"
+        className="full-page home-button-container"
         vertical
         gap="small"
         style={{
