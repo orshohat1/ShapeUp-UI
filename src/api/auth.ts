@@ -1,4 +1,5 @@
-import axiosInstance from "./axios-instance";
+import axiosInstance from "./axios-instances/axios-instance";
+import fileRequestAxiosInstance from "./axios-instances/file-axios-request-instance";
 const AUTH_ROUTE = "/users";
 
 export const login = async (email: string, password: string) => {
@@ -21,17 +22,30 @@ export const register = async (
   email: string,
   password: string,
   birthdate: Date,
-  city: string
+  city: string,
+  street: string,
+  gender: string,
+  avatar: File,
+  gymOwnerDocumentFile: File
 ) => {
+  const registerFormData = new FormData();
+  registerFormData.append("firstName", firstname);
+  registerFormData.append("lastName", lastname);
+  registerFormData.append("email", email);
+  registerFormData.append("password", password);
+  registerFormData.append("birthdate", birthdate.toString());
+  registerFormData.append("city", city);
+  registerFormData.append("street", street);
+  registerFormData.append("gender", gender);
+  registerFormData.append("avatar", avatar);
+  console.log("gymOwnerDocument", gymOwnerDocumentFile);
+  // registerFormData.append("gymOwnerDocument", gymOwnerDocumentFile);
+
   try {
-    const response = await axiosInstance.post(`${AUTH_ROUTE}/register`, {
-      firstname,
-      lastname,
-      email,
-      password,
-      birthdate,
-      city,
-    });
+    const response = await fileRequestAxiosInstance.post(
+      `${AUTH_ROUTE}/signup`,
+      registerFormData
+    );
     return response.data;
   } catch (error) {
     console.error("Registration failed:", error);
