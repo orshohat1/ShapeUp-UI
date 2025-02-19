@@ -1,5 +1,6 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import fileRequestAxiosInstance from "./axios-instances/file-axios-request-instance";
+import { notification } from "antd";
 const AUTH_ROUTE = "/users";
 
 export const login = async (email: string, password: string) => {
@@ -9,8 +10,12 @@ export const login = async (email: string, password: string) => {
       password,
     });
     return response.data;
-  } catch (error) {
-    console.error("Login failed:", error);
+  } catch (error:any) {
+    notification.error({
+      message: "Login Failed",
+      description: error.response?.data?.message || "Something went wrong. Please try again.",
+      placement: "top",
+    });
     throw error;
   }
 };
@@ -38,8 +43,6 @@ export const register = async (
   registerFormData.append("street", street);
   registerFormData.append("gender", gender);
   registerFormData.append("avatar", avatar);
-  console.log("gymOwnerDocument", gymOwnerDocumentFile);
-  // registerFormData.append("gymOwnerDocument", gymOwnerDocumentFile);
 
   try {
     const response = await fileRequestAxiosInstance.post(
@@ -47,8 +50,12 @@ export const register = async (
       registerFormData
     );
     return response.data;
-  } catch (error) {
-    console.error("Registration failed:", error);
+  } catch (error:any) {
+    notification.error({
+      message: "Registration Failed",
+      description: error.response?.data?.message || "Something went wrong. Please try again.",
+      placement: "top",
+    });
     throw error;
   }
 };

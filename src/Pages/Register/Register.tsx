@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./Register.less";
 import type { FormProps } from "antd";
+import dayjs from "dayjs";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Layout,
@@ -45,7 +46,6 @@ const Register: React.FC = () => {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    console.log("Register values:", values);
     const avatarFile = avatarFileRef.current;
     if (!avatarFile) {
       message.error("No avatar file selected");
@@ -81,12 +81,10 @@ const Register: React.FC = () => {
           avatarFile,
           gymOwnerDocumentFile
         );
-        console.log("Register successful:", data);
         // Instead of message -> redirect to home page
         message.success("Registration successful");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
-        console.error("Register error:", error);
         message.error("Registration failed: " + errorMsg);
       }
     }
@@ -95,7 +93,7 @@ const Register: React.FC = () => {
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
-    console.log("Failed:", errorInfo);
+    console.log("Registration failed:", errorInfo);
   };
 
   const onChange = (
@@ -204,11 +202,9 @@ const Register: React.FC = () => {
               >
                 <DatePicker
                   className="register-input"
-                  format="YYYY-MM-DD"
+                  format="DD-MM-YYYY"
                   allowClear
-                  onChange={(date, dateString) => {
-                    console.log(date, dateString);
-                  }}
+                  disabledDate={(current) => current && current.isAfter(dayjs())}
                 />
               </Form.Item>
             </Col>

@@ -24,7 +24,6 @@ const Login: React.FC = () => {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    console.log("Login values:", values);
     if (values.email && values.password) {
       try {
         const data = await login(values.email, values.password);
@@ -40,12 +39,12 @@ const Login: React.FC = () => {
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
-    console.log("Failed:", errorInfo);
+    console.log("Login failed:", errorInfo);
   };
 
   return (
     <div className="full-page login-page-container">
-      <h1>Welcome back! Glad to see you, Again!</h1>
+      <h1>Welcome back! Glad to see you, again!</h1>
       <Content
         style={{
           margin: "0 auto",
