@@ -3,7 +3,7 @@ import "./LoginUser.less";
 import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input } from "antd";
-import { login, loginWithGoogle } from "../../../api/auth";
+import { login } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
 const { Content } = Layout;
 
@@ -38,7 +38,7 @@ const LoginUser: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    console.log("Google login clicked");
+    window.location.href = "http://localhost:3000/users/auth/google";
   };
 
 
