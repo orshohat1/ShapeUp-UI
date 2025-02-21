@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import "./LoginUser.less";
 import type { FormProps } from "antd";
+import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input } from "antd";
 import { login } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
@@ -34,6 +35,10 @@ const LoginUser: React.FC = () => {
         // Handle error (e.g., show error message)
       }
     }
+  };
+
+  const handleGoogleLogin = () => {
+    console.log("Google login clicked");
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -92,6 +97,12 @@ const LoginUser: React.FC = () => {
           >
             <Input.Password className="login-input" placeholder="Password " />
           </Form.Item>
+
+          <Button className="google-login-button" 
+            onClick={handleGoogleLogin}>
+            <img src={googleLogo} alt="Google" style={{ width: "20px", height: "20px" }} />
+            Sign In with Google
+          </Button>
 
           <Form.Item style={{ marginTop: "3rem" }}>
             <Button
