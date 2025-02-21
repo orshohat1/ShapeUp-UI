@@ -3,7 +3,7 @@ import "./LoginUser.less";
 import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input } from "antd";
-import { login } from "../../../api/auth";
+import { login, loginWithGoogle } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
 const { Content } = Layout;
 
@@ -37,9 +37,10 @@ const LoginUser: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     console.log("Google login clicked");
   };
+
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo

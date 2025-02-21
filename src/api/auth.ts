@@ -59,3 +59,19 @@ export const register = async (
     throw error;
   }
 };
+
+export const loginWithGoogle = async (idToken: string) => {
+  try {
+      const response = await axiosInstance.post(`${AUTH_ROUTE}/auth/google`, {
+          idToken,
+      });
+      return response.data;
+  } catch (error: any) {
+      notification.error({
+          message: "Google Login Failed",
+          description: error.response?.data?.message || "Something went wrong. Please try again.",
+          placement: "top",
+      });
+      throw error;
+  }
+};
