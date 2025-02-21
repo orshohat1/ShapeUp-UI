@@ -25,7 +25,6 @@ const RegisterUser: React.FC = () => {
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
-  const gymOwnerDocumentFileRef = useRef(null);
 
   useEffect(() => {
     form
@@ -52,12 +51,6 @@ const RegisterUser: React.FC = () => {
       return;
     }
 
-    const gymOwnerDocumentFile = gymOwnerDocumentFileRef.current;
-    if (!gymOwnerDocumentFile) {
-      message.error("No gym owner document file selected");
-      return;
-    }
-
     if (
       values.firstname &&
       values.lastname &&
@@ -78,10 +71,8 @@ const RegisterUser: React.FC = () => {
           values.city,
           values.street,
           values.gender,
-          avatarFile,
-          gymOwnerDocumentFile
+          avatarFile
         );
-        // Instead of message -> redirect to home page
         message.success("Registration successful");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
@@ -114,7 +105,6 @@ const RegisterUser: React.FC = () => {
     if (!isImage) {
       message.error("You can only upload image files!");
     }
-    // Prevent auto-upload behavior
     return false;
   };
 
@@ -147,12 +137,7 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="firstname"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your firstname",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your firstname" }]}
               >
                 <Input className="register-input" placeholder="First name" />
               </Form.Item>
@@ -160,12 +145,7 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="lastname"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your lastname",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your lastname" }]}
               >
                 <Input className="register-input" placeholder="Last name" />
               </Form.Item>
@@ -175,30 +155,15 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="email"
-                rules={[
-                  {
-                    required: true,
-                    type: "email",
-                    message: "Please input a valid email",
-                  },
-                ]}
+                rules={[{ required: true, type: "email", message: "Please input a valid email" }]}
               >
-                <Input
-                  className="register-input"
-                  type="email"
-                  placeholder="Email"
-                />
+                <Input className="register-input" type="email" placeholder="Email" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item<FieldType>
                 name="birthdate"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your birthdate",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your birthdate" }]}
               >
                 <DatePicker
                   className="register-input"
@@ -211,55 +176,35 @@ const RegisterUser: React.FC = () => {
           </Row>
           <Row gutter={24}>
             <Col span={12}>
-              {" "}
               <Form.Item<FieldType>
                 name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your password" }]}
               >
-                <Input.Password
-                  className="register-input"
-                  placeholder="Password"
-                />
+                <Input.Password className="register-input" placeholder="Password" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item<FieldType>
                 name="city"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your city",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your city" }]}
               >
                 <Input className="register-input" placeholder="City" />
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={24}>
             <Col span={12}>
               <Form.Item
                 name="street"
-                rules={[
-                  { required: true, message: "Please input your street" },
-                ]}
+                rules={[{ required: true, message: "Please input your street" }]}
               >
                 <Input className="register-input" placeholder="Street" />
               </Form.Item>
             </Col>
-
             <Col span={12}>
               <Form.Item
                 name="gender"
-                rules={[
-                  { required: true, message: "Please select your gender" },
-                ]}
+                rules={[{ required: true, message: "Please select your gender" }]}
               >
                 <Select className="register-input" placeholder="Select Gender">
                   <Select.Option value="male">Male</Select.Option>
@@ -268,11 +213,8 @@ const RegisterUser: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={24}>
-            <Col span={12}>
-              {}
-            </Col>
+            <Col span={12}></Col>
             <Col span={12}>
               <Form.Item valuePropName="avatar">
                 <Upload.Dragger
@@ -292,7 +234,6 @@ const RegisterUser: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Form.Item style={{ marginTop: "3rem" }}>
             <Button
               style={{ margin: "auto", width: "100%" }}
