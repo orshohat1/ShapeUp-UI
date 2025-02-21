@@ -21,12 +21,12 @@ const Home: React.FC = () => {
       >
         <Link to="/login">
           <Button color="default" variant="solid" block>
-            Login
+            Login Gym owner 
           </Button>
         </Link>
-        <Link to="/register" >
+        <Link to="/user/login" >
           <Button color="default" variant="outlined" block>
-            Register
+            Login User
           </Button>
         </Link>
       </Flex>
