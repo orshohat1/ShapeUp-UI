@@ -5,22 +5,6 @@
 @border-light: #e5e7eb;
 @text-gray: #6b7280;
 
-// Reset and root styles
-// * {
-//   margin: 0;
-//   padding: 0;
-//   box-sizing: border-box;
-// }
-
-// html, body, #root, .App {
-//     height: 100%;
-//     width: 100%;
-//     margin: 0;
-//     padding: 0;
-//     overflow: hidden;
-// }
-
-// Mixins
 .card() {
   background-color: @bg-white;
   border-radius: 1rem;
@@ -47,6 +31,12 @@
     flex-shrink: 0; 
     border-radius: 8px; 
     z-index: 10;
+
+    .logo {
+        width: 120px;  
+        position: absolute;
+        top:-1%;
+      }
 }
 
 .main {
@@ -62,7 +52,7 @@
     .card();
     position: absolute;
     padding: 2rem;
-    height: 98%; // Ensure full height coverage
+    height: 98%; 
     width: 98%;
     top: 1%;
     left: 2%;
@@ -71,7 +61,7 @@
 
 .header {
   margin-bottom: 0rem;
-  margin-top: -1rem;
+  margin-top: -0.5rem;
   margin-left: 2rem;
 
   .title {
