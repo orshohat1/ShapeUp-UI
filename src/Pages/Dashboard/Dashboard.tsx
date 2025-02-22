@@ -9,11 +9,13 @@ const Dashboard: React.FC<DashboardProps> = () => {
     <div className="container">
       <aside className="sidebar">
         <img src={logo} className="logo" />
+        <div className="divider"></div>
       </aside>
       <main className="main">
         <div className="content">
           <header className="header">
-            <h1 className="title">Overview</h1>
+            <h1 className="main-title">Overview</h1>
+            <span className="title">My Gyms</span>
           </header>          
         </div>
       </main>
