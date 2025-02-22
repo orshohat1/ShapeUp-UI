@@ -6,20 +6,21 @@ interface DashboardProps {
 }
 const Dashboard: React.FC<DashboardProps> = () => {
   return (
-    <div className="container">
-      <aside className="sidebar">
+    <div className="container-fluid">
+    <div className="row">
+      {/* Sidebar */}
+      <aside className="col-auto align-items-center justify-content-center sidebar">
         <img src={logo} className="logo" />
-        <div className="divider"></div>
+         <div className="divider"></div>
       </aside>
-      <main className="main">
-        <div className="content">
-          <header className="header">
-            <h1 className="main-title">Overview</h1>
-            <span className="title">My Gyms</span>
-          </header>          
-        </div>
+
+      {/* Main Content */}
+      <main className="col bg-white p-3">
+        <h1>Overview</h1>
+        <p>My Gyms</p>
       </main>
     </div>
+  </div>
   );
 };
 

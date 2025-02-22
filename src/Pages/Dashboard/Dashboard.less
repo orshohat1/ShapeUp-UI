@@ -19,11 +19,7 @@
 }
 
 .sidebar {
-    width: 100px;
     background-color: @blue-primary;
-    height: 100vh;
-    position: absolute;
-    left:-1%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -31,9 +27,11 @@
     flex-shrink: 0; 
     border-radius: 8px; 
     z-index: 10;
+    width: 180px !important;
+    height: 100vh;
 
     .logo {
-        width: 120px;  
+        width: 190px;  
         position: absolute;
         top:-1%;
     }
@@ -42,7 +40,7 @@
         width: 80%; 
         height: 2px; 
         background-color: @border-light; 
-        margin-top: 260%;
+        margin-top: 70vh;
     }
 }
 
