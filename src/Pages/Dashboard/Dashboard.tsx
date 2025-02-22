@@ -1,0 +1,24 @@
+import React from 'react';
+import './Dashboard.less';
+interface DashboardProps {
+  children?: React.ReactNode;
+}
+const Dashboard: React.FC<DashboardProps> = () => {
+  return (
+    <div className="container">
+      <aside className="sidebar">
+        <div className="logo" />
+        <nav className="menuItem" />
+      </aside>
+      <main className="main">
+        <div className="content">
+          <header className="header">
+            <h1 className="title">Overview</h1>
+          </header>          
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Dashboard;

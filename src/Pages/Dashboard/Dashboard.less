@@ -1,0 +1,81 @@
+// Dashboard.less
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@bg-white: #ffffff;
+@border-light: #e5e7eb;
+@text-gray: #6b7280;
+
+// Reset and root styles
+// * {
+//   margin: 0;
+//   padding: 0;
+//   box-sizing: border-box;
+// }
+
+// html, body, #root, .App {
+//     height: 100%;
+//     width: 100%;
+//     margin: 0;
+//     padding: 0;
+//     overflow: hidden;
+// }
+
+// Mixins
+.card() {
+  background-color: @bg-white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 100px;
+    background-color: @blue-primary;
+    height: 100vh;
+    position: absolute;
+    left:-1%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    flex-shrink: 0; 
+    border-radius: 8px; 
+    z-index: 10;
+}
+
+.main {
+    position: absolute;
+    left:7%;
+    top: -0.95%;
+    height: 101%;
+    width: 93%;
+    padding: 1rem;
+    background-color: @bg-light;
+
+  .content {
+    .card();
+    position: absolute;
+    padding: 2rem;
+    height: 98%; // Ensure full height coverage
+    width: 98%;
+    top: 1%;
+    left: 2%;
+  }
+}
+
+.header {
+  margin-bottom: 0rem;
+  margin-top: -1rem;
+  margin-left: 2rem;
+
+  .title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
