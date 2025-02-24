@@ -2,6 +2,7 @@ import React from 'react';
 import './Dashboard.less';
 import logo from '../../assets/Logo/shape-up.png';
 import dashboard from '../../assets/Logo/Dashboard.png';
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 interface DashboardProps {
   children?: React.ReactNode;
 }
@@ -19,7 +20,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
       {/* Main Content */}
       <main className="col bg-white p-3">
         <h1>Overview</h1>
-        <p>My Gyms</p>
+        <div className="my-gyms-header">
+            <p className="my-gyms-text">My Gyms</p>
+            <PlusCircleOutlined className="plus-icon" />
+        </div>
       </main>
     </div>
   </div>
