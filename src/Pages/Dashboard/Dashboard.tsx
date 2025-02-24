@@ -2,7 +2,7 @@ import React from 'react';
 import './Dashboard.less';
 import logo from '../../assets/Logo/shape-up.png';
 import dashboard from '../../assets/Logo/Dashboard.png';
-import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined } from '@ant-design/icons';
 interface DashboardProps {
   children?: React.ReactNode;
 }
