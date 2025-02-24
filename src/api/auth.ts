@@ -31,7 +31,7 @@ export const register = async (
   street: string,
   gender: string,
   avatar: File,
-  gymOwnerDocumentFile: File
+  gymOwnerDocumentFile?: File
 ) => {
   const registerFormData = new FormData();
   registerFormData.append("firstName", firstname);
