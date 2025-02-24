@@ -214,9 +214,9 @@ const RegisterUser: React.FC = () => {
             </Col>
           </Row>
           <Row gutter={24}>
-            <Col span={12}></Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item valuePropName="avatar">
+              <div className="upload-container">
                 <Upload.Dragger
                   accept="image/*"
                   listType="picture"
@@ -231,6 +231,7 @@ const RegisterUser: React.FC = () => {
                     Click or drag file to this area to upload
                   </p>
                 </Upload.Dragger>
+              </div>
               </Form.Item>
             </Col>
           </Row>
