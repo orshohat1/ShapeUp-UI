@@ -5,11 +5,13 @@ import { Layout, Button, Form, Input } from "antd";
 const { Content } = Layout;
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     form
@@ -28,6 +30,7 @@ const Login: React.FC = () => {
       try {
         const data = await login(values.email, values.password);
         console.log("Login successful:", data);
+        navigate("/dashboard");
         // You can handle login success, store tokens, etc.
       } catch (error) {
         console.error("Login error:", error);
