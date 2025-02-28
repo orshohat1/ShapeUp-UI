@@ -31,10 +31,8 @@ const Login: React.FC = () => {
         const data = await login(values.email, values.password);
         console.log("Login successful:", data);
         navigate("/dashboard");
-        // You can handle login success, store tokens, etc.
       } catch (error) {
         console.error("Login error:", error);
-        // Handle error (e.g., show error message)
       }
     }
   };

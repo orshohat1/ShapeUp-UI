@@ -11,57 +11,82 @@
 }
 
 .container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .sidebar {
-    background-color: @blue-primary;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
-    flex-shrink: 0; 
-    border-radius: 8px; 
-    z-index: 10;
-    width: 180px !important;
-    height: 100vh;
+  background-color: @blue-primary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  flex-shrink: 0;
+  border-radius: 0 8px 8px 0;
+  z-index: 10;
+  width: 180px !important;
+  height: 100vh;
 
-    .logo {
-        width: 190px;  
-        margin-top: -55%;
-    }
+  .logo {
+    width: 100%;
+    height: 100px;
+  }
 
-    .dashboard {
-      background-color: white;
-      width: 150px;  
-      border-radius: 5px;
-    }
+  .dashboard {
+    background-color: white;
+    width: 150px;
+    border-radius: 5px;
+  }
+
+  .aside-bottom-container {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
 
     .divider {
-        width: 100%; 
-        height: 2px; 
-        background-color: @border-light; 
-        margin-top: 70vh;
+      width: 100%;
+      height: 2px;
+      background-color: @border-light;
     }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: @bg-light;
+        margin-right: 0.5rem;
+      }
+
+      .user-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: @bg-light;
+      }
+    }
+  }
 }
 
 .main {
-    position: absolute;
-    left:7%;
-    top: -0.95%;
-    height: 101%;
-    width: 93%;
-    padding: 1rem;
-    background-color: @bg-light;
+  position: absolute;
+  left: 7%;
+  top: -0.95%;
+  height: 101%;
+  width: 93%;
+  padding: 1rem;
+  background-color: @bg-light;
 
   .content {
     .card();
     position: absolute;
     padding: 2rem;
-    height: 98%; 
+    height: 98%;
     width: 98%;
     top: 1%;
     left: 2%;
