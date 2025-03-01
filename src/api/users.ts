@@ -4,7 +4,7 @@ const USERS_ROUTE = "/users";
 
 export const getUserProfile = async () => {
   try {
-    const response = await axiosInstance.get(`${USERS_ROUTE}/userProfile`, {
+    const response = await axiosInstance.get(`${USERS_ROUTE}/getMyProfile`, {
         withCredentials: true
     });
     return response.data;
