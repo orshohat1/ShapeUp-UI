@@ -5,20 +5,23 @@ import Register from "./Pages/Register/Register";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import LoginUser from "./Pages/User/Login/LoginUser";
 import RegisterUser from "./Pages/User/Register/RegisterUser";
+import { UserProfileProvider } from "./context/UserProfileProvider";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/user/login" element={<LoginUser />} />
-        <Route path="/user/register" element={<RegisterUser />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
+    <UserProfileProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/user/login" element={<LoginUser />} />
+          <Route path="/user/register" element={<RegisterUser />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </BrowserRouter>
+    </UserProfileProvider>
   );
 };
 

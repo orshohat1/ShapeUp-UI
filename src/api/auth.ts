@@ -8,7 +8,7 @@ export const login = async (email: string, password: string) => {
     const response = await axiosInstance.post(`${AUTH_ROUTE}/login`, {
       email,
       password,
-    });
+    }, { withCredentials: true });
     return response.data;
   } catch (error:any) {
     notification.error({
@@ -47,7 +47,8 @@ export const register = async (
   try {
     const response = await fileRequestAxiosInstance.post(
       `${AUTH_ROUTE}/signup`,
-      registerFormData
+      registerFormData,
+      { withCredentials: true }
     );
     return response.data;
   } catch (error:any) {
