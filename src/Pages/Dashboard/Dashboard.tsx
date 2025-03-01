@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Dashboard.less";
 import logo from "../../assets/Logo/shape-up.png";
 import dashboard from "../../assets/Logo/Dashboard.png";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { getUserProfile } from "../../api/users";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
@@ -83,6 +83,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
               <span className="user-name">
                 {userProfile?.firstName} {userProfile?.lastName}
               </span>
+              <EditOutlined className="edit-icon" />
+              <LogoutOutlined className="logout-icon" />
             </div>
           </div>
         </aside>
@@ -100,7 +102,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
                 {/* // TODO: create component for gym card */}
                 {gyms?.map((gym: any) => (
-                  <div key={gym._id} className="gym-card">  
+                  <div key={gym._id} className="gym-card">
                     <p>{gym.name}</p>
                     <p>{gym.location}</p>
                   </div>
