@@ -125,6 +125,25 @@
 .plus-icon {
   font-size: 24px;
   cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.plus-icon:hover {
+  transform: scale(1.1);
+}
+
+.modal-input {
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.save-btn {
+  width: 100%;
 }
 
 .logout-icon {
@@ -137,4 +156,68 @@
   font-size: 24px;
   cursor: pointer;
   margin-left: 12px;
+}
+
+.modal-image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  .image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .remove-image-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .image-preview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+
+.custom-file-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #0056b3;
 }
