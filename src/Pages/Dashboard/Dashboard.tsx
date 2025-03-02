@@ -7,7 +7,7 @@ import { Modal, Input, Button, notification } from "antd";
 import { getUserProfile } from "../../api/users";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
-import { getGymsByOwner } from "../../api/gym-owner";
+import { getGymsByOwner, addGym } from "../../api/gym-owner";
 
 const Dashboard: React.FC = () => {
   const { userProfile, setUserProfile } = useUserProfile();
@@ -89,9 +89,28 @@ const Dashboard: React.FC = () => {
     setGymData({ ...gymData, [e.target.name]: e.target.value });
   };
 
-  const handleSaveGym = () => {
-    console.log("Saving gym:", gymData);
-    handleCloseAddGymModal();
+  const handleSaveGym = async () => {
+    const formData = new FormData();
+
+    formData.append("name", gymData.name);
+    formData.append("city", gymData.city);
+    formData.append("description", gymData.description);
+    gymImages.forEach((image) => {
+      formData.append("pictures", image);
+    });
+    try {
+      if (!userProfile) {
+        throw new Error("User profile not found");
+      }
+      const newGym = await addGym(formData, userProfile.id);
+
+      // it updates gyms list on the screen without re-fetching
+      setGyms((prevGyms: any) => [...prevGyms, newGym]);
+
+      handleCloseAddGymModal();
+    } catch (error) {
+      console.error("Error saving gym:", error);
+    }
   };
 
   if (userProfileError) return <p style={{ color: "red" }}>{userProfileError}</p>;
