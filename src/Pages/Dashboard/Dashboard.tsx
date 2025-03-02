@@ -8,6 +8,7 @@ import { getUserProfile } from "../../api/users";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import { getGymsByOwner, addGym } from "../../api/gym-owner";
+import GymBox from '../../components/GymBox/GymBox';
 
 const Dashboard: React.FC = () => {
   const { userProfile, setUserProfile } = useUserProfile();
@@ -113,6 +114,22 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleGymEdit = () => {
+    console.log('Edit clicked');
+  };
+
+  const handleGymDelete = () => {
+    console.log('Delete clicked');
+  };
+
+  const handleGymUpdatePrices = () => {
+    console.log('Update Prices clicked');
+  };
+
+  const handleGymGeneratePricingSuggestions = () => {
+    console.log('Generate Pricing Suggestions clicked');
+  };
+
   if (userProfileError) return <p style={{ color: "red" }}>{userProfileError}</p>;
 
   return (
@@ -138,21 +155,28 @@ const Dashboard: React.FC = () => {
         {/* Main Content */}
         <main className="col bg-white p-3">
           <h1>Overview</h1>
+          <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
+          <PlusCircleOutlined className="plus-icon" onClick={handleOpenAddGymModal} />
           <div className="my-gyms-header">
             {gymsError ? (
               <p style={{ color: "red" }}>{gymsError}</p>
             ) : (
               <>
-                <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
                 {gyms?.map((gym: any) => (
                   <div key={gym._id} className="gym-card">
-                    <p>{gym.name}</p>
-                    <p>{gym.location}</p>
+                    <GymBox
+                      gymName={gym.name}
+                      city={gym.city}
+                      onEdit={handleGymEdit}
+                      onDelete={handleGymDelete}
+                      onUpdatePrices={handleGymUpdatePrices}
+                      onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
+                    />
                   </div>
                 ))}
               </>
             )}
-            <PlusCircleOutlined className="plus-icon" onClick={handleOpenAddGymModal} />
+            
           </div>
         </main>
       </div>
