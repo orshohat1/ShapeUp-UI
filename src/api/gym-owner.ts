@@ -51,7 +51,6 @@ export const addGym = async (
   } catch (error: any) {
     let errorMessage = "Something went wrong. Please try again.";
 
-    // Check for specific validation error message
     if (error.response?.data?.message === "Validation array is not empty") {
       errorMessage = "Please fill in all fields";
     } else if (error.response?.data?.message) {
