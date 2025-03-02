@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Dashboard.less";
 import logo from "../../assets/Logo/shape-up.png";
 import dashboard from "../../assets/Logo/Dashboard.png";
-import { PlusCircleOutlined, LogoutOutlined, EditOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { Modal, Input, Button, notification } from "antd";
 import { getUserProfile } from "../../api/users";
 import { useUserProfile } from "../../context/useUserProfile";
@@ -111,8 +111,7 @@ const Dashboard: React.FC = () => {
             <div className="user-info">
               <img src={userProfile?.avatarUrl} alt="avatar" className="user-avatar" />
               <span className="user-name">{userProfile?.firstName} {userProfile?.lastName}</span>
-              <EditOutlined className="edit-icon" />
-              <LogoutOutlined className="logout-icon" />
+
             </div>
           </div>
         </aside>
