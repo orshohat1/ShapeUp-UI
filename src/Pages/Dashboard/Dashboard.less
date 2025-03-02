@@ -110,11 +110,22 @@
 }
 
 .my-gyms-header {
-  display: flex;
-  align-items: center;
-  position: relative;
+  display: grid;
+  gap: 10px;
 
-  
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 .my-gyms-text {

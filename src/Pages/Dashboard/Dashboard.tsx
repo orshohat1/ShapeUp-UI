@@ -161,22 +161,18 @@ const Dashboard: React.FC = () => {
             {gymsError ? (
               <p style={{ color: "red" }}>{gymsError}</p>
             ) : (
-              <>
-                {gyms?.map((gym: any) => (
-                  <div key={gym._id} className="gym-card">
-                    <GymBox
-                      gymName={gym.name}
-                      city={gym.city}
-                      onEdit={handleGymEdit}
-                      onDelete={handleGymDelete}
-                      onUpdatePrices={handleGymUpdatePrices}
-                      onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
-                    />
-                  </div>
-                ))}
-              </>
+              gyms?.map((gym: any) => (
+                <GymBox
+                  key={gym._id}
+                  gymName={gym.name}
+                  city={gym.city}
+                  onEdit={handleGymEdit}
+                  onDelete={handleGymDelete}
+                  onUpdatePrices={handleGymUpdatePrices}
+                  onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
+                />
+              ))
             )}
-            
           </div>
         </main>
       </div>

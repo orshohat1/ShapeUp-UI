@@ -30,7 +30,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         </div>
       </div>
       <p>{city}</p>
-      <Button onClick={onUpdatePrices} className="gym-box-button">
+      <Button type='primary' onClick={onUpdatePrices} className="gym-box-button">
         Update Prices
       </Button>
       <Button onClick={onGeneratePricingSuggestions} className="gym-box-button">
