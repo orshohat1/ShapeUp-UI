@@ -3,6 +3,14 @@ import { notification } from "antd";
 
 const GYMS_ROUTE = "/gyms";
 
+// interface Gym {
+//   _id: string;
+//   name: string;
+//   city: string;
+//   description: string;
+//   pictures: string[]; // Array of image URLs or File objects
+// }
+
 export const getGymsByOwner = async (ownerID: string) => {
   try {
     const response = await axiosInstance.get(`${GYMS_ROUTE}`, {
@@ -59,6 +67,48 @@ export const addGym = async (
 
     notification.error({
       message: "Adding Gym Failed",
+      description: errorMessage,
+      placement: "top",
+    });
+
+    throw error;
+  }
+
+};
+
+export const updateGymById = async (
+  formData: FormData,
+  gymId: string,
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `${GYMS_ROUTE}/${gymId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      }
+    );
+
+    notification.success({
+      message: "Gym edited successfully",
+      description: "The gym has been edited.",
+      placement: "top",
+    });
+
+    return response.data.gym;
+  } catch (error: any) {
+    let errorMessage = "Something went wrong. Please try again.";
+
+    if (error.response?.data?.message === "Validation array is not empty") {
+      errorMessage = "Please fill in all fields";
+    } else if (error.response?.data?.message) {
+      errorMessage = error.response?.data?.message;
+    }
+
+    notification.error({
+      message: "Editing Gym Failed",
       description: errorMessage,
       placement: "top",
     });

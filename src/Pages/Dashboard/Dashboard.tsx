@@ -7,7 +7,7 @@ import { Modal, Input, Button, notification } from "antd";
 import { getUserProfile } from "../../api/users";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
-import { getGymsByOwner, addGym } from "../../api/gym-owner";
+import { getGymsByOwner, addGym, updateGymById } from "../../api/gym-owner";
 import GymBox from '../../components/GymBox/GymBox';
 
 const Dashboard: React.FC = () => {
@@ -18,9 +18,10 @@ const Dashboard: React.FC = () => {
   const [loadingGyms, setLoadingGyms] = useState(true);
   const [gymsError, setGymsError] = useState(null);
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
+  const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
   const [gymData, setGymData] = useState({ name: "", city: "", description: "" });
-  const [gymImages, setGymImages] = useState<File[]>([]);
-
+  const [gymImages, setGymImages] = useState<any[]>([]);
+  const [selectedGym, setSelectedGym] = useState<any>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -86,6 +87,20 @@ const Dashboard: React.FC = () => {
     setGymImages([]);
   };
 
+  const handleOpenEditGymModal = (gym: any) => {
+    setSelectedGym(gym);
+    setGymData({ name: gym.name, city: gym.city, description: gym.description });
+    setGymImages(gym.pictures);
+    setIsEditGymModalVisible(true);
+  };
+
+  const handleCloseEditGymModal = () => {
+    setIsEditGymModalVisible(false);
+    setSelectedGym(null);
+    setGymData({ name: "", city: "", description: "" });
+    setGymImages([]);
+  };
+
   const handleGymDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setGymData({ ...gymData, [e.target.name]: e.target.value });
   };
@@ -96,9 +111,11 @@ const Dashboard: React.FC = () => {
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
+
     gymImages.forEach((image) => {
       formData.append("pictures", image);
     });
+
     try {
       if (!userProfile) {
         throw new Error("User profile not found");
@@ -114,9 +131,46 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleGymEdit = () => {
-    console.log('Edit clicked');
+  const handleUpdateGym = async () => {
+    const formData = new FormData();
+
+    formData.append("name", gymData.name);
+    formData.append("city", gymData.city);
+    formData.append("description", gymData.description);
+
+    if (gymImages.length === 0) {
+      notification.warning({
+        message: "Image Upload Minimum",
+        description: "At least one picture is required",
+        placement: "top",
+        duration: 3,
+      });
+      handleCloseEditGymModal();
+      return;
+    }
+
+    gymImages.forEach((image) => {
+      formData.append("pictures[]", image);
+    });
+
+    try {
+      if (!selectedGym) {
+        throw new Error("No gym selected for update");
+      }
+
+      const updatedGym = await updateGymById(formData, selectedGym._id);
+
+      setGyms((prevGyms: any) =>
+        prevGyms.map((gym: any) => (gym._id === selectedGym._id ? updatedGym : gym))
+      );
+
+      handleCloseEditGymModal();
+    } catch (error) {
+      console.error("Error updating gym:", error);
+    }
   };
+
+  const handleGymEdit = (gym: any) => handleOpenEditGymModal(gym);
 
   const handleGymDelete = () => {
     console.log('Delete clicked');
@@ -147,7 +201,6 @@ const Dashboard: React.FC = () => {
             <div className="user-info">
               <img src={userProfile?.avatarUrl} alt="avatar" className="user-avatar" />
               <span className="user-name">{userProfile?.firstName} {userProfile?.lastName}</span>
-
             </div>
           </div>
         </aside>
@@ -166,7 +219,7 @@ const Dashboard: React.FC = () => {
                   key={gym._id}
                   gymName={gym.name}
                   city={gym.city}
-                  onEdit={handleGymEdit}
+                  onEdit={() => handleGymEdit(gym)}
                   onDelete={handleGymDelete}
                   onUpdatePrices={handleGymUpdatePrices}
                   onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
@@ -205,7 +258,11 @@ const Dashboard: React.FC = () => {
             <div className="image-preview-container">
               {gymImages.map((image, index) => (
                 <div key={index} className="image-preview">
-                  <img src={URL.createObjectURL(image)} alt={`Gym Image ${index}`} />
+                  {/* Check if the image is a File object or a URL */}
+                  <img
+                    src={typeof image === "string" ? image : URL.createObjectURL(image)}
+                    alt={`Gym Image ${index}`}
+                  />
                   <button onClick={() => handleRemoveImage(index)} className="remove-image-btn">✖</button>
                 </div>
               ))}
@@ -215,6 +272,52 @@ const Dashboard: React.FC = () => {
 
         <div className="modal-actions" style={{ marginTop: "20px", textAlign: "right" }}>
           <Button type="primary" onClick={handleSaveGym} className="save-btn">Save</Button>
+        </div>
+      </Modal>
+
+      {/* Edit Gym Modal */}
+      <Modal
+        title="Edit Gym"
+        open={isEditGymModalVisible}
+        onCancel={handleCloseEditGymModal}
+        footer={null}
+        width={850}
+      >
+        <div style={{ display: "flex", gap: "20px" }}>
+          {/* Left Side - Gym Inputs */}
+          <div style={{ flex: "0 0 300px" }}>
+            <Input name="name" placeholder="Name" value={gymData.name} onChange={handleGymDataChange} className="modal-input" />
+            <Input name="city" placeholder="City" value={gymData.city} onChange={handleGymDataChange} className="modal-input" />
+            <Input.TextArea name="description" placeholder="Description" value={gymData.description} onChange={handleGymDataChange} className="modal-input" autoSize={{ minRows: 3, maxRows: 6 }} />
+          </div>
+
+          {/* Right Side - Image Upload */}
+          <div className="modal-image-upload" style={{ flex: 1 }}>
+            <p>Upload Gym Images (Max: 5)</p>
+
+            <label className="custom-file-upload">
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={gymImages.length >= 5} style={{ display: "none" }} />
+              <UploadOutlined style={{ fontSize: 24, cursor: "pointer" }} />
+            </label>
+
+            <div className="image-preview-container">
+              {gymImages.map((image, index) => (
+                <div key={index} className="image-preview">
+                  {/* Check if the image is a File object or a URL */}
+                  <img
+                    src={typeof image === "string" ? image : URL.createObjectURL(image)}
+                    alt={`Gym Image ${index}`}
+                  />
+                  <button onClick={() => handleRemoveImage(index)} className="remove-image-btn">✖</button>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
+
+        <div className="modal-actions" style={{ marginTop: "20px", textAlign: "right" }}>
+          <Button type="primary" onClick={handleUpdateGym} className="save-btn">Save Changes</Button>
         </div>
       </Modal>
     </div>
