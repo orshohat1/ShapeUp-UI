@@ -3,14 +3,6 @@ import { notification } from "antd";
 
 const GYMS_ROUTE = "/gyms";
 
-// interface Gym {
-//   _id: string;
-//   name: string;
-//   city: string;
-//   description: string;
-//   pictures: string[]; // Array of image URLs or File objects
-// }
-
 export const getGymsByOwner = async (ownerID: string) => {
   try {
     const response = await axiosInstance.get(`${GYMS_ROUTE}`, {
