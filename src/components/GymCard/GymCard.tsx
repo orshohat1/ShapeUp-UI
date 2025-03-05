@@ -1,17 +1,27 @@
 import React from "react";
-import { HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "./GymCard.less";
 
 interface GymCardProps {
+  gymId: string;
   gymName: string;
   city: string;
-  rating: number;
-  reviews: number;
-  pricing: Record<string, string>;
+  rating: string;
+  reviewsCount: number;
   images: string[];
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }
 
-const GymCard: React.FC<GymCardProps> = ({ gymName, city, rating, reviews, pricing, images }) => {
+const GymCard: React.FC<GymCardProps> = ({
+  gymName,
+  city,
+  rating,
+  reviewsCount,
+  images,
+  isFavorite,
+  onToggleFavorite,
+}) => {
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
   const handleNext = () => {
@@ -26,17 +36,14 @@ const GymCard: React.FC<GymCardProps> = ({ gymName, city, rating, reviews, prici
     <div className="gym-card">
       <div className="gym-header">
         <h3>{gymName}</h3>
-        <HeartOutlined className="favorite-icon" />
+        {isFavorite ? (
+          <HeartFilled className="favorite-icon active" onClick={onToggleFavorite} />
+        ) : (
+          <HeartOutlined className="favorite-icon" onClick={onToggleFavorite} />
+        )}
       </div>
-      <p className="gym-location">Location: {city}</p>
-      <p className="gym-rating">Rating: {rating} ⭐ ({reviews} reviews)</p>
-      
-      <p className="gym-pricing-title">Pricing:</p>
-      <ul className="gym-pricing">
-        {Object.entries(pricing).map(([key, value]) => (
-          <li key={key}>{key}: {value}</li>
-        ))}
-      </ul>
+      <p className="gym-location">📍 {city}</p>
+      <p className="gym-rating">⭐ {rating} ({reviewsCount} reviews)</p>
 
       <div className="gym-image-slider">
         <LeftOutlined onClick={handlePrev} className="slider-arrow" />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
+import { getUserProfile, addFavoriteGym, removeFavoriteGym } from "../../../api/users";
 import GymCard from "../../../components/GymCard/GymCard";
 import { Button, Pagination, Spin, Alert } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
@@ -7,16 +8,25 @@ import "./GymsList.less";
 
 const GymsList: React.FC = () => {
   const [gyms, setGyms] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const gymsPerPage = 6;
 
   useEffect(() => {
-    const fetchGyms = async () => {
+    const fetchData = async () => {
       try {
         const fetchedGyms = await getGyms();
         setGyms(fetchedGyms);
+
+
+        try {
+          const userData = await getUserProfile();
+          setUser(userData);
+        } catch {
+          setUser(null); 
+        }
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load gyms.");
       } finally {
@@ -24,7 +34,7 @@ const GymsList: React.FC = () => {
       }
     };
 
-    fetchGyms();
+    fetchData();
   }, []);
 
   if (loading) return <Spin size="large" className="loading-spinner" />;
@@ -34,10 +44,26 @@ const GymsList: React.FC = () => {
   const indexOfFirstGym = indexOfLastGym - gymsPerPage;
   const currentGyms = gyms.slice(indexOfFirstGym, indexOfLastGym);
 
+  const toggleFavorite = async (gymId: string) => {
+    if (!user) return; 
+
+    try {
+      if (user.favoriteGyms.includes(gymId)) {
+        await removeFavoriteGym(user._id, gymId);
+        setUser({ ...user, favoriteGyms: user.favoriteGyms.filter((id:string) => id !== gymId) });
+      } else {
+        await addFavoriteGym(user._id, gymId);
+        setUser({ ...user, favoriteGyms: [...user.favoriteGyms, gymId] });
+      }
+    } catch (err) {
+      console.error("Failed to update favorites", err);
+    }
+  };
+
   return (
     <div className="gyms-container">
       <div className="header">
-        <div className="profile">👤 Hello, Ron Cohen!</div>
+        {user && <div className="profile">👤 Hello, <strong>{user.firstName}</strong>!</div>}
         <div className="actions">
           <Button>Filter</Button>
           <Button>Recommend</Button>
@@ -49,12 +75,14 @@ const GymsList: React.FC = () => {
         {currentGyms.map((gym) => (
           <GymCard
             key={gym._id}
+            gymId={gym._id}
             gymName={gym.name}
             city={gym.city}
-            rating={gym.rating || 4.5}
-            reviews={gym.reviews || 12}
-            pricing={{ "1 day": "$5", "3 days": "$10", "5 days": "$14", "7 days": "$18" }}
+            rating={gym.rating || "No ratings yet"}
+            reviewsCount={gym.reviews?.length || 0}
             images={gym.pictures || ["/default-gym.jpg"]}
+            isFavorite={user ? user.favoriteGyms.includes(gym._id) : false}
+            onToggleFavorite={() => toggleFavorite(gym._id)}
           />
         ))}
       </div>

@@ -1,57 +1,84 @@
-.gym-card {
-    width: 300px;
-    padding: 15px;
-    border-radius: 10px;
+.gyms-container {
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 22px; 
+  }
+  
+  .actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .gyms-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); 
+    gap: 30px;
+    justify-content: center;
+  }
+  
+  .gym-card {
+    width: 100%;
+    max-width: 550px;
+    padding: 25px;
+    border-radius: 12px;
     background: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     text-align: left;
-    font-family: Arial, sans-serif;
+    transition: transform 0.2s ease-in-out;
+  
+    &:hover {
+      transform: scale(1.02);
+    }
   
     .gym-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 20px;
     }
   
     .favorite-icon {
-      font-size: 20px;
+      font-size: 26px;
       cursor: pointer;
       color: gray;
   
-      &:hover {
+      &.active {
         color: red;
       }
     }
   
-    .gym-location, .gym-rating, .gym-pricing-title {
-      margin: 5px 0;
-      font-size: 14px;
+    .gym-location,
+    .gym-rating {
+      margin: 10px 0;
+      font-size: 18px;
       color: #555;
-    }
-  
-    .gym-pricing {
-      list-style-type: none;
-      padding: 0;
-      font-size: 14px;
     }
   
     .gym-image-slider {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 10px;
+      margin-top: 15px;
   
       .slider-arrow {
-        font-size: 20px;
+        font-size: 24px;
         cursor: pointer;
-        margin: 0 10px;
+        margin: 0 15px;
       }
   
       .gym-image {
-        width: 80px;
-        height: 80px;
+        width: 100%;
+        height: 250px; 
         object-fit: cover;
-        border-radius: 5px;
+        border-radius: 10px;
       }
     }
   }
