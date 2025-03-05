@@ -65,10 +65,12 @@ const GymCard: React.FC<GymCardProps> = ({
       <p className="gym-location">📍 {city}</p>
       <p className="gym-rating">
         ⭐ {rating}{" "}
-        <span style={{ cursor: reviewsCount > 0 ? "pointer" : "default" }}>
+        <span
+          style={{ cursor: reviewsCount > 0 ? "pointer" : "default" }}
+          onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
+        >
           (
           <span
-            onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
             style={{
               textDecoration: reviewsCount > 0 ? "underline" : "none",
               color: "inherit",
