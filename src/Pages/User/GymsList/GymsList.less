@@ -1,0 +1,39 @@
+.gyms-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .profile {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .settings-icon {
+    font-size: 22px;
+    cursor: pointer;
+  }
+}
+
+.gyms-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.pagination {
+  margin-top: 20px;
+}
