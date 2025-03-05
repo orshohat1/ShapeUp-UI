@@ -65,20 +65,20 @@ const GymCard: React.FC<GymCardProps> = ({
       <p className="gym-location">📍 {city}</p>
       <p className="gym-rating">
         ⭐ {rating}{" "}
-        <span
-          style={{
-            cursor: reviewsCount > 0 ? "pointer" : "default",
-          }}
-          onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
-        >
-          (<span style={{ textDecoration: reviewsCount > 0 ? "underline" : "none" }}>
+        <span style={{ cursor: reviewsCount > 0 ? "pointer" : "default" }}>
+          (
+          <span
+            onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
+            style={{
+              textDecoration: reviewsCount > 0 ? "underline" : "none",
+              color: "inherit",
+            }}
+          >
             {reviewsCount}
-          </span>)
-        </span>{" "}
-        reviews
+          </span>{" "}
+          reviews)
+        </span>
       </p>
-
-
       {/* Image Slider */}
       <div className="gym-image-slider">
         <LeftOutlined onClick={handlePrev} className="slider-arrow" />
