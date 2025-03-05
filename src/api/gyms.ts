@@ -19,7 +19,7 @@ export const getGyms = async () => {
     for (let gym of gyms) {
       try {
         const reviewResponse = await axiosInstance.get(`${REVIEWS_ROUTE}/gym/${gym._id}`, {
-          withCredentials: true, // Ensure authentication is included
+          withCredentials: true, 
         });
 
         const reviews: Review[] = reviewResponse.data.reviews || [];

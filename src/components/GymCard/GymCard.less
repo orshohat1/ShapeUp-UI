@@ -1,85 +1,87 @@
-.gyms-container {
-    max-width: 1200px; 
-    margin: 0 auto;
-    padding: 20px;
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@bg-white: #ffffff;
+@border-light: #e5e7eb;
+@text-gray: #6b7280;
+@shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+.gym-card {
+  background-color: @bg-white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: @shadow;
+  transition: transform 0.2s ease-in-out;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  &:hover {
+    transform: scale(1.03);
   }
-  
-  .header {
+
+  .gym-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    font-size: 22px; 
-  }
-  
-  .actions {
-    display: flex;
-    gap: 12px;
-  }
-  
-  .gyms-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); 
-    gap: 30px;
-    justify-content: center;
-  }
-  
-  .gym-card {
     width: 100%;
-    max-width: 550px;
-    padding: 25px;
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-    text-align: left;
-    transition: transform 0.2s ease-in-out;
-  
-    &:hover {
-      transform: scale(1.02);
-    }
-  
-    .gym-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    padding-bottom: 10px;
+
+    .gym-name {
       font-size: 20px;
+      font-weight: bold;
     }
-  
+
     .favorite-icon {
-      font-size: 26px;
+      font-size: 24px;
       cursor: pointer;
       color: gray;
-  
+
       &.active {
         color: red;
       }
     }
-  
-    .gym-location,
-    .gym-rating {
-      margin: 10px 0;
-      font-size: 18px;
-      color: #555;
+  }
+
+  .gym-location {
+    font-size: 16px;
+    color: @text-gray;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .gym-rating {
+    font-size: 16px;
+    color: @text-gray;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .gym-image-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    position: relative;
+    width: 100%;
+    max-height: 250px;
+
+    .slider-arrow {
+      font-size: 22px;
+      cursor: pointer;
+      margin: 0 12px;
     }
-  
-    .gym-image-slider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 15px;
-  
-      .slider-arrow {
-        font-size: 24px;
-        cursor: pointer;
-        margin: 0 15px;
-      }
-  
-      .gym-image {
-        width: 100%;
-        height: 250px; 
-        object-fit: cover;
-        border-radius: 10px;
-      }
+
+    .gym-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
     }
   }
-  
+}

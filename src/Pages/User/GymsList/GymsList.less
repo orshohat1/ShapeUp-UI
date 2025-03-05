@@ -1,39 +1,107 @@
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@bg-white: #ffffff;
+@border-light: #e5e7eb;
+@text-gray: #6b7280;
+
+/* Entire Layout */
 .gyms-container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
+  display: flex;
+  height: 100vh;
+  background-color: @bg-light;
 }
 
+/* Sidebar */
+.sidebar {
+  background-color: @blue-primary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  flex-shrink: 0;
+  width: 230px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 230px;
+  width: calc(100% - 230px);
+  padding: 2rem;
+  background-color: @bg-light;
+}
+
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  min-height: 60px;
+}
+
+/* Ensures header aligns with gym cards */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin-bottom: 20px;
+}
 
-  .profile {
-    font-size: 18px;
-    font-weight: bold;
-  }
+/* User Profile */
+.profile {
+  display: flex;
+  align-items: center;
 
-  .actions {
-    display: flex;
-    gap: 10px;
-  }
-
-  .settings-icon {
-    font-size: 22px;
-    cursor: pointer;
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
   }
 }
 
+/* Toolbar */
+.actions {
+  display: flex;
+  gap: 15px; /* Adds spacing */
+}
+
+/* Gym Cards Grid */
 .gyms-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  justify-items: center;
+  grid-template-columns: repeat(3, minmax(350px, 1fr));
+  gap: 25px;
+  justify-content: center;
+  padding-top: 20px;
 }
 
-.pagination {
-  margin-top: 20px;
+/* Gym Card */
+.gym-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  width: 100%;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+}
+
+/* Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
 }
