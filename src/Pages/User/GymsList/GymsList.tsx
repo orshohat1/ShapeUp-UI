@@ -4,7 +4,6 @@ import { getUserProfile, addFavoriteGym, removeFavoriteGym } from "../../../api/
 import GymCard from "../../../components/GymCard/GymCard";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import { Button, Pagination, Spin, Alert } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
 import "./GymsList.less";
 
 const GymsList: React.FC = () => {
