@@ -73,7 +73,6 @@ const GymsList: React.FC = () => {
           <div className="actions">
             <Button>Filter</Button>
             <Button>Favorites</Button>
-            <SettingOutlined className="settings-icon" />
           </div>
         </div>
 
