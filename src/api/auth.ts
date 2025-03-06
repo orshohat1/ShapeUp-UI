@@ -10,7 +10,7 @@ export const login = async (email: string, password: string) => {
       password,
     }, { withCredentials: true });
     return response.data;
-  } catch (error:any) {
+  } catch (error: any) {
     notification.error({
       message: "Login Failed",
       description: error.response?.data?.message || "Something went wrong. Please try again.",
@@ -51,7 +51,7 @@ export const register = async (
       { withCredentials: true }
     );
     return response.data;
-  } catch (error:any) {
+  } catch (error: any) {
     notification.error({
       message: "Registration Failed",
       description: error.response?.data?.message || "Something went wrong. Please try again.",
