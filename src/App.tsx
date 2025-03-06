@@ -5,6 +5,7 @@ import Register from "./Pages/Register/Register";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import LoginUser from "./Pages/User/Login/LoginUser";
 import RegisterUser from "./Pages/User/Register/RegisterUser";
+import GymsList from "./Pages/User/GymsList/GymsList";
 import { UserProfileProvider } from "./context/UserProfileProvider";
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user/login" element={<LoginUser />} />
           <Route path="/user/register" element={<RegisterUser />} />
+          <Route path="/gyms" element={<GymsList />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </BrowserRouter>

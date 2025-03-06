@@ -1,0 +1,93 @@
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@bg-white: #ffffff;
+@border-light: #e5e7eb;
+@text-gray: #6b7280;
+@shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+.gym-card {
+  background-color: @bg-white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: @shadow;
+  transition: transform 0.2s ease-in-out;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  .gym-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 10px;
+
+    .gym-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .favorite-icon {
+      font-size: 24px;
+      cursor: pointer;
+      color: gray;
+
+      &.active {
+        color: red;
+      }
+    }
+  }
+
+  .gym-location {
+    font-size: 16px;
+    color: @text-gray;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .gym-rating {
+    font-size: 16px;
+    color: @text-gray;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #0056b3;
+    }
+  }
+
+  .gym-image-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    position: relative;
+    width: 100%;
+    max-height: 250px;
+
+    .slider-arrow {
+      font-size: 22px;
+      cursor: pointer;
+      margin: 0 12px;
+    }
+
+    .gym-image {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+  }
+}
