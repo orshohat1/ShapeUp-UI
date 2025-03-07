@@ -11,7 +11,7 @@
   flex-shrink: 0;
   border-radius: 0 8px 8px 0;
   z-index: 10;
-  width: 220px !important;
+  width: 250px !important;
   height: 100vh;
   text-align: center;
   padding: 15px 10px !important;
@@ -27,7 +27,6 @@
     border-radius: 5px;
   }
 
-
   .menu {
     width: 100%;
     display: flex;
@@ -35,7 +34,7 @@
     align-items: center;
     row-gap: 1rem;
   }
-  
+
   .menu-item {
     background-color: white;
     padding: 10px 15px;
@@ -53,7 +52,7 @@
       margin-right: auto;
     }
   }
-  
+
   .menu-item.active {
     background-color: #0056b3;
     color: white;
@@ -76,7 +75,7 @@
       margin-top: 1rem;
       width: 100%;
       justify-content: space-between;
-      padding: 15px;
+      padding: 15px 10px;
       background: rgba(255, 255, 255, 0.1);
 
       .user-avatar {
@@ -91,11 +90,24 @@
         font-size: 0.8rem;
         font-weight: 600;
         color: @bg-light;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 76px;
+        display: block;
       }
 
       .user-actions-container {
-        display: flex;
-        gap: 0.5rem;  
+        .icon-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .icon-button:hover {
+          color: white;
+        }
       }
     }
   }
