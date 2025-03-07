@@ -1,36 +1,40 @@
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@border-light: #e5e7eb;
+
 .sidebar {
-    background-color: #768ebd;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
-    height: 100vh;
-    width: 220px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 100;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .logo-container {
+  background-color: @blue-primary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  flex-shrink: 0;
+  border-radius: 0 8px 8px 0;
+  z-index: 10;
+  width: 250px !important;
+  height: 100vh;
+  text-align: center;
+  padding: 15px 10px !important;
+
+  .logo {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  
-    .logo {
-      max-width: 150px;
-    }
+    height: 100px;
   }
-  
+
+  .dashboard {
+    background-color: white;
+    width: 180px;
+    border-radius: 5px;
+  }
+
   .menu {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    row-gap: 1rem;
   }
-  
+
   .menu-item {
     background-color: white;
     padding: 10px 15px;
@@ -42,33 +46,70 @@
     width: 80%;
     text-align: center;
     justify-content: center;
+
+    .item-title {
+      margin-left: 0;
+      margin-right: auto;
+      color: purple;
+    }
   }
-  
+
   .menu-item.active {
     background-color: #0056b3;
     color: white;
   }
-  
-  .user-info {
+
+  .aside-bottom-container {
     margin-top: auto;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
+    text-align: center;
+
+    .divider {
+      width: 100%;
+      height: 2px;
+      background-color: @border-light;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+      width: 100%;
+      justify-content: space-between;
+      padding: 15px 10px;
+      background: rgba(255, 255, 255, 0.1);
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: @bg-light;
+        margin-right: 0.5rem;
+      }
+
+      .user-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: @bg-light;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 76px;
+        display: block;
+      }
+
+      .user-actions-container {
+        .icon-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .icon-button:hover {
+          color: white;
+        }
+      }
+    }
   }
-  
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-  }
-  
-  .user-name {
-    font-size: 14px;
-    color: white;
-  }
-  
+}

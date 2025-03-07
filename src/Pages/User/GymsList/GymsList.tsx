@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
-import { getUserProfile, addFavoriteGym, removeFavoriteGym } from "../../../api/users";
+import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
 import GymCard from "../../../components/GymCard/GymCard";
-import Sidebar from "../../../components/Sidebar/Sidebar";
 import { Button, Pagination, Spin, Alert } from "antd";
 import "./GymsList.less";
 
@@ -37,7 +36,8 @@ const GymsList: React.FC = () => {
   }, []);
 
   if (loading) return <Spin size="large" className="loading-spinner" />;
-  if (error) return <Alert message="Error" description={error} type="error" showIcon />;
+  if (error)
+    return <Alert message="Error" description={error} type="error" showIcon />;
 
   const indexOfLastGym = currentPage * gymsPerPage;
   const indexOfFirstGym = indexOfLastGym - gymsPerPage;
@@ -47,7 +47,7 @@ const GymsList: React.FC = () => {
     if (!user) return;
 
     try {
-      if (user.favoriteGyms.includes(gymId)) {
+      if (user.favoriteGyms?.includes(gymId)) {
         await removeFavoriteGym(user._id, gymId);
         setUser({ ...user, favoriteGyms: user.favoriteGyms.filter((id: string) => id !== gymId) });
       } else {
@@ -61,8 +61,6 @@ const GymsList: React.FC = () => {
 
   return (
     <div className="gyms-container">
-      <Sidebar user={user} />
-
       <div className="main-content">
         <div className="header">
           <div className="profile">
@@ -85,7 +83,7 @@ const GymsList: React.FC = () => {
               rating={gym.rating || "No ratings yet"}
               reviewsCount={gym.reviewsCount || 0}
               images={gym.pictures || ["/default-gym.jpg"]}
-              isFavorite={user ? user.favoriteGyms.includes(gym._id) : false}
+              isFavorite={user ? user?.favoriteGyms?.includes(gym._id) : false}
               onToggleFavorite={() => toggleFavorite(gym._id)}
             />
           ))}

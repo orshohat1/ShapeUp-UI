@@ -8,10 +8,12 @@ export interface UserProfile {
     lastName: string;
     role: string;
     street: string;
+    city: string;
     id: string;
 }
 
 export interface UserProfileContextType {
   userProfile: UserProfile | null;
-  setUserProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
+  refreshUserProfile: () => void;
+  logout: () => void;
 }

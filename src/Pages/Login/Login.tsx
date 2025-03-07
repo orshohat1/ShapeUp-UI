@@ -6,12 +6,14 @@ const { Content } = Layout;
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "../../context/useUserProfile";
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const navigate = useNavigate();
+  const { refreshUserProfile } = useUserProfile();
 
   useEffect(() => {
     form
@@ -28,8 +30,8 @@ const Login: React.FC = () => {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.email && values.password) {
       try {
-        const data = await login(values.email, values.password);
-        console.log("Login successful:", data);
+        await login(values.email, values.password);
+        refreshUserProfile();
         navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);

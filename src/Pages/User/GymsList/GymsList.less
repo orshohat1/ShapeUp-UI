@@ -11,24 +11,18 @@
   background-color: @bg-light;
 }
 
-/* Sidebar */
-.sidebar {
-  background-color: @blue-primary;
+.loading-spinner {
   display: flex;
-  flex-direction: column;
+  height: 100%;
+  width: 100%;
   align-items: center;
-  padding: 1rem 0;
-  flex-shrink: 0;
-  width: 230px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
+  justify-content: center;
 }
 
 /* Main Content */
 .main-content {
-  margin-left: 230px;
+  margin-right: auto;
+  margin-left: auto;
   width: calc(100% - 230px);
   padding: 2rem;
   background-color: @bg-light;
