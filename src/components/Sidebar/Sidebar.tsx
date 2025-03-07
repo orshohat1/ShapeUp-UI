@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Sidebar.less";
 import logo from "../../assets/Logo/shape-up.png";
 import {
@@ -9,19 +9,20 @@ import {
 } from "@ant-design/icons";
 import { useUserProfile } from "../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
+import UpdateProfileModal from "../UpdateProfileModal/UpdateProfileModal";
 
 const Sidebar: React.FC<{ user?: any }> = () => {
-  const { userProfile } = useUserProfile();
+  const { userProfile, logout } = useUserProfile();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleEdit = () => {
-    console.log("Edit clicked!");
-    // Add edit functionality
+    setIsModalOpen(true);
   };
 
-  const handleLogout = () => {
-    console.log("Logout clicked!");
-    // Add logout functionality
+  const handleLogout = async () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -69,6 +70,8 @@ const Sidebar: React.FC<{ user?: any }> = () => {
           </div>
         </div>
       </div>
+
+      <UpdateProfileModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </aside>
   );
 };

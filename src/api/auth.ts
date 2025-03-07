@@ -60,3 +60,16 @@ export const register = async (
     throw error;
   }
 };
+
+export const logoutServer = async () => {
+  try {
+    await axiosInstance.post(`${AUTH_ROUTE}/logout`, {}, { withCredentials: true });
+  } catch (error: any) {
+    notification.error({
+      message: "Logout Failed",
+      description: error.response?.data?.message || "Something went wrong. Please try again.",
+      placement: "top",
+    });
+    throw error;
+  }
+}
