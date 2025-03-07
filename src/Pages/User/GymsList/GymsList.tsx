@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
-import { getUserProfile, addFavoriteGym, removeFavoriteGym } from "../../../api/users";
+import { addFavoriteGym, removeFavoriteGym } from "../../../api/users";
 import GymCard from "../../../components/GymCard/GymCard";
-import Sidebar from "../../../components/Sidebar/Sidebar";
 import { Button, Pagination, Spin, Alert } from "antd";
 import "./GymsList.less";
+import { useUserProfile } from "../../../context/useUserProfile";
 
 const GymsList: React.FC = () => {
   const [gyms, setGyms] = useState<any[]>([]);
@@ -13,19 +13,13 @@ const GymsList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const gymsPerPage = 6;
+  const { userProfile } = useUserProfile();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const fetchedGyms = await getGyms();
         setGyms(fetchedGyms);
-
-        try {
-          const userData = await getUserProfile();
-          setUser(userData);
-        } catch {
-          setUser(null);
-        }
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load gyms.");
       } finally {
@@ -36,20 +30,38 @@ const GymsList: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (userProfile) {
+      setUser((prevUser: any) => {
+        if (prevUser?.favoriteGyms === userProfile.favoriteGyms) {
+          console.log("User profile updated, but favoriteGyms are the same", prevUser);
+          return prevUser;
+        }
+
+        console.log("User profile updated, updating favoriteGyms", { ...userProfile, favoriteGyms: prevUser?.favoriteGyms || null });
+        return { ...userProfile, favoriteGyms: prevUser?.favoriteGyms || null };
+      });
+    }
+  }, [userProfile]);
+
   if (loading) return <Spin size="large" className="loading-spinner" />;
-  if (error) return <Alert message="Error" description={error} type="error" showIcon />;
+  if (error)
+    return <Alert message="Error" description={error} type="error" showIcon />;
 
   const indexOfLastGym = currentPage * gymsPerPage;
   const indexOfFirstGym = indexOfLastGym - gymsPerPage;
   const currentGyms = gyms.slice(indexOfFirstGym, indexOfLastGym);
 
   const toggleFavorite = async (gymId: string) => {
-    if (!user) return;
+    if (!userProfile) return;
 
     try {
-      if (user.favoriteGyms.includes(gymId)) {
+      if (user.favoriteGyms?.includes(gymId)) {
         await removeFavoriteGym(user._id, gymId);
-        setUser({ ...user, favoriteGyms: user.favoriteGyms.filter((id: string) => id !== gymId) });
+        setUser({
+          ...user,
+          favoriteGyms: user.favoriteGyms.filter((id: string) => id !== gymId),
+        });
       } else {
         await addFavoriteGym(user._id, gymId);
         setUser({ ...user, favoriteGyms: [...user.favoriteGyms, gymId] });
@@ -61,8 +73,6 @@ const GymsList: React.FC = () => {
 
   return (
     <div className="gyms-container">
-      <Sidebar user={user} />
-
       <div className="main-content">
         <div className="header">
           <div className="profile">
@@ -85,7 +95,7 @@ const GymsList: React.FC = () => {
               rating={gym.rating || "No ratings yet"}
               reviewsCount={gym.reviewsCount || 0}
               images={gym.pictures || ["/default-gym.jpg"]}
-              isFavorite={user ? user.favoriteGyms.includes(gym._id) : false}
+              isFavorite={user ? user?.favoriteGyms?.includes(gym._id) : false}
               onToggleFavorite={() => toggleFavorite(gym._id)}
             />
           ))}

@@ -5,12 +5,17 @@ import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input } from "antd";
 import { login } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
+import { getUserProfile } from "../../../api/users";
+import { useUserProfile } from "../../../context/useUserProfile";
+import { useNavigate } from "react-router-dom";
 const { Content } = Layout;
 
 const LoginUser: React.FC = () => {
   const [form] = Form.useForm();
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
+  const { setUserProfile } = useUserProfile();
+  const navigate = useNavigate();
 
   useEffect(() => {
     form
@@ -29,7 +34,25 @@ const LoginUser: React.FC = () => {
       try {
         const data = await login(values.email, values.password);
         console.log("Login successful:", data);
-        // You can handle login success, store tokens, etc.
+        console.log("Fetching user profile...");
+        const userProfileData = await getUserProfile();
+
+        const userProfile = {
+          avatarUrl: userProfileData.avatarUrl,
+          birthdate: userProfileData.birthdate,
+          email: userProfileData.email,
+          favoriteGyms: userProfileData.favoriteGyms || [],
+          firstName: userProfileData.firstName,
+          gender: userProfileData.gender,
+          lastName: userProfileData.lastName,
+          role: userProfileData.role,
+          id: userProfileData._id,
+          street: userProfileData.street,
+        };
+
+        setUserProfile(userProfile);
+        console.log("User profile fetched:", userProfileData);
+        navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);
         // Handle error (e.g., show error message)
@@ -40,7 +63,6 @@ const LoginUser: React.FC = () => {
   const handleGoogleLogin = async () => {
     window.location.href = "http://localhost:3000/users/auth/google";
   };
-
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
@@ -99,9 +121,12 @@ const LoginUser: React.FC = () => {
             <Input.Password className="login-input" placeholder="Password " />
           </Form.Item>
 
-          <Button className="google-login-button" 
-            onClick={handleGoogleLogin}>
-            <img src={googleLogo} alt="Google" style={{ width: "20px", height: "20px" }} />
+          <Button className="google-login-button" onClick={handleGoogleLogin}>
+            <img
+              src={googleLogo}
+              alt="Google"
+              style={{ width: "20px", height: "20px" }}
+            />
             Sign In with Google
           </Button>
 

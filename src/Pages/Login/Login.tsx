@@ -6,12 +6,15 @@ const { Content } = Layout;
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "../../context/useUserProfile";
+import { getUserProfile } from "../../api/users";
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const navigate = useNavigate();
+  const { setUserProfile } = useUserProfile();
 
   useEffect(() => {
     form
@@ -30,6 +33,25 @@ const Login: React.FC = () => {
       try {
         const data = await login(values.email, values.password);
         console.log("Login successful:", data);
+        console.log("Fetching user profile...");
+        const userProfileData = await getUserProfile();
+
+        const userProfile = {
+          _id: userProfileData._id,
+          avatarUrl: userProfileData.avatarUrl,
+          birthdate: userProfileData.birthdate,
+          email: userProfileData.email,
+          favoriteGyms: userProfileData.favoriteGyms || [],
+          firstName: userProfileData.firstName,
+          gender: userProfileData.gender,
+          lastName: userProfileData.lastName,
+          role: userProfileData.role,
+          id: userProfileData._id,
+          street: userProfileData.street,
+        }
+
+        setUserProfile(userProfile);
+        console.log("User profile fetched:", userProfileData);
         navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);
