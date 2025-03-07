@@ -34,19 +34,31 @@ const Sidebar: React.FC<{ user?: any }> = () => {
       <div className="menu">
         {userProfile?.role === "gym_owner" ||
           (userProfile?.role === "user" && (
-            <div className="menu-item" onClick={() => navigate("/dashboard")}>
-              <DotChartOutlined style={{ marginRight: "auto" }} />
+            <div className="menu-item">
+              <div style={{ marginRight: "auto" }}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 100 100"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="30" cy="30" r="10" fill="purple" />
+                  <circle cx="70" cy="30" r="10" fill="purple" />
+                  <circle cx="30" cy="70" r="10" fill="purple" />
+                  <circle cx="70" cy="70" r="10" fill="purple" />
+                </svg>
+              </div>
               <span className="item-title">Dashboard</span>
             </div>
           ))}
 
-        {userProfile?.role === "gym_owner" ||
+        {/* {userProfile?.role === "gym_owner" ||
           (userProfile?.role === "user" && (
             <div className="menu-item" onClick={() => navigate("/gyms")}>
               <HomeOutlined style={{ marginRight: "auto" }} />
               <span className="item-title">Gyms</span>
             </div>
-          ))}
+          ))} */}
       </div>
 
       <div className="aside-bottom-container">
@@ -71,7 +83,10 @@ const Sidebar: React.FC<{ user?: any }> = () => {
         </div>
       </div>
 
-      <UpdateProfileModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <UpdateProfileModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </aside>
   );
 };
