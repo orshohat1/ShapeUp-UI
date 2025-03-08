@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from "react";
 import "./Register.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
-import { UploadOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import {
   Layout,
   Button,
@@ -26,6 +27,7 @@ const Register: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
   const gymOwnerDocumentFileRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     form
@@ -81,8 +83,8 @@ const Register: React.FC = () => {
           avatarFile,
           gymOwnerDocumentFile
         );
-        // Instead of message -> redirect to home page
         message.success("Registration successful");
+        navigate("/dashboard");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
         message.error("Registration failed: " + errorMsg);
@@ -204,7 +206,9 @@ const Register: React.FC = () => {
                   className="register-input"
                   format="DD-MM-YYYY"
                   allowClear
-                  disabledDate={(current) => current && current.isAfter(dayjs())}
+                  disabledDate={(current) =>
+                    current && current.isAfter(dayjs())
+                  }
                 />
               </Form.Item>
             </Col>
@@ -280,10 +284,10 @@ const Register: React.FC = () => {
                   maxCount={1}
                 >
                   <p className="ant-upload-drag-icon">
-                    <UploadOutlined />
+                    <FileTextOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag file to this area to upload
+                    Upload gym owner license here
                   </p>
                 </Upload.Dragger>
               </Form.Item>
@@ -301,7 +305,7 @@ const Register: React.FC = () => {
                     <UserOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag file to this area to upload
+                    Upload avatar profile image here
                   </p>
                 </Upload.Dragger>
               </Form.Item>
