@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
 import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
 import GymCard from "../../../components/GymCard/GymCard";
-import { Button, Pagination, Spin, Alert } from "antd";
+import { Button, Pagination, Spin, Alert, Modal } from "antd";
 import "./GymsList.less";
 
 const GymsList: React.FC = () => {
@@ -11,6 +11,7 @@ const GymsList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false); // Modal visibility state
   const gymsPerPage = 6;
 
   useEffect(() => {
@@ -59,6 +60,14 @@ const GymsList: React.FC = () => {
     }
   };
 
+  const openFavoritesModal = () => {
+    setFavoritesModalVisible(true);
+  };
+
+  const closeFavoritesModal = () => {
+    setFavoritesModalVisible(false);
+  };
+
   return (
     <div className="gyms-container">
       <div className="main-content">
@@ -69,7 +78,7 @@ const GymsList: React.FC = () => {
           </div>
           <div className="actions">
             <Button>Filter</Button>
-            <Button>Favorites</Button>
+            <Button onClick={openFavoritesModal}>Favorites</Button>
           </div>
         </div>
 
@@ -99,6 +108,36 @@ const GymsList: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Favorites Modal */}
+      <Modal
+        title="My Favorite Gyms"
+        open={isFavoritesModalVisible}
+        onCancel={closeFavoritesModal}
+        footer={null}
+      >
+        <div className="favorites-list">
+          {user?.favoriteGyms?.length ? (
+            gyms
+              .filter((gym) => user.favoriteGyms.includes(gym._id))
+              .map((gym) => (
+                <GymCard
+                  key={gym._id}
+                  gymId={gym._id}
+                  gymName={gym.name}
+                  city={gym.city}
+                  rating={gym.rating || "No ratings yet"}
+                  reviewsCount={gym.reviewsCount || 0}
+                  images={gym.pictures || ["/default-gym.jpg"]}
+                  isFavorite={true}
+                  onToggleFavorite={() => toggleFavorite(gym._id)}
+                />
+              ))
+          ) : (
+            <p>No favorite gyms added yet :(</p>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
