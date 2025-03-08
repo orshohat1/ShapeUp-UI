@@ -13,6 +13,7 @@ interface GymCardProps {
   images: string[];
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  onReviewAdded: (gymId: string) => void;
 }
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -24,24 +25,30 @@ const GymCard: React.FC<GymCardProps> = ({
   images,
   isFavorite,
   onToggleFavorite,
+  onReviewAdded,
 }) => {
   const [reviews, setReviews] = useState([] as any[]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [localReviewsCount, setLocalReviewsCount] = useState(reviewsCount);
+  const [averageRating, setAverageRating] = useState(parseFloat(rating));
 
   useEffect(() => {
-    if (reviewsCount > 0) {
-      const fetchReviews = async () => {
-        try {
-          const fetchedReviews = await getGymReviews(gymId);
-          setReviews(fetchedReviews);
-        } catch (error) {
-          console.error("Failed to load reviews", error);
-        }
-      };
-      fetchReviews();
-    }
+    const fetchReviews = async () => {
+      try {
+        const fetchedReviews = await getGymReviews(gymId);
+        setReviews(fetchedReviews);
+
+        setLocalReviewsCount(fetchedReviews.length);
+        const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
+        setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
+      } catch (error) {
+        console.error("Failed to load reviews", error);
+      }
+    };
+
+    fetchReviews();
   }, [gymId, reviewsCount]);
 
   const handleNext = () => {
@@ -56,7 +63,19 @@ const GymCard: React.FC<GymCardProps> = ({
     try {
       await addReview(gymId, values.rating, values.content);
       notification.success({ message: "Review added successfully!" });
+
+      setLocalReviewsCount((prev) => prev + 1);
       setIsReviewFormOpen(false);
+
+      // Update the reviews state with the new review
+      const updatedReviews = [...reviews, { rating: values.rating, content: values.content, user: { name: "You" } }];
+      setReviews(updatedReviews);
+
+      const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
+      const newAverageRating = (totalRating / updatedReviews.length).toFixed(1);
+      setAverageRating(parseFloat(newAverageRating));
+
+      onReviewAdded(gymId);
     } catch (error) {
       notification.error({ message: "Failed to add review. Please try again." });
     }
@@ -73,9 +92,8 @@ const GymCard: React.FC<GymCardProps> = ({
         )}
       </div>
       <p className="gym-location">📍 {city}</p>
-      <p className={`gym-rating ${reviewsCount > 0 ? "clickable" : ""}`}
-        onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}>
-        ⭐ {rating} (<span>{reviewsCount}</span> {reviewsCount === 1 ? "review" : "reviews"})
+      <p className="gym-rating" onClick={() => setIsModalOpen(true)}>
+        ⭐ {averageRating} (<span>{localReviewsCount}</span> {localReviewsCount === 1 ? "review" : "reviews"})
       </p>
 
       <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>

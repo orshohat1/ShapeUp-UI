@@ -69,6 +69,15 @@ const GymsList: React.FC = () => {
   };
 
 
+  const handleReviewAdded = async () => {
+    try {
+      const updatedGyms = await getGyms();
+      setGyms(updatedGyms);
+    } catch (err) {
+      console.error("Failed to update gyms after review", err);
+    }
+  };
+  
   const openFavoritesModal = () => {
     setFavoritesModalVisible(true);
     setModalPage(1); // Reset modal pagination when opening the modal
@@ -117,6 +126,7 @@ const GymsList: React.FC = () => {
               images={gym.pictures || ["/default-gym.jpg"]}
               isFavorite={user ? user?.favoriteGyms?.includes(gym._id) : false}
               onToggleFavorite={() => toggleFavorite(gym._id)}
+              onReviewAdded={handleReviewAdded}
             />
           ))}
         </div>
@@ -152,6 +162,7 @@ const GymsList: React.FC = () => {
                 images={gym.pictures || ["/default-gym.jpg"]}
                 isFavorite={true}
                 onToggleFavorite={() => toggleFavorite(gym._id)}
+                onReviewAdded={handleReviewAdded}
               />
             ))
           ) : (
