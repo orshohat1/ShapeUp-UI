@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import "./Login.less";
 import type { FormProps } from "antd";
 import { Layout, Button, Form, Input } from "antd";
-const { Content } = Layout;
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../context/useUserProfile";
+const { Content } = Layout;
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();

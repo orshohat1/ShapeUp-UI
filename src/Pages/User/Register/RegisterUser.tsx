@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from "react";
 import "./RegisterUser.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
-import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { UserOutlined } from "@ant-design/icons";
 import {
   Layout,
   Button,
@@ -140,7 +140,9 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="firstname"
-                rules={[{ required: true, message: "Please input your firstname" }]}
+                rules={[
+                  { required: true, message: "Please input your firstname" },
+                ]}
               >
                 <Input className="register-input" placeholder="First name" />
               </Form.Item>
@@ -148,7 +150,9 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="lastname"
-                rules={[{ required: true, message: "Please input your lastname" }]}
+                rules={[
+                  { required: true, message: "Please input your lastname" },
+                ]}
               >
                 <Input className="register-input" placeholder="Last name" />
               </Form.Item>
@@ -158,21 +162,35 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="email"
-                rules={[{ required: true, type: "email", message: "Please input a valid email" }]}
+                rules={[
+                  {
+                    required: true,
+                    type: "email",
+                    message: "Please input a valid email",
+                  },
+                ]}
               >
-                <Input className="register-input" type="email" placeholder="Email" />
+                <Input
+                  className="register-input"
+                  type="email"
+                  placeholder="Email"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item<FieldType>
                 name="birthdate"
-                rules={[{ required: true, message: "Please input your birthdate" }]}
+                rules={[
+                  { required: true, message: "Please input your birthdate" },
+                ]}
               >
                 <DatePicker
                   className="register-input"
                   format="DD-MM-YYYY"
                   allowClear
-                  disabledDate={(current) => current && current.isAfter(dayjs())}
+                  disabledDate={(current) =>
+                    current && current.isAfter(dayjs())
+                  }
                 />
               </Form.Item>
             </Col>
@@ -181,9 +199,14 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item<FieldType>
                 name="password"
-                rules={[{ required: true, message: "Please input your password" }]}
+                rules={[
+                  { required: true, message: "Please input your password" },
+                ]}
               >
-                <Input.Password className="register-input" placeholder="Password" />
+                <Input.Password
+                  className="register-input"
+                  placeholder="Password"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -199,7 +222,9 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 name="street"
-                rules={[{ required: true, message: "Please input your street" }]}
+                rules={[
+                  { required: true, message: "Please input your street" },
+                ]}
               >
                 <Input className="register-input" placeholder="Street" />
               </Form.Item>
@@ -207,7 +232,9 @@ const RegisterUser: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 name="gender"
-                rules={[{ required: true, message: "Please select your gender" }]}
+                rules={[
+                  { required: true, message: "Please select your gender" },
+                ]}
               >
                 <Select className="register-input" placeholder="Select Gender">
                   <Select.Option value="male">Male</Select.Option>
@@ -219,22 +246,22 @@ const RegisterUser: React.FC = () => {
           <Row gutter={24}>
             <Col span={24}>
               <Form.Item valuePropName="avatar">
-              <div className="upload-container">
-                <Upload.Dragger
-                  accept="image/*"
-                  listType="picture"
-                  beforeUpload={beforeUpload}
-                  onChange={(info) => onChange(info, avatarFileRef)}
-                  maxCount={1}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <UserOutlined />
-                  </p>
-                  <p className="ant-upload-text">
-                    Click or drag file to this area to upload
-                  </p>
-                </Upload.Dragger>
-              </div>
+                <div className="upload-container">
+                  <Upload.Dragger
+                    accept="image/*"
+                    listType="picture"
+                    beforeUpload={beforeUpload}
+                    onChange={(info) => onChange(info, avatarFileRef)}
+                    maxCount={1}
+                  >
+                    <p className="ant-upload-drag-icon">
+                      <UserOutlined />
+                    </p>
+                    <p className="ant-upload-text">
+                      Upload avatar profile image here
+                    </p>
+                  </Upload.Dragger>
+                </div>
               </Form.Item>
             </Col>
           </Row>
@@ -253,7 +280,8 @@ const RegisterUser: React.FC = () => {
       </Content>
       <div className="register-link">
         <span>
-          Already have an account? <a href={`${CLIENT_URL}/user/login`}>Login Now</a>
+          Already have an account?{" "}
+          <a href={`${CLIENT_URL}/user/login`}>Login Now</a>
         </span>
       </div>
     </div>

@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import "./Sidebar.less";
 import logo from "../../assets/Logo/shape-up.png";
-import {
-  HomeOutlined,
-  EditOutlined,
-  LogoutOutlined,
-  DotChartOutlined,
-} from "@ant-design/icons";
+import { HomeOutlined, EditOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useUserProfile } from "../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
 import UpdateProfileModal from "../UpdateProfileModal/UpdateProfileModal";
@@ -32,33 +27,31 @@ const Sidebar: React.FC<{ user?: any }> = () => {
       </div>
 
       <div className="menu">
-        {userProfile?.role === "gym_owner" ||
-          (userProfile?.role === "user" && (
-            <div className="menu-item">
-              <div style={{ marginRight: "auto" }}>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 100 100"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="30" cy="30" r="10" fill="purple" />
-                  <circle cx="70" cy="30" r="10" fill="purple" />
-                  <circle cx="30" cy="70" r="10" fill="purple" />
-                  <circle cx="70" cy="70" r="10" fill="purple" />
-                </svg>
-              </div>
-              <span className="item-title">Dashboard</span>
+        {userProfile?.role === "user" && (
+          <div className="menu-item">
+            <div style={{ marginRight: "auto" }}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 100 100"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="30" cy="30" r="10" fill="purple" />
+                <circle cx="70" cy="30" r="10" fill="purple" />
+                <circle cx="30" cy="70" r="10" fill="purple" />
+                <circle cx="70" cy="70" r="10" fill="purple" />
+              </svg>
             </div>
-          ))}
+            <span className="item-title">Dashboard</span>
+          </div>
+        )}
 
-        {/* {userProfile?.role === "gym_owner" ||
-          (userProfile?.role === "user" && (
-            <div className="menu-item" onClick={() => navigate("/gyms")}>
-              <HomeOutlined style={{ marginRight: "auto" }} />
-              <span className="item-title">Gyms</span>
-            </div>
-          ))} */}
+        {userProfile?.role === "gym_owner" && (
+          <div className="menu-item" onClick={() => navigate("/gyms")}>
+            <HomeOutlined style={{ marginRight: "auto", color: "purple" }} />
+            <span className="item-title">Gyms</span>
+          </div>
+        )}
       </div>
 
       <div className="aside-bottom-container">
