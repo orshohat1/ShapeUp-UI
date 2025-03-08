@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import "./Register.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
-import { UploadOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
 import {
   Layout,
   Button,
@@ -204,7 +204,9 @@ const Register: React.FC = () => {
                   className="register-input"
                   format="DD-MM-YYYY"
                   allowClear
-                  disabledDate={(current) => current && current.isAfter(dayjs())}
+                  disabledDate={(current) =>
+                    current && current.isAfter(dayjs())
+                  }
                 />
               </Form.Item>
             </Col>
@@ -280,10 +282,10 @@ const Register: React.FC = () => {
                   maxCount={1}
                 >
                   <p className="ant-upload-drag-icon">
-                    <UploadOutlined />
+                    <FileTextOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag file to this area to upload
+                    Upload GYM owner license here
                   </p>
                 </Upload.Dragger>
               </Form.Item>
@@ -301,7 +303,7 @@ const Register: React.FC = () => {
                     <UserOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Click or drag file to this area to upload
+                    Upload avatar profile image here
                   </p>
                 </Upload.Dragger>
               </Form.Item>

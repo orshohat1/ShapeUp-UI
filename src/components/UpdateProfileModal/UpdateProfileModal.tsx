@@ -265,7 +265,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
                       <UserOutlined />
                     </p>
                     <p className="ant-upload-text">
-                      Click or drag file to this area to upload
+                      Click or drag avatar file to this area
                     </p>
                   </Upload.Dragger>
                 </Form.Item>

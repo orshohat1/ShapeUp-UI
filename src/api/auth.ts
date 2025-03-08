@@ -20,7 +20,6 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-// TODO: need to add a register parameters here
 export const register = async (
   firstname: string,
   lastname: string,
@@ -43,6 +42,10 @@ export const register = async (
   registerFormData.append("street", street);
   registerFormData.append("gender", gender);
   registerFormData.append("avatar", avatar);
+  
+  if (gymOwnerDocumentFile) {
+    registerFormData.append("gymOwnerLicenseImage", gymOwnerDocumentFile);
+  }
 
   try {
     const response = await fileRequestAxiosInstance.post(
