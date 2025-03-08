@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getGymReviews } from "../../api/reviews";
-import { List, Rate, Modal, Avatar } from "antd";
+import { getGymReviews, addReview } from "../../api/reviews";
+import { List, Rate, Modal, Avatar, Button, Input, Form, notification } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "./GymCard.less";
 
@@ -28,6 +28,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const [reviews, setReviews] = useState([] as any[]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
 
   useEffect(() => {
     if (reviewsCount > 0) {
@@ -39,7 +40,6 @@ const GymCard: React.FC<GymCardProps> = ({
           console.error("Failed to load reviews", error);
         }
       };
-
       fetchReviews();
     }
   }, [gymId, reviewsCount]);
@@ -50,6 +50,17 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const handlePrev = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleAddReview = async (values: { rating: number; content: string }) => {
+    try {
+      await addReview(gymId, values.rating, values.content);
+      notification.success({ message: "Review added successfully!" });
+      setIsReviewFormOpen(false);
+      setIsModalOpen(false);
+    } catch (error) {
+      notification.error({ message: "Failed to add review. Please try again." });
+    }
   };
 
   return (
@@ -64,23 +75,21 @@ const GymCard: React.FC<GymCardProps> = ({
       </div>
       <p className="gym-location">📍 {city}</p>
       <p className="gym-rating">
-        ⭐ {rating}{" "}
+        ⭐ {rating} {" "}
         <span
           style={{ cursor: reviewsCount > 0 ? "pointer" : "default" }}
           onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
         >
-          (
-          <span
-            style={{
-              textDecoration: reviewsCount > 0 ? "underline" : "none",
-              color: "inherit",
-            }}
-          >
+          (<span style={{ textDecoration: reviewsCount > 0 ? "underline" : "none", color: "inherit" }}>
             {reviewsCount}
           </span>{" "}
           reviews)
         </span>
       </p>
+      <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>
+        Add Review
+      </Button>
+
       {/* Image Slider */}
       <div className="gym-image-slider">
         <LeftOutlined onClick={handlePrev} className="slider-arrow" />
@@ -112,6 +121,28 @@ const GymCard: React.FC<GymCardProps> = ({
             </List.Item>
           )}
         />
+      </Modal>
+
+      {/* Add Review Modal */}
+      <Modal
+        title="Add Review"
+        open={isReviewFormOpen}
+        onCancel={() => setIsReviewFormOpen(false)}
+        footer={null}
+      >
+        <Form onFinish={handleAddReview} layout="vertical">
+          <Form.Item name="rating" label="Rating" rules={[{ required: true, message: "Please rate the gym" }]}>
+            <Rate />
+          </Form.Item>
+          <Form.Item name="content" label="Review" rules={[{ required: true, message: "Please enter your review" }]}>
+            <Input.TextArea rows={4} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit Review
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );

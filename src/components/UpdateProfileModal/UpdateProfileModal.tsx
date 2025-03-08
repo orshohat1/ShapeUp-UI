@@ -42,7 +42,6 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   }, [form, values]);
 
   useEffect(() => {
-    console.log("userProfile:", userProfile);
   }, [userProfile]);
 
   useEffect(() => {
