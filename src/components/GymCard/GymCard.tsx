@@ -73,18 +73,11 @@ const GymCard: React.FC<GymCardProps> = ({
         )}
       </div>
       <p className="gym-location">📍 {city}</p>
-      <p className="gym-rating">
-        ⭐ {rating} {" "}
-        <span
-          style={{ cursor: reviewsCount > 0 ? "pointer" : "default" }}
-          onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
-        >
-          (<span style={{ textDecoration: reviewsCount > 0 ? "underline" : "none", color: "inherit" }}>
-            {reviewsCount}
-          </span>{" "}
-          reviews)
-        </span>
+      <p className={`gym-rating ${reviewsCount > 0 ? "clickable" : ""}`}
+        onClick={reviewsCount > 0 ? () => setIsModalOpen(true) : undefined}>
+        ⭐ {rating} (<span>{reviewsCount}</span> {reviewsCount === 1 ? "review" : "reviews"})
       </p>
+
       <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>
         Add Review
       </Button>
