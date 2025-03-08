@@ -12,6 +12,7 @@ const GymsList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false); // Modal visibility state
+  const [modalPage, setModalPage] = useState(1); // Page state for the modal
   const gymsPerPage = 6;
 
   useEffect(() => {
@@ -62,11 +63,26 @@ const GymsList: React.FC = () => {
 
   const openFavoritesModal = () => {
     setFavoritesModalVisible(true);
+    setModalPage(1); // Reset modal pagination when opening the modal
   };
 
   const closeFavoritesModal = () => {
     setFavoritesModalVisible(false);
   };
+
+  const handleModalPaginationChange = (page: number) => {
+    setModalPage(page);
+  };
+
+  // Get the favorite gyms from the user
+  const favoriteGyms = user?.favoriteGyms || [];
+
+  // Paginate favorite gyms (1 gym per page)
+  const indexOfLastFavorite = modalPage * 1;
+  const indexOfFirstFavorite = indexOfLastFavorite - 1;
+  const currentFavoriteGyms = gyms
+    .filter((gym) => favoriteGyms.includes(gym._id))
+    .slice(indexOfFirstFavorite, indexOfLastFavorite);
 
   return (
     <div className="gyms-container">
@@ -78,7 +94,7 @@ const GymsList: React.FC = () => {
           </div>
           <div className="actions">
             <Button>Filter</Button>
-            <Button onClick={openFavoritesModal}>Favorites</Button>
+            <Button onClick={openFavoritesModal}>Favorites</Button> {/* Open Modal */}
           </div>
         </div>
 
@@ -111,32 +127,39 @@ const GymsList: React.FC = () => {
 
       {/* Favorites Modal */}
       <Modal
-        title="My Favorite Gyms"
+        title="Your Favorite Gyms"
         open={isFavoritesModalVisible}
         onCancel={closeFavoritesModal}
         footer={null}
       >
         <div className="favorites-list">
-          {user?.favoriteGyms?.length ? (
-            gyms
-              .filter((gym) => user.favoriteGyms.includes(gym._id))
-              .map((gym) => (
-                <GymCard
-                  key={gym._id}
-                  gymId={gym._id}
-                  gymName={gym.name}
-                  city={gym.city}
-                  rating={gym.rating || "No ratings yet"}
-                  reviewsCount={gym.reviewsCount || 0}
-                  images={gym.pictures || ["/default-gym.jpg"]}
-                  isFavorite={true}
-                  onToggleFavorite={() => toggleFavorite(gym._id)}
-                />
-              ))
+          {currentFavoriteGyms.length ? (
+            currentFavoriteGyms.map((gym) => (
+              <GymCard
+                key={gym._id}
+                gymId={gym._id}
+                gymName={gym.name}
+                city={gym.city}
+                rating={gym.rating || "No ratings yet"}
+                reviewsCount={gym.reviewsCount || 0}
+                images={gym.pictures || ["/default-gym.jpg"]}
+                isFavorite={true}
+                onToggleFavorite={() => toggleFavorite(gym._id)}
+              />
+            ))
           ) : (
-            <p>No favorite gyms added yet :(</p>
+            <p>No favorite gyms added yet!</p>
           )}
         </div>
+
+        {/* Modal Pagination */}
+        <Pagination
+          current={modalPage}
+          total={favoriteGyms.length}
+          pageSize={1} // 1 gym per page
+          onChange={handleModalPaginationChange}
+          className="modal-pagination"
+        />
       </Modal>
     </div>
   );
