@@ -22,3 +22,22 @@ export const getGymReviews = async (gymId: string): Promise<Review[]> => {
     return [];
   }
 };
+
+export const addReview = async (gym: string, rating: number, content: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `${REVIEWS_ROUTE}`,
+      {
+        rating,
+        content,
+        gym,
+      },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding review:", error);
+    throw error;
+  }
+};
+

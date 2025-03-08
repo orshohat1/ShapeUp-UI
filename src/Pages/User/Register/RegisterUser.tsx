@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import "./RegisterUser.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
 import {
   Layout,
@@ -25,6 +26,7 @@ const RegisterUser: React.FC = () => {
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     form
@@ -74,6 +76,7 @@ const RegisterUser: React.FC = () => {
           avatarFile
         );
         message.success("Registration successful");
+        navigate("/gyms");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
         message.error("Registration failed: " + errorMsg);

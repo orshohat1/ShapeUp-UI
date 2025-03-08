@@ -33,7 +33,7 @@ const LoginUser: React.FC = () => {
       try {
         await login(values.email, values.password);
         refreshUserProfile();
-        navigate("/dashboard");
+        navigate("/gyms");
       } catch (error) {
         console.error("Login error:", error);
         // Handle error (e.g., show error message)
@@ -126,7 +126,7 @@ const LoginUser: React.FC = () => {
       </Content>
       <div className="register-link">
         <span>
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <a href={`${CLIENT_URL}/user/register`}>Register Now</a>
         </span>
       </div>
