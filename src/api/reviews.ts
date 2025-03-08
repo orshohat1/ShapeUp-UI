@@ -25,7 +25,6 @@ export const getGymReviews = async (gymId: string): Promise<Review[]> => {
 
 export const addReview = async (gym: string, rating: number, content: string) => {
   try {
-    console.log("Adding review", gym, rating, content);
     const response = await axiosInstance.post(
       `${REVIEWS_ROUTE}`,
       {
