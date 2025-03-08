@@ -59,6 +59,7 @@
     color: @text-gray;
     display: flex;
     align-items: center;
+    cursor: pointer;
 
     &:hover {
       color: #0056b3;
@@ -86,14 +87,35 @@
     .slider-arrow {
       font-size: 22px;
       cursor: pointer;
-      margin: 0 12px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #333;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      padding: 8px;
+      transition: background 0.3s ease;
+  
+      &:hover {
+        background: rgba(255, 255, 255, 1);
+      }
     }
-
+  
+    .slider-arrow:first-of-type {
+      left: 10px;
+    }
+  
+    .slider-arrow:last-of-type {
+      right: 10px;
+    }
+  
     .gym-image {
       width: 100%;
       height: 200px;
       object-fit: contain;
       border-radius: 8px;
+      user-select: none;
+      pointer-events: none;
     }
   }
   
