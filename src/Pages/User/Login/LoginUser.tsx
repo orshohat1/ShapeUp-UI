@@ -33,7 +33,7 @@ const LoginUser: React.FC = () => {
       try {
         await login(values.email, values.password);
         refreshUserProfile();
-        navigate("/dashboard");
+        navigate("/gyms");
       } catch (error) {
         console.error("Login error:", error);
         // Handle error (e.g., show error message)
