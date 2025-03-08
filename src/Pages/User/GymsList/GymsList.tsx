@@ -11,8 +11,8 @@ const GymsList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false); // Modal visibility state
-  const [modalPage, setModalPage] = useState(1); // Page state for the modal
+  const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false);
+  const [modalPage, setModalPage] = useState(1);
   const gymsPerPage = 6;
 
   useEffect(() => {
@@ -50,8 +50,15 @@ const GymsList: React.FC = () => {
 
     try {
       if (user.favoriteGyms?.includes(gymId)) {
+        const updatedFavorites = user.favoriteGyms.filter((id: string) => id !== gymId);
         await removeFavoriteGym(user._id, gymId);
-        setUser({ ...user, favoriteGyms: user.favoriteGyms.filter((id: string) => id !== gymId) });
+        setUser({ ...user, favoriteGyms: updatedFavorites });
+
+        // adjust paging if the last item on the last page is removed
+        const totalPages = Math.ceil(updatedFavorites.length / 1);
+        if (modalPage > totalPages) {
+          setModalPage(Math.max(totalPages, 1));
+        }
       } else {
         await addFavoriteGym(user._id, gymId);
         setUser({ ...user, favoriteGyms: [...user.favoriteGyms, gymId] });
@@ -60,6 +67,7 @@ const GymsList: React.FC = () => {
       console.error("Failed to update favorites", err);
     }
   };
+
 
   const openFavoritesModal = () => {
     setFavoritesModalVisible(true);
@@ -74,7 +82,6 @@ const GymsList: React.FC = () => {
     setModalPage(page);
   };
 
-  // Get the favorite gyms from the user
   const favoriteGyms = user?.favoriteGyms || [];
 
   // Paginate favorite gyms (1 gym per page)
@@ -156,7 +163,7 @@ const GymsList: React.FC = () => {
         <Pagination
           current={modalPage}
           total={favoriteGyms.length}
-          pageSize={1} // 1 gym per page
+          pageSize={1}
           onChange={handleModalPaginationChange}
           className="modal-pagination"
         />
