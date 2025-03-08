@@ -33,7 +33,7 @@ export const addReview = async (gym: string, rating: number, content: string) =>
         content,
         gym,
       },
-      { withCredentials: true } // This should be in the config, not the body
+      { withCredentials: true }
     );
     return response.data;
   } catch (error) {

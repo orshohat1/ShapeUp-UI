@@ -57,7 +57,6 @@ const GymCard: React.FC<GymCardProps> = ({
       await addReview(gymId, values.rating, values.content);
       notification.success({ message: "Review added successfully!" });
       setIsReviewFormOpen(false);
-      setIsModalOpen(false);
     } catch (error) {
       notification.error({ message: "Failed to add review. Please try again." });
     }
