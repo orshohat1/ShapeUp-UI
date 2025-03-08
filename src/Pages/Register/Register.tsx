@@ -3,6 +3,7 @@ import "./Register.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
 import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import {
   Layout,
   Button,
@@ -26,6 +27,7 @@ const Register: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
   const gymOwnerDocumentFileRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     form
@@ -81,8 +83,8 @@ const Register: React.FC = () => {
           avatarFile,
           gymOwnerDocumentFile
         );
-        // Instead of message -> redirect to home page
         message.success("Registration successful");
+        navigate("/dashboard");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
         message.error("Registration failed: " + errorMsg);
@@ -285,7 +287,7 @@ const Register: React.FC = () => {
                     <FileTextOutlined />
                   </p>
                   <p className="ant-upload-text">
-                    Upload GYM owner license here
+                    Upload gym owner license here
                   </p>
                 </Upload.Dragger>
               </Form.Item>

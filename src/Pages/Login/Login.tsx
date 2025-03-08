@@ -32,7 +32,7 @@ const Login: React.FC = () => {
       try {
         await login(values.email, values.password);
         refreshUserProfile();
-        navigate("/gyms");
+        navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);
       }
