@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './GymBox.less';
 
@@ -26,7 +26,15 @@ const GymBox: React.FC<GymBoxProps> = ({
         <h3>{gymName}</h3>
         <div className="gym-box-icons">
           <EditOutlined onClick={onEdit} className="gym-box-icon" />
-          <DeleteOutlined onClick={onDelete} className="gym-box-icon" />
+          
+          <Popconfirm
+            title="Are you sure you want to delete this gym?"
+            onConfirm={onDelete}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined className="gym-box-icon" />
+          </Popconfirm>
         </div>
       </div>
       <p>{city}</p>
