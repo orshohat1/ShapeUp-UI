@@ -42,7 +42,7 @@ export const register = async (
   registerFormData.append("street", street);
   registerFormData.append("gender", gender);
   registerFormData.append("avatar", avatar);
-  
+
   if (gymOwnerDocumentFile) {
     registerFormData.append("gymOwnerLicenseImage", gymOwnerDocumentFile);
   }
@@ -66,7 +66,9 @@ export const register = async (
 
 export const logoutServer = async () => {
   try {
-    await axiosInstance.post(`${AUTH_ROUTE}/logout`, {}, { withCredentials: true });
+    await axiosInstance.post(`${AUTH_ROUTE}/logout`, {
+      refreshToken: localStorage.getItem("refreshToken"),
+    }, { withCredentials: true });
   } catch (error: any) {
     notification.error({
       message: "Logout Failed",

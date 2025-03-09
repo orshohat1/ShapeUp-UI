@@ -47,7 +47,9 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
     // TODO: Need to implement post("/logout") request to server
     // await logoutServer();
     localStorage.removeItem("userProfile");
+    console.log("Logging out (removing access_token)");
     Cookies.remove("access_token");
+    console.log("Logged out (removed access_token)");
     setUserProfile(null);
   };
 
