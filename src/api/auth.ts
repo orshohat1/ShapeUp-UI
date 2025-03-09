@@ -64,11 +64,12 @@ export const register = async (
   }
 };
 
-export const logoutServer = async () => {
+export const logoutServer = async (refresh_token: string) => {
   try {
     await axiosInstance.post(`${AUTH_ROUTE}/logout`, {
-      refreshToken: localStorage.getItem("refreshToken"),
-    }, { withCredentials: true });
+      refreshToken: refresh_token,
+    },
+      { withCredentials: true });
   } catch (error: any) {
     notification.error({
       message: "Logout Failed",

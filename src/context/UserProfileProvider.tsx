@@ -3,6 +3,7 @@ import { UserProfile } from "./UserProfileContext";
 import { UserProfileContext } from "./useUserProfile";
 import { getUserProfile } from "../api/users";
 import Cookies from "js-cookie";
+import { logoutServer } from "../api/auth";
 
 interface UserProfileProviderProps {
   children: ReactNode;
@@ -43,13 +44,14 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
     setUserProfile(userProfile);
   };
 
-  const logout = () => {
-    // TODO: Need to implement post("/logout") request to server
-    // await logoutServer();
+  const logout = async () => {
+    const refreshToken = Cookies.get("refresh_token");
+    if (!refreshToken) {
+      console.error("No refresh token found in cookies.");
+      return;
+    }
+    await logoutServer(refreshToken);
     localStorage.removeItem("userProfile");
-    console.log("Logging out (removing access_token)");
-    Cookies.remove("access_token");
-    console.log("Logged out (removed access_token)");
     setUserProfile(null);
   };
 
