@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
 import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
 import GymCard from "../../../components/GymCard/GymCard";
-import { Button, Pagination, Spin, Alert, Modal } from "antd";
+import { Button, Pagination, Spin, Alert, Modal, List, Rate } from "antd";
 import "./GymsList.less";
 
 const GymsList: React.FC = () => {
@@ -12,8 +12,12 @@ const GymsList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false);
+  const [isReviewsModalVisible, setReviewsModalVisible] = useState(false);
+  const [selectedGymReviews, setSelectedGymReviews] = useState<any[]>([]);
   const [modalPage, setModalPage] = useState(1);
+  const [reviewsPage, setReviewsPage] = useState(1);
   const gymsPerPage = 6;
+  const reviewsPerPage = 5;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +58,6 @@ const GymsList: React.FC = () => {
         await removeFavoriteGym(user._id, gymId);
         setUser({ ...user, favoriteGyms: updatedFavorites });
 
-        // adjust paging if the last item on the last page is removed
         const totalPages = Math.ceil(updatedFavorites.length / 1);
         if (modalPage > totalPages) {
           setModalPage(Math.max(totalPages, 1));
@@ -68,7 +71,6 @@ const GymsList: React.FC = () => {
     }
   };
 
-
   const handleReviewAdded = async () => {
     try {
       const updatedGyms = await getGyms();
@@ -77,10 +79,10 @@ const GymsList: React.FC = () => {
       console.error("Failed to update gyms after review", err);
     }
   };
-  
+
   const openFavoritesModal = () => {
     setFavoritesModalVisible(true);
-    setModalPage(1); // Reset modal pagination when opening the modal
+    setModalPage(1);
   };
 
   const closeFavoritesModal = () => {
@@ -91,14 +93,31 @@ const GymsList: React.FC = () => {
     setModalPage(page);
   };
 
-  const favoriteGyms = user?.favoriteGyms || [];
+  const openReviewsModal = (reviews: any[]) => {
+    setSelectedGymReviews(reviews);
+    setReviewsPage(1);
+    setReviewsModalVisible(true);
+  };
 
-  // Paginate favorite gyms (1 gym per page)
+  const closeReviewsModal = () => {
+    setReviewsModalVisible(false);
+    setSelectedGymReviews([]);
+  };
+
+  const handleReviewsPaginationChange = (page: number) => {
+    setReviewsPage(page);
+  };
+
+  const favoriteGyms = user?.favoriteGyms || [];
   const indexOfLastFavorite = modalPage * 1;
   const indexOfFirstFavorite = indexOfLastFavorite - 1;
   const currentFavoriteGyms = gyms
     .filter((gym) => favoriteGyms.includes(gym._id))
     .slice(indexOfFirstFavorite, indexOfLastFavorite);
+
+  const indexOfLastReview = reviewsPage * reviewsPerPage;
+  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+  const currentReviews = selectedGymReviews.slice(indexOfFirstReview, indexOfLastReview);
 
   return (
     <div className="gyms-container">
@@ -110,7 +129,7 @@ const GymsList: React.FC = () => {
           </div>
           <div className="actions">
             <Button>Filter</Button>
-            <Button onClick={openFavoritesModal}>Favorites</Button> {/* Open Modal */}
+            <Button onClick={openFavoritesModal}>Favorites</Button>
           </div>
         </div>
 
@@ -121,12 +140,13 @@ const GymsList: React.FC = () => {
               gymId={gym._id}
               gymName={gym.name}
               city={gym.city}
-              rating={gym.rating || "No ratings yet"}
+              rating={gym.reviewsCount > 0 ? gym.rating : "No reviews yet"}
               reviewsCount={gym.reviewsCount || 0}
               images={gym.pictures || ["/default-gym.jpg"]}
               isFavorite={user ? user?.favoriteGyms?.includes(gym._id) : false}
               onToggleFavorite={() => toggleFavorite(gym._id)}
               onReviewAdded={handleReviewAdded}
+              onReviewsClick={() => openReviewsModal(gym.reviews)}
             />
           ))}
         </div>
@@ -157,12 +177,13 @@ const GymsList: React.FC = () => {
                 gymId={gym._id}
                 gymName={gym.name}
                 city={gym.city}
-                rating={gym.rating || "No ratings yet"}
+                rating={gym.reviewsCount > 0 ? gym.rating : "No reviews yet"}
                 reviewsCount={gym.reviewsCount || 0}
                 images={gym.pictures || ["/default-gym.jpg"]}
                 isFavorite={true}
                 onToggleFavorite={() => toggleFavorite(gym._id)}
                 onReviewAdded={handleReviewAdded}
+                onReviewsClick={() => openReviewsModal(gym.reviews)}
               />
             ))
           ) : (
@@ -170,12 +191,39 @@ const GymsList: React.FC = () => {
           )}
         </div>
 
-        {/* Modal Pagination */}
         <Pagination
           current={modalPage}
           total={favoriteGyms.length}
           pageSize={1}
           onChange={handleModalPaginationChange}
+          className="modal-pagination"
+        />
+      </Modal>
+
+      {/* Reviews Modal */}
+      <Modal
+        title="Reviews"
+        open={isReviewsModalVisible}
+        onCancel={closeReviewsModal}
+        footer={null}
+      >
+        <List
+          dataSource={currentReviews}
+          renderItem={(review) => (
+            <List.Item>
+              <div>
+                <strong>{review.user?.firstName || "Anonymous"}</strong>
+                <Rate disabled defaultValue={review.rating} />
+                <p>{review.content}</p>
+              </div>
+            </List.Item>
+          )}
+        />
+        <Pagination
+          current={reviewsPage}
+          total={selectedGymReviews.length}
+          pageSize={reviewsPerPage}
+          onChange={handleReviewsPaginationChange}
           className="modal-pagination"
         />
       </Modal>

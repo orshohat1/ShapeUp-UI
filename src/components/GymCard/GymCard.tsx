@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getGymReviews, addReview } from "../../api/reviews";
-import { List, Rate, Modal, Avatar, Button, Input, Form, notification } from "antd";
+import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "./GymCard.less";
 
@@ -14,6 +14,7 @@ interface GymCardProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onReviewAdded: (gymId: string) => void;
+  onReviewsClick?: () => void;
 }
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -26,13 +27,16 @@ const GymCard: React.FC<GymCardProps> = ({
   isFavorite,
   onToggleFavorite,
   onReviewAdded,
+  onReviewsClick,
 }) => {
   const [reviews, setReviews] = useState([] as any[]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [localReviewsCount, setLocalReviewsCount] = useState(reviewsCount);
-  const [averageRating, setAverageRating] = useState(parseFloat(rating));
+  const [averageRating, setAverageRating] = useState(parseFloat(rating) || 0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 5;
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -41,8 +45,12 @@ const GymCard: React.FC<GymCardProps> = ({
         setReviews(fetchedReviews);
 
         setLocalReviewsCount(fetchedReviews.length);
-        const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
-        setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
+        if (fetchedReviews.length > 0) {
+          const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
+          setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
+        } else {
+          setAverageRating(0);
+        }
       } catch (error) {
         console.error("Failed to load reviews", error);
       }
@@ -68,7 +76,7 @@ const GymCard: React.FC<GymCardProps> = ({
       setIsReviewFormOpen(false);
 
       // Update the reviews state with the new review
-      const updatedReviews = [...reviews, { rating: values.rating, content: values.content, user: { name: "You" } }];
+      const updatedReviews = [...reviews, { rating: values.rating, content: values.content, user: { firstName: "You" } }];
       setReviews(updatedReviews);
 
       const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
@@ -92,8 +100,15 @@ const GymCard: React.FC<GymCardProps> = ({
         )}
       </div>
       <p className="gym-location">📍 {city}</p>
-      <p className="gym-rating" onClick={() => setIsModalOpen(true)}>
-        ⭐ {averageRating} (<span>{localReviewsCount}</span> {localReviewsCount === 1 ? "review" : "reviews"})
+
+      {/* Clickable Review Text */}
+      <p className="gym-rating">
+        ⭐ {localReviewsCount > 0 ? averageRating : "No reviews yet"} (
+        <span
+          onClick={localReviewsCount > 0 ? () => setIsModalOpen(true) : undefined} >
+          {localReviewsCount} {localReviewsCount === 1 ? "review" : "reviews"}
+        </span>
+        )
       </p>
 
       <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>
@@ -114,23 +129,37 @@ const GymCard: React.FC<GymCardProps> = ({
         onCancel={() => setIsModalOpen(false)}
         footer={null}
       >
-        <List
-          dataSource={reviews}
-          renderItem={(review: any) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={<Avatar src={review.user?.avatarUrl || "/default-avatar.png"} />}
-                title={<b>{review.user?.name || "Anonymous User"}</b>}
-                description={
-                  <>
-                    <Rate disabled defaultValue={review.rating} />
-                    <p>{review.content}</p>
-                  </>
-                }
-              />
-            </List.Item>
-          )}
-        />
+        {reviews.length > 0 ? (
+          <>
+            <List
+              dataSource={reviews.slice((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage)}
+              renderItem={(review: any) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar src={review.user?.avatarUrl || "/default-avatar.png"} />}
+                    title={<b>{review.user?.firstName || "Anonymous User"}</b>}
+                    description={
+                      <>
+                        <Rate disabled defaultValue={review.rating} />
+                        <p>{review.content}</p>
+                      </>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            {/* Pagination for Reviews */}
+            <Pagination
+              current={currentPage}
+              total={reviews.length}
+              pageSize={reviewsPerPage}
+              onChange={(page) => setCurrentPage(page)}
+              className="reviews-pagination"
+            />
+          </>
+        ) : (
+          <p>No reviews yet!</p>
+        )}
       </Modal>
 
       {/* Add Review Modal */}
