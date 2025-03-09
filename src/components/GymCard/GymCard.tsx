@@ -100,18 +100,12 @@ const GymCard: React.FC<GymCardProps> = ({
         )}
       </div>
       <p className="gym-location">📍 {city}</p>
-      
+
       {/* Clickable Review Text */}
       <p className="gym-rating">
         ⭐ {localReviewsCount > 0 ? averageRating : "No reviews yet"} (
         <span
-          onClick={localReviewsCount > 0 ? () => setIsModalOpen(true) : undefined}
-          style={{
-            cursor: localReviewsCount > 0 ? "pointer" : "default",
-            textDecoration: localReviewsCount > 0 ? "underline" : "none",
-            color: "black",
-          }}
-        >
+          onClick={localReviewsCount > 0 ? () => setIsModalOpen(true) : undefined} >
           {localReviewsCount} {localReviewsCount === 1 ? "review" : "reviews"}
         </span>
         )
