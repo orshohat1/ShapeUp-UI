@@ -110,7 +110,7 @@ export const updateGymById = async (
 
 export const deleteGymById = async (gymId: string) => {
   try {
-    await axiosInstance.delete(`${GYMS_ROUTE}/${gymId}`);
+    await axiosInstance.delete(`${GYMS_ROUTE}/${gymId}`, { withCredentials: true });
     notification.success({
       message: "Gym Deleted",
       description: "The gym has been successfully removed.",
