@@ -40,7 +40,6 @@ const App = () => {
             <Route path="/user/login" element={<LoginUser />} />
             <Route path="/user/register" element={<RegisterUser />} />
             <Route path="/gyms" element={<GymsList />} />
-            <Route path="*" element={<Home />} />
           </Routes>
         </Layout>
       </BrowserRouter>
