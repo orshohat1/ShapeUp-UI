@@ -65,7 +65,6 @@ export const addGym = async (
 
     throw error;
   }
-
 };
 
 export const updateGymById = async (
@@ -107,5 +106,24 @@ export const updateGymById = async (
 
     throw error;
   }
+};
 
+export const deleteGymById = async (gymId: string) => {
+  try {
+    await axiosInstance.delete(`${GYMS_ROUTE}/${gymId}`);
+    notification.success({
+      message: "Gym Deleted",
+      description: "The gym has been successfully removed.",
+      placement: "top",
+    });
+  } catch (error: any) {
+    notification.error({
+      message: "Failed to Delete Gym",
+      description:
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.",
+      placement: "top",
+    });
+    throw error;
+  }
 };
