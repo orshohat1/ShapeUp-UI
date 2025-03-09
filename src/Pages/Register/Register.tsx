@@ -3,6 +3,7 @@ import "./Register.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
 import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
+import { useUserProfile } from "../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
 import {
   Layout,
@@ -28,6 +29,7 @@ const Register: React.FC = () => {
   const avatarFileRef = useRef(null);
   const gymOwnerDocumentFileRef = useRef(null);
   const navigate = useNavigate();
+  const { refreshUserProfile } = useUserProfile();
 
   useEffect(() => {
     form
@@ -71,7 +73,7 @@ const Register: React.FC = () => {
       values.gender
     ) {
       try {
-        const data = await register(
+        await register(
           values.firstname,
           values.lastname,
           values.email,
@@ -83,7 +85,8 @@ const Register: React.FC = () => {
           avatarFile,
           gymOwnerDocumentFile
         );
-        message.success("Registration successful");
+        refreshUserProfile();
+        message.success("Registration successful!");
         navigate("/dashboard");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
