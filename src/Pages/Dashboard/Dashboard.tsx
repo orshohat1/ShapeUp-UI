@@ -4,7 +4,7 @@ import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { Modal, Input, Button, notification } from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
-import { getGymsByOwner, addGym, updateGymById } from "../../api/gym-owner";
+import { getGymsByOwner, addGym, updateGymById, deleteGymById} from "../../api/gym-owner";
 import GymBox from '../../components/GymBox/GymBox';
 
 const Dashboard: React.FC = () => {
@@ -149,8 +149,18 @@ const Dashboard: React.FC = () => {
 
   const handleGymEdit = (gym: any) => handleOpenEditGymModal(gym);
 
-  const handleGymDelete = () => {
-    console.log('Delete clicked');
+  const handleGymDelete = async (gymId: string) => {
+    try {
+      await deleteGymById(gymId);
+      setGyms((prevGyms: any) => prevGyms.filter((gym: any) => gym._id !== gymId));
+    } catch (error) {
+      console.error("Error deleting gym:", error);
+      notification.error({
+        message: "Deletion Failed",
+        description: "Could not delete the gym. Please try again.",
+        placement: "top",
+      });
+    }
   };
 
   const handleGymUpdatePrices = () => {
@@ -180,7 +190,7 @@ const Dashboard: React.FC = () => {
                   gymName={gym.name}
                   city={gym.city}
                   onEdit={() => handleGymEdit(gym)}
-                  onDelete={handleGymDelete}
+                  onDelete={() => handleGymDelete(gym._id)}
                   onUpdatePrices={handleGymUpdatePrices}
                   onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
                 />
