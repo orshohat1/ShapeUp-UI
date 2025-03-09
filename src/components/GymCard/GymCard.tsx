@@ -96,7 +96,6 @@ const GymCard: React.FC<GymCardProps> = ({
         {isNaN(averageRating) ? "No reviews yet" : `⭐ ${averageRating} (${localReviewsCount} ${localReviewsCount === 1 ? "review" : "reviews"})`}
       </p>
 
-
       <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>
         Add Review
       </Button>
