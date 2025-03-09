@@ -17,7 +17,7 @@ const Sidebar: React.FC<{ user?: any }> = () => {
 
   const handleLogout = async () => {
     logout();
-    userProfile?.role === "user" ? navigate("/user/login") : navigate("/login");
+    userProfile?.role === "gym_owner" ? navigate("/login") : navigate("/user/login");
   };
 
   return (
