@@ -100,8 +100,6 @@ const GymCard: React.FC<GymCardProps> = ({
         )}
       </div>
       <p className="gym-location">📍 {city}</p>
-
-      {/* Clickable Review Text */}
       <p className="gym-rating">
         ⭐ {localReviewsCount > 0 ? averageRating : "No reviews yet"} (
         <span
