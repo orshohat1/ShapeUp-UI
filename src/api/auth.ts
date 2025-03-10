@@ -20,6 +20,23 @@ export const login = async (email: string, password: string) => {
   }
 };
 
+export const googleSSO = async () => {
+  try {
+    console.log("Redirecting to Google SSO...");
+    window.location.href = "http://localhost:3000/users/auth/google";
+  } catch (error: any) {
+    console.error("Google SSO failed:", error);
+    notification.error({
+      message: "Login Failed",
+      description: "Something went wrong. Please try again.",
+      placement: "top",
+    });
+    throw error;
+  }
+};
+
+
+
 export const register = async (
   firstname: string,
   lastname: string,

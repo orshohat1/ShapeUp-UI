@@ -3,7 +3,7 @@ import "./LoginUser.less";
 import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input } from "antd";
-import { login } from "../../../api/auth";
+import { login, googleSSO } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
@@ -36,13 +36,16 @@ const LoginUser: React.FC = () => {
         navigate("/gyms");
       } catch (error) {
         console.error("Login error:", error);
-        // Handle error (e.g., show error message)
       }
     }
   };
 
   const handleGoogleLogin = async () => {
-    window.location.href = "http://localhost:3000/users/auth/google";
+    try {
+      await googleSSO();
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
