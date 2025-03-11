@@ -28,6 +28,14 @@ const LoginUser: React.FC = () => {
     password?: string;
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      await googleSSO();
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.email && values.password) {
       try {
@@ -37,14 +45,6 @@ const LoginUser: React.FC = () => {
       } catch (error) {
         console.error("Login error:", error);
       }
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      await googleSSO();
-    } catch (error) {
-      console.error("Login error:", error);
     }
   };
 
@@ -104,6 +104,10 @@ const LoginUser: React.FC = () => {
           >
             <Input.Password className="login-input" placeholder="Password " />
           </Form.Item>
+
+          <div className="or-divider">
+            <span>Or</span>
+          </div>
 
           <Button className="google-login-button" onClick={handleGoogleLogin}>
             <img
