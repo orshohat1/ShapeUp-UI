@@ -124,7 +124,6 @@ const GymsList: React.FC = () => {
       <div className="main-content">
         <div className="header">
           <div className="profile">
-            {user && <img src={user.avatarUrl} alt="User" />}
             <span>Hello, {user ? user.firstName : "Guest"}!</span>
           </div>
           <div className="actions">
