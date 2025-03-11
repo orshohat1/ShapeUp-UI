@@ -93,6 +93,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
         );
         refreshUserProfile();
         message.success("Profile updated successfully");
+        onClose();
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
         message.error("Profile update failed: " + errorMsg);

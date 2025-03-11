@@ -6,6 +6,7 @@
 
 .gyms-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   background-color: @bg-light;
 }
@@ -19,11 +20,10 @@
 }
 
 .main-content {
-  margin-right: auto;
-  margin-left: auto;
-  width: calc(100% - 230px);
+  flex-grow: 1;
   padding: 2rem;
   background-color: @bg-light;
+  overflow-y: auto;
 }
 
 .header {
@@ -92,6 +92,9 @@
   display: flex;
   justify-content: center;
   margin-top: 40px;
+  background-color: #ffffff;
+  padding-top: 20px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .pagination {
