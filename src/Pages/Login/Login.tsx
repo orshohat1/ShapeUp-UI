@@ -30,8 +30,7 @@ const Login: React.FC = () => {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.email && values.password) {
       try {
-        const response = await login(values.email, values.password);
-        console.log("Login response:", response);
+        await login(values.email, values.password);
         refreshUserProfile();
         navigate("/dashboard");
       } catch (error) {
