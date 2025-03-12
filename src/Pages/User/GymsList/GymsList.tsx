@@ -146,6 +146,7 @@ const GymsList: React.FC = () => {
               onToggleFavorite={() => toggleFavorite(gym._id)}
               onReviewAdded={handleReviewAdded}
               onReviewsClick={() => openReviewsModal(gym.reviews)}
+              ownerId={gym.owner}
             />
           ))}
         </div>
