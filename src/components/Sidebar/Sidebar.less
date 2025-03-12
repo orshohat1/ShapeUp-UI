@@ -91,14 +91,18 @@
         font-size: 0.8rem;
         font-weight: 600;
         color: @bg-light;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        width: 76px;
+        width: calc(100% - 60px);
         display: block;
+        white-space: normal;
       }
 
       .user-actions-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 5px;
+        
         .icon-button {
           background: none;
           border: none;

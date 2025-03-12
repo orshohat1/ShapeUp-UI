@@ -70,7 +70,10 @@ const GymCard: React.FC<GymCardProps> = ({
   const handleAddReview = async (values: { rating: number; content: string }) => {
     try {
       await addReview(gymId, values.rating, values.content);
-      notification.success({ message: "Review added successfully!" });
+      notification.success({
+        message: "Review added successfully!",
+        placement: "top",
+      });
 
       setLocalReviewsCount((prev) => prev + 1);
       setIsReviewFormOpen(false);
