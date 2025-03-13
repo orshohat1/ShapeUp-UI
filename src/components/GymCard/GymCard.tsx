@@ -105,7 +105,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const openChatModal = () => {
     setChatModalOpen(true);
     fetchChatHistory();
-    socket.emit("add_user", userId); // Register user in chat system
+    socket.emit("add_user", userId);
   };
 
   const sendMessage = () => {
