@@ -14,6 +14,6 @@ export interface UserProfile {
 
 export interface UserProfileContextType {
   userProfile: UserProfile | null;
-  refreshUserProfile: () => void;
+  refreshUserProfile: () => Promise<any>;
   logout: () => void;
 }

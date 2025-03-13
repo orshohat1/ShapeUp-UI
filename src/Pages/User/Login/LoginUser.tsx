@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "./LoginUser.less";
 import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
-import { Layout, Button, Form, Input } from "antd";
+import { Layout, Button, Form, Input, notification } from "antd";
 import { login, googleSSO } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
@@ -40,7 +40,16 @@ const LoginUser: React.FC = () => {
     if (values.email && values.password) {
       try {
         await login(values.email, values.password);
-        refreshUserProfile();
+        const userProfile = await refreshUserProfile();
+        if (userProfile && userProfile.role !== 'user') {
+          notification.warning({
+            message: "Unauthorized",
+            description: "This page is only for users.",
+            placement: "top",
+          });
+          return;
+        }
+
         navigate("/gyms");
       } catch (error) {
         console.error("Login error:", error);

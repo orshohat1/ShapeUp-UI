@@ -48,6 +48,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
 
       setUserProfile(userProfile);
       localStorage.setItem("userProfile", JSON.stringify(userProfile));
+      return userProfile;
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
