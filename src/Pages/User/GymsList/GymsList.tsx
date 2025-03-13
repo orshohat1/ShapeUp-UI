@@ -3,18 +3,25 @@ import { getGyms } from "../../../api/gyms";
 import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
 import {askChatAi} from "../../../api/chat-ai";
 import GymCard from "../../../components/GymCard/GymCard";
-import { Button, Pagination, Spin, Alert, Modal, List, Rate } from "antd";
+import { Button, Pagination, Spin, Alert, Modal, List, Rate, Input } from "antd";
 import "./GymsList.less";
 
 const GymsList: React.FC = () => {
   const [gyms, setGyms] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
+
   const [chatAiResponse, setAiResponse] = useState<any>(null);
+  const [filteredGyms, setFilteredGyms] = useState<any[]>([]);
+  const [filterName, setFilterName] = useState<string>("");
+  const [filterCity, setFilterCity] = useState<string>("");
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false);
+
   const [isChatAIModalVisible, setChatAIModal] = useState(false);
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isReviewsModalVisible, setReviewsModalVisible] = useState(false);
   const [selectedGymReviews, setSelectedGymReviews] = useState<any[]>([]);
   const [modalPage, setModalPage] = useState(1);
@@ -27,7 +34,7 @@ const GymsList: React.FC = () => {
       try {
         const fetchedGyms = await getGyms();
         setGyms(fetchedGyms);
-
+        setFilteredGyms(fetchedGyms);
         try {
           const userData = await getUserProfile();
           setUser(userData);
@@ -51,7 +58,7 @@ const GymsList: React.FC = () => {
 
   const indexOfLastGym = currentPage * gymsPerPage;
   const indexOfFirstGym = indexOfLastGym - gymsPerPage;
-  const currentGyms = gyms.slice(indexOfFirstGym, indexOfLastGym);
+  const currentGyms = filteredGyms.slice(indexOfFirstGym, indexOfLastGym);
 
   const toggleFavorite = async (gymId: string) => {
     if (!user) return;
@@ -82,6 +89,10 @@ const GymsList: React.FC = () => {
     } catch (err) {
       console.error("Failed to update gyms after review", err);
     }
+  };
+
+  const openFilterModal = () => {
+    setFilterModalVisible(true);
   };
 
   const openFavoritesModal = () => {
@@ -129,6 +140,26 @@ const GymsList: React.FC = () => {
     setReviewsPage(page);
   };
 
+  const applyFilters = () => {
+    let filtered = gyms;
+
+    if (filterName.trim() !== "") {
+      filtered = filtered.filter((gym) =>
+        gym.name.toLowerCase().includes(filterName.toLowerCase())
+      );
+    }
+
+    if (filterCity.trim() !== "") {
+      filtered = filtered.filter((gym) =>
+        gym.city.toLowerCase().includes(filterCity.toLowerCase())
+      );
+    }
+
+    setFilteredGyms(filtered);
+    setCurrentPage(1);
+    setFilterModalVisible(false);
+  };
+
   const favoriteGyms = user?.favoriteGyms || [];
   const indexOfLastFavorite = modalPage * 1;
   const indexOfFirstFavorite = indexOfLastFavorite - 1;
@@ -147,8 +178,11 @@ const GymsList: React.FC = () => {
             <span>Hello, {user ? user.firstName : "Guest"}!</span>
           </div>
           <div className="actions">
+
             <Button onClick={openChatAIModal}>Suggest Workout Plan</Button>
-            <Button>Filter</Button>
+
+            <Button onClick={openFilterModal}>Filter</Button>
+
             <Button onClick={openFavoritesModal}>Favorites</Button>
           </div>
         </div>
@@ -174,13 +208,39 @@ const GymsList: React.FC = () => {
         <div className="pagination-container">
           <Pagination
             current={currentPage}
-            total={gyms.length}
+            total={filteredGyms.length}
             pageSize={gymsPerPage}
             onChange={(page) => setCurrentPage(page)}
             className="pagination"
           />
         </div>
       </div>
+
+      {/* Filter Modal */}
+      <Modal
+        title="Filter Gyms"
+        open={isFilterModalVisible}
+        onCancel={() => setFilterModalVisible(false)}
+        footer={null}
+      >
+        <div>
+          <Input
+            placeholder="Enter gym name"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            style={{ marginBottom: "10px" }}
+          />
+          <Input
+            placeholder="Enter city"
+            value={filterCity}
+            onChange={(e) => setFilterCity(e.target.value)}
+            style={{ marginBottom: "10px" }}
+          />
+          <Button type="primary" block onClick={applyFilters}>
+            Apply Filters
+          </Button>
+        </div>
+      </Modal>
 
       {/* Favorites Modal */}
       <Modal
