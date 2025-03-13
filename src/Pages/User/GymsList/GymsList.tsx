@@ -14,7 +14,7 @@ const GymsList: React.FC = () => {
   const [filteredGyms, setFilteredGyms] = useState<any[]>([]);
   const [filterName, setFilterName] = useState<string>("");
   const [filterCity, setFilterCity] = useState<string>("");
-
+  const [isChatLoading, setChatLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,14 +103,20 @@ const GymsList: React.FC = () => {
   const openChatAIModal = async () => {
     if (user?._id) {
       try {
+        setChatLoading(true);
         const response = await askChatAi(user._id, user.birthdate.toString(), user.gender);
         setAiResponse(response);
       } catch (err) {
         console.error("Chat AI Error:", err);
         setAiResponse("Failed to fetch AI response");
       }
+      finally {
+        setChatLoading(false);
+        setChatAIModal(true);
+      }
     }
-    setChatAIModal(true);
+    else
+      setChatAIModal(true);
   };
 
   const closeChatAIModal = () => {
@@ -179,7 +185,9 @@ const GymsList: React.FC = () => {
           </div>
           <div className="actions">
 
-            <Button onClick={openChatAIModal}>Suggest Workout Plan</Button>
+          <Button onClick={openChatAIModal} disabled={isChatLoading}>
+            {isChatLoading ? <Spin /> : "Suggest Workout Plan"}
+          </Button>
 
             <Button onClick={openFilterModal}>Filter</Button>
 
@@ -288,15 +296,14 @@ const GymsList: React.FC = () => {
         footer={null}
       >
         <div className="ChatAI-popup">
-          {
-          chatAiResponse.length ? (
+          {isChatLoading ? (
+            <Spin size="large" />
+          ) : chatAiResponse.length ? (
             <p>{chatAiResponse}</p>
           ) : (
             <p>Failed to retrieve workout plan from AI!</p>
           )}
-        </div>
-        
-        
+      </div>
       </Modal>
 
 
