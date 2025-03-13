@@ -78,10 +78,6 @@ const GymCard: React.FC<GymCardProps> = ({
 
     fetchReviews();
 
-    // socket.on("message", (message) => {
-    //   setMessages((prevMessages) => [...prevMessages, message]);
-    // });
-
     return () => {
       socket.off("message");
     };
