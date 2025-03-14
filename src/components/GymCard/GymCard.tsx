@@ -12,6 +12,7 @@ interface GymCardProps {
   reviewsCount: number;
   images: string[];
   isFavorite: boolean;
+  currentUser: { _id: string, firstName: string };
   onToggleFavorite: () => void;
   onReviewAdded: (gymId: string) => void;
   onReviewsClick?: () => void;
@@ -25,6 +26,7 @@ const GymCard: React.FC<GymCardProps> = ({
   reviewsCount,
   images,
   isFavorite,
+  currentUser,
   onToggleFavorite,
   onReviewAdded,
   onReviewsClick,
@@ -69,6 +71,16 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const handleAddReview = async (values: { rating: number; content: string }) => {
     try {
+      const existingReview = reviews.find((review) => review.user._id === currentUser._id);
+      if (existingReview) {
+        notification.error({
+          message: "You have already left a review for this gym.",
+          placement: "top",
+        });
+        setIsReviewFormOpen(false);
+        return;
+      }
+
       await addReview(gymId, values.rating, values.content);
       notification.success({
         message: "Review added successfully!",
@@ -79,7 +91,7 @@ const GymCard: React.FC<GymCardProps> = ({
       setIsReviewFormOpen(false);
 
       // Update the reviews state with the new review
-      const updatedReviews = [...reviews, { rating: values.rating, content: values.content, user: { firstName: "You" } }];
+      const updatedReviews = [...reviews, { rating: values.rating, content: values.content, user: { _id: currentUser._id, firstName: currentUser.firstName } }];
       setReviews(updatedReviews);
 
       const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);

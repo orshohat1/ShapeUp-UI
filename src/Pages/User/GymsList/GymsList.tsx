@@ -171,6 +171,7 @@ const GymsList: React.FC = () => {
               reviewsCount={gym.reviewsCount || 0}
               images={gym.pictures || ["/default-gym.jpg"]}
               isFavorite={user ? user?.favoriteGyms?.includes(gym._id) : false}
+              currentUser={user}
               onToggleFavorite={() => toggleFavorite(gym._id)}
               onReviewAdded={handleReviewAdded}
               onReviewsClick={() => openReviewsModal(gym.reviews)}
@@ -234,6 +235,7 @@ const GymsList: React.FC = () => {
                 reviewsCount={gym.reviewsCount || 0}
                 images={gym.pictures || ["/default-gym.jpg"]}
                 isFavorite={true}
+                currentUser={user}
                 onToggleFavorite={() => toggleFavorite(gym._id)}
                 onReviewAdded={handleReviewAdded}
                 onReviewsClick={() => openReviewsModal(gym.reviews)}

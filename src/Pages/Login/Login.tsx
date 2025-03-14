@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./Login.less";
 import type { FormProps } from "antd";
-import { Layout, Button, Form, Input } from "antd";
+import { Layout, Button, Form, Input, notification } from "antd";
 import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +31,15 @@ const Login: React.FC = () => {
     if (values.email && values.password) {
       try {
         await login(values.email, values.password);
-        refreshUserProfile();
+        const userProfile = await refreshUserProfile();
+        if (userProfile && userProfile.role !== 'gym_owner') {
+          notification.warning({
+            message: "Unauthorized",
+            description: "This page is only for gym owner.",
+            placement: "top",
+          });
+          return;
+        }
         navigate("/dashboard");
       } catch (error) {
         console.error("Login error:", error);
