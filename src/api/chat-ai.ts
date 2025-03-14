@@ -5,9 +5,14 @@ const USERS_ROUTE = "/askChatAi";
 
 export const askChatAi = async (userId: string, userBirthDate: string, userGender: string) => {
     try {
+        let question = 'Please give me a workout plan.';
+        if(userBirthDate != null)
+          question += ` I was born in ${userBirthDate}.`;
+        if(userGender != null)
+          question += ` I am a ${userGender}.`
         const response = await axiosInstance.post(
             `${USERS_ROUTE}/${userId}`,
-            { question: `Please give me a workout plan. i was born in ${userBirthDate} and i am a ${userGender}` },
+            { question: question },
             { withCredentials: true }
           );
       return response.data.message;
