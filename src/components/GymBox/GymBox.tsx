@@ -29,8 +29,8 @@ const GymBox: React.FC<GymBoxProps> = ({
 
 }) => {
   const [isChatModalVisible, setChatModalVisible] = useState(false);
-  const [chatUsers, setChatUsers] = useState<{ userId: string; name: string }[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [chatUsers, setChatUsers] = useState<{ userId: string; firstName: string; lastName: string }[]>([]);
+  const [selectedUser, setSelectedUser] = useState<{ userId: string; firstName: string; lastName: string } | null>(null);
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
 
@@ -53,15 +53,22 @@ const GymBox: React.FC<GymBoxProps> = ({
   const fetchChatUsers = () => {
     socket.emit("get_gym_chats", ownerId, (chatData: any) => {
       if (chatData) {
-        setChatUsers(chatData);
+        const uniqueUsers = Array.from(
+          new Map(chatData.map((user: any) => [user.userId, user])).values()
+        );
+        setChatUsers(uniqueUsers.map((user: any) => ({
+          userId: user.userId,
+          firstName: user.firstName,
+          lastName: user.lastName
+        })));
       } else {
         notification.error({ message: "Failed to load chat users." });
       }
     });
   };
-
+  
   const fetchChatHistory = (userId: string) => {
-    socket.emit("get_users_chat", ownerId, userId, (chatHistory: any) => {
+    socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
       setMessages(chatHistory.messages || []);
     });
   };
@@ -75,16 +82,16 @@ const GymBox: React.FC<GymBoxProps> = ({
     socket.emit("add_user", ownerId);
   };
 
-  const selectUser = (userId: string) => {
-    setSelectedUser(userId);
-    setInterval(() => { fetchChatHistory(userId); }, 1000);
+  const selectUser = (user: { userId: string; firstName: string; lastName: string }) => {
+    setSelectedUser(user);
+    setInterval(() => { fetchChatHistory(user.userId); }, 1000);
   };
-
+  
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
     const message = { sender: ownerId, text: newMessage };
-    socket.emit("communicate", ownerId, selectedUser, newMessage);
+    socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
   };
@@ -111,17 +118,22 @@ const GymBox: React.FC<GymBoxProps> = ({
         Chat with Users
       </Button>
 
-      <Modal title="Chat with Users" open={isChatModalVisible} onCancel={() => setChatModalVisible(false)} footer={null}>
+      <Modal 
+          title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"} 
+          open={isChatModalVisible} 
+          onCancel={() => setChatModalVisible(false)} 
+          footer={null}
+        >
         {!selectedUser ? (
           <List
-            bordered
-            dataSource={chatUsers}
-            renderItem={(user) => (
-              <List.Item onClick={() => selectUser(user.userId)} style={{ cursor: "pointer" }}>
-                {user.name}
-              </List.Item>
-            )}
-          />
+          bordered
+          dataSource={chatUsers}
+          renderItem={(user) => (
+            <List.Item onClick={() => selectUser(user)} style={{ cursor: "pointer" }}>
+              {user.firstName} {user.lastName}
+            </List.Item>
+          )}
+        />
         ) : (
           <>
             <Button type="default" onClick={() => setSelectedUser(null)}>

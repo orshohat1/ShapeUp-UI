@@ -89,7 +89,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const fetchChatHistory = async () => {
     if (!userId) return;
     
-    socket.emit("get_users_chat", userId, ownerId, (chatHistory: any) => {
+    socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
       if (chatHistory && chatHistory.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
           sender: msg.creator.toString(),
@@ -115,7 +115,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
     const message = { sender: userId || "Guest", text: newMessage };
     socket.emit("add_user", ownerId);
-    socket.emit("communicate", userId, ownerId, newMessage);
+    socket.emit("communicate", userId, ownerId, gymName, newMessage);
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
   };
