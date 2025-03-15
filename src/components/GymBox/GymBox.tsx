@@ -69,7 +69,12 @@ const GymBox: React.FC<GymBoxProps> = ({
   
   const fetchChatHistory = (userId: string) => {
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
-      setMessages(chatHistory.messages || []);
+      const formattedMessages = chatHistory.messages.map((msg: any) => ({
+        sender: msg.sender.toString(),
+        text: msg.text,
+        timestamp: msg.timestamp
+      }));
+      setMessages(formattedMessages || []);
     });
   };
 
@@ -92,7 +97,11 @@ const GymBox: React.FC<GymBoxProps> = ({
 
     const message = { sender: ownerId, text: newMessage };
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
-    setMessages((prev) => [...prev, message]);
+    setMessages((prev) => 
+      prev.some((msg) => msg.text === newMessage && msg.sender === ownerId) 
+        ? prev 
+        : [...prev, message]
+    );
     setNewMessage("");
   };
 
@@ -143,7 +152,7 @@ const GymBox: React.FC<GymBoxProps> = ({
               dataSource={messages}
               renderItem={(msg) => (
                 <List.Item>
-                  <strong>{msg.sender === ownerId ? "You" : "User"}:</strong> {msg.text}
+                  <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
                 </List.Item>
               )}
             />

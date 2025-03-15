@@ -92,7 +92,7 @@ const GymCard: React.FC<GymCardProps> = ({
     socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
       if (chatHistory && chatHistory.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
-          sender: msg.creator.toString(),
+          sender: msg.sender.toString(),
           text: msg.text,
           timestamp: msg.timestamp
         }));
@@ -106,7 +106,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const openChatModal = () => {
     setChatModalOpen(true);
-    fetchChatHistory();
+    setInterval(() => { fetchChatHistory(); }, 1000);
     socket.emit("add_user", userId);
   };
 
