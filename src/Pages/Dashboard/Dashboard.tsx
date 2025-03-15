@@ -17,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [gymData, setGymData] = useState({ name: "", city: "", description: "" });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
+  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -189,6 +190,7 @@ const Dashboard: React.FC = () => {
                   key={gym._id}
                   gymName={gym.name}
                   city={gym.city}
+                  ownerId={gym.owner}
                   onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
                   onUpdatePrices={handleGymUpdatePrices}

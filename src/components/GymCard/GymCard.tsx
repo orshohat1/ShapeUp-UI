@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getGymReviews, addReview } from "../../api/reviews";
+import { getUserProfile } from "../../api/users";
 import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
 
 interface GymCardProps {
@@ -16,7 +18,16 @@ interface GymCardProps {
   onToggleFavorite: () => void;
   onReviewAdded: (gymId: string) => void;
   onReviewsClick?: () => void;
+  ownerId: string;
 }
+
+const CHAT_SERVER_URL = "http://localhost:3002";
+const PATH = "/users-chat";
+
+const socket: Socket = io(CHAT_SERVER_URL, {
+  path: PATH, 
+  transports: ["websocket", "polling"], 
+});
 
 const GymCard: React.FC<GymCardProps> = ({
   gymId,
@@ -30,15 +41,21 @@ const GymCard: React.FC<GymCardProps> = ({
   onToggleFavorite,
   onReviewAdded,
   onReviewsClick,
+  ownerId
 }) => {
   const [reviews, setReviews] = useState([] as any[]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isChatModalOpen, setChatModalOpen] = useState(false);
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
+  const [newMessage, setNewMessage] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [localReviewsCount, setLocalReviewsCount] = useState(reviewsCount);
   const [averageRating, setAverageRating] = useState(parseFloat(rating) || 0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userId, setUserId] = useState<string | null>(null);
   const reviewsPerPage = 5;
+  
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -53,13 +70,55 @@ const GymCard: React.FC<GymCardProps> = ({
         } else {
           setAverageRating(0);
         }
+
+        const userData = await getUserProfile();
+        setUserId(userData._id);
       } catch (error) {
-        console.error("Failed to load reviews", error);
+        console.error("Failed to load reviews or user profile", error);
       }
     };
 
     fetchReviews();
+
+    return () => {
+      socket.off("message");
+    };
+
   }, [gymId, reviewsCount]);
+
+  const fetchChatHistory = async () => {
+    if (!userId) return;
+    
+    socket.emit("get_users_chat", userId, ownerId, (chatHistory: any) => {
+      if (chatHistory && chatHistory.messages) {
+        const formattedMessages = chatHistory.messages.map((msg: any) => ({
+          sender: msg.creator.toString(),
+          text: msg.text,
+          timestamp: msg.timestamp
+        }));
+        
+        setMessages(formattedMessages);
+      } else {
+        setMessages([]);
+      }
+    });
+  };
+
+  const openChatModal = () => {
+    setChatModalOpen(true);
+    fetchChatHistory();
+    socket.emit("add_user", userId);
+  };
+
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
+
+    const message = { sender: userId, text: newMessage };
+    socket.emit("add_user", ownerId);
+    socket.emit("communicate", userId, ownerId, newMessage);
+    setMessages((prev) => [...prev, message]);
+    setNewMessage("");
+  };
 
   const handleNext = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -126,6 +185,10 @@ const GymCard: React.FC<GymCardProps> = ({
 
       <Button className="add-review-btn" type="primary" size="small" onClick={() => setIsReviewFormOpen(true)}>
         Add Review
+      </Button>
+
+      <Button className="chat-btn" type="default" size="small" onClick={openChatModal}>
+        Chat with Owner
       </Button>
 
       {/* Image Slider */}
@@ -195,6 +258,32 @@ const GymCard: React.FC<GymCardProps> = ({
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* Chat Modal */}
+      <Modal
+        title={`Chat with ${gymName} Owner`}
+        open={isChatModalOpen}
+        onCancel={() => setChatModalOpen(false)}
+        footer={null}
+      >
+        <List
+          dataSource={messages}
+          renderItem={(msg) => (
+            <List.Item>
+              <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
+            </List.Item>
+          )}
+        />
+        <Input.TextArea
+          rows={2}
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type your message..."
+        />
+        <Button type="primary" onClick={sendMessage} block>
+          Send
+        </Button>
       </Modal>
     </div>
   );
