@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
 import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
+import {askChatAi} from "../../../api/chat-ai";
 import GymCard from "../../../components/GymCard/GymCard";
 import { Button, Pagination, Spin, Alert, Modal, List, Rate, Input } from "antd";
 import "./GymsList.less";
@@ -8,13 +9,18 @@ import "./GymsList.less";
 const GymsList: React.FC = () => {
   const [gyms, setGyms] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
+
+  const [chatAiResponse, setAiResponse] = useState<any>(null);
   const [filteredGyms, setFilteredGyms] = useState<any[]>([]);
   const [filterName, setFilterName] = useState<string>("");
   const [filterCity, setFilterCity] = useState<string>("");
+  const [isChatLoading, setChatLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFavoritesModalVisible, setFavoritesModalVisible] = useState(false);
+
+  const [isChatAIModalVisible, setChatAIModal] = useState(false);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [isReviewsModalVisible, setReviewsModalVisible] = useState(false);
   const [selectedGymReviews, setSelectedGymReviews] = useState<any[]>([]);
@@ -32,13 +38,14 @@ const GymsList: React.FC = () => {
         try {
           const userData = await getUserProfile();
           setUser(userData);
-        } catch {
+        } catch (err: any) {
           setUser(null);
         }
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load gyms.");
       } finally {
         setLoading(false);
+        setAiResponse("Loading...")
       }
     };
 
@@ -93,6 +100,29 @@ const GymsList: React.FC = () => {
     setModalPage(1);
   };
 
+  const openChatAIModal = async () => {
+    if (user?._id) {
+      try {
+        setChatLoading(true);
+        const response = await askChatAi(user._id, user.birthdate, user.gender);
+        setAiResponse(response);
+      } catch (err) {
+        console.error("Chat AI Error:", err);
+        setAiResponse("Failed to fetch AI response");
+      }
+      finally {
+        setChatLoading(false);
+        setChatAIModal(true);
+      }
+    }
+    else
+      setChatAIModal(true);
+  };
+
+  const closeChatAIModal = () => {
+    setChatAIModal(false);
+  };
+
   const closeFavoritesModal = () => {
     setFavoritesModalVisible(false);
   };
@@ -142,7 +172,6 @@ const GymsList: React.FC = () => {
   const currentFavoriteGyms = gyms
     .filter((gym) => favoriteGyms.includes(gym._id))
     .slice(indexOfFirstFavorite, indexOfLastFavorite);
-
   const indexOfLastReview = reviewsPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = selectedGymReviews.slice(indexOfFirstReview, indexOfLastReview);
@@ -155,7 +184,13 @@ const GymsList: React.FC = () => {
             <span>Hello, {user ? user.firstName : "Guest"}!</span>
           </div>
           <div className="actions">
+
+          <Button onClick={openChatAIModal} disabled={isChatLoading}>
+            {isChatLoading ? <Spin /> : "Suggest Workout Plan"}
+          </Button>
+
             <Button onClick={openFilterModal}>Filter</Button>
+
             <Button onClick={openFavoritesModal}>Favorites</Button>
           </div>
         </div>
@@ -254,6 +289,25 @@ const GymsList: React.FC = () => {
           className="modal-pagination"
         />
       </Modal>
+
+      {/* Chat AI Modal */}
+      <Modal
+        title="Generate Your Workout Plan By AI"
+        open={isChatAIModalVisible}
+        onCancel={closeChatAIModal}
+        footer={null}
+      >
+        <div className="ChatAI-popup">
+          {isChatLoading ? (
+            <Spin size="large" />
+          ) : chatAiResponse.length ? (
+            <p>{chatAiResponse}</p>
+          ) : (
+            <p>Failed to retrieve workout plan from AI!</p>
+          )}
+      </div>
+      </Modal>
+
 
       {/* Reviews Modal */}
       <Modal
