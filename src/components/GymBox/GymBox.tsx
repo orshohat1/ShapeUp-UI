@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Popconfirm, Modal, Input, List, notification } from "antd";
+import { Button, Popconfirm, Modal, Input, List, notification, Spin } from "antd";
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
 import './GymBox.less';
@@ -33,6 +33,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [selectedUser, setSelectedUser] = useState<{ userId: string; firstName: string; lastName: string } | null>(null);
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!ownerId) return;
@@ -75,6 +76,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         timestamp: msg.timestamp
       }));
       setMessages(formattedMessages || []);
+      setIsLoading(false);
     });
   };
 
@@ -89,6 +91,7 @@ const GymBox: React.FC<GymBoxProps> = ({
 
   const selectUser = (user: { userId: string; firstName: string; lastName: string }) => {
     setSelectedUser(user);
+    setIsLoading(true);
     setInterval(() => { fetchChatHistory(user.userId); }, 1000);
   };
   
@@ -148,14 +151,21 @@ const GymBox: React.FC<GymBoxProps> = ({
             <Button type="default" onClick={() => setSelectedUser(null)}>
               Back to User List
             </Button>
-            <List
-              dataSource={messages}
-              renderItem={(msg) => (
-                <List.Item>
-                  <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
-                </List.Item>
-              )}
-            />
+            {isLoading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                <Spin size="large" />
+                <p>Loading messages...</p>
+              </div>
+            ) : (
+              <List
+                dataSource={messages}
+                renderItem={(msg) => (
+                  <List.Item>
+                    <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
+                  </List.Item>
+                )}
+              />
+            )}
             <div className="chat-input-container">
               <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
               <Button type="primary" onClick={sendMessage} block>

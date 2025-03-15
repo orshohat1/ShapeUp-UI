@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getGymReviews, addReview } from "../../api/reviews";
 import { getUserProfile } from "../../api/users";
-import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination } from "antd";
+import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination, Spin } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
@@ -54,6 +54,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const [averageRating, setAverageRating] = useState(parseFloat(rating) || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const reviewsPerPage = 5;
   
 
@@ -101,11 +102,13 @@ const GymCard: React.FC<GymCardProps> = ({
       } else {
         setMessages([]);
       }
+      setIsLoading(false);
     });
   };
 
   const openChatModal = () => {
     setChatModalOpen(true);
+    setIsLoading(true);
     setInterval(() => { fetchChatHistory(); }, 1000);
     socket.emit("add_user", userId);
   };
@@ -267,14 +270,21 @@ const GymCard: React.FC<GymCardProps> = ({
         onCancel={() => setChatModalOpen(false)}
         footer={null}
       >
-        <List
-          dataSource={messages}
-          renderItem={(msg) => (
-            <List.Item>
-              <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
-            </List.Item>
-          )}
-        />
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <Spin size="large" />
+            <p>Loading messages...</p>
+          </div>
+        ) : (
+          <List
+            dataSource={messages}
+            renderItem={(msg) => (
+              <List.Item>
+                <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
+              </List.Item>
+            )}
+          />
+        )}
         <Input.TextArea
           rows={2}
           value={newMessage}
