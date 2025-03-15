@@ -104,7 +104,7 @@ const GymsList: React.FC = () => {
     if (user?._id) {
       try {
         setChatLoading(true);
-        const response = await askChatAi(user._id, user.birthdate.toString(), user.gender);
+        const response = await askChatAi(user._id, user.birthdate, user.gender);
         setAiResponse(response);
       } catch (err) {
         console.error("Chat AI Error:", err);

@@ -3,11 +3,11 @@ import { notification } from "antd";
 
 const USERS_ROUTE = "/askChatAi";
 
-export const askChatAi = async (userId: string, userBirthDate: string, userGender: string) => {
+export const askChatAi = async (userId: string, userBirthDate: Date, userGender: string) => {
     try {
         let question = 'Please give me a workout plan.';
         if(userBirthDate != null)
-          question += ` I was born in ${userBirthDate}.`;
+          question += ` I was born in ${userBirthDate.toString()}.`;
         if(userGender != null)
           question += ` I am a ${userGender}.`
         const response = await axiosInstance.post(
