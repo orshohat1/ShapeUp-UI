@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Popconfirm, Modal, Input, List, notification } from "antd";
-import { EditOutlined, DeleteOutlined, MessageOutlined  } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
 import './GymBox.less';
 
@@ -10,16 +10,14 @@ interface GymBoxProps {
   ownerId: string;
   onEdit: () => void;
   onDelete: () => void;
-  onUpdatePrices: () => void;
-  onGeneratePricingSuggestions: () => void;
 }
 
 const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH, 
-  transports: ["websocket", "polling"], 
+  path: PATH,
+  transports: ["websocket", "polling"],
 });
 
 const GymBox: React.FC<GymBoxProps> = ({
@@ -28,8 +26,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   ownerId,
   onEdit,
   onDelete,
-  onUpdatePrices,
-  onGeneratePricingSuggestions,
+
 }) => {
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [chatUsers, setChatUsers] = useState<{ userId: string; name: string }[]>([]);
@@ -39,7 +36,7 @@ const GymBox: React.FC<GymBoxProps> = ({
 
   useEffect(() => {
     if (!ownerId) return;
-  
+
     socket.on("message", (message) => {
       if (!selectedUser || message.sender === selectedUser || message.sender === ownerId) {
         setMessages((prevMessages) => {
@@ -47,7 +44,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         });
       }
     });
-  
+
     return () => {
       socket.off("message");
     };
@@ -80,7 +77,7 @@ const GymBox: React.FC<GymBoxProps> = ({
 
   const selectUser = (userId: string) => {
     setSelectedUser(userId);
-    setInterval(() => {fetchChatHistory(userId);}, 1000);
+    setInterval(() => { fetchChatHistory(userId); }, 1000);
   };
 
   const sendMessage = () => {
@@ -98,7 +95,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         <h3>{gymName}</h3>
         <div className="gym-box-icons">
           <EditOutlined onClick={onEdit} className="gym-box-icon" />
-          
+
           <Popconfirm
             title="Are you sure you want to delete this gym?"
             onConfirm={onDelete}
@@ -110,14 +107,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         </div>
       </div>
       <p>{city}</p>
-      <Button type='primary' onClick={onUpdatePrices} className="gym-box-button">
-        Update Prices
-      </Button>
-      <Button onClick={onGeneratePricingSuggestions} className="gym-box-button">
-        Generate Pricing Suggestions
-      </Button>
-
-      <Button type="default" className="gym-box-button" icon={<MessageOutlined />} onClick={openChatModal}>
+      <Button type="primary" className="gym-box-button" icon={<MessageOutlined />} onClick={openChatModal}>
         Chat with Users
       </Button>
 
@@ -145,10 +135,13 @@ const GymBox: React.FC<GymBoxProps> = ({
                 </List.Item>
               )}
             />
-            <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
-            <Button type="primary" onClick={sendMessage} block>
-              Send
-            </Button>
+            <div className="chat-input-container">
+              <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
+              <Button type="primary" onClick={sendMessage} block>
+                Send
+              </Button>
+            </div>
+
           </>
         )}
       </Modal>

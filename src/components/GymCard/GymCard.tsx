@@ -18,7 +18,7 @@ interface GymCardProps {
   onToggleFavorite: () => void;
   onReviewAdded: (gymId: string) => void;
   onReviewsClick?: () => void;
-  ownerId: string;
+  ownerId?: string;
 }
 
 const CHAT_SERVER_URL = "http://localhost:3002";
@@ -113,7 +113,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const sendMessage = () => {
     if (!newMessage.trim()) return;
 
-    const message = { sender: userId, text: newMessage };
+    const message = { sender: userId || "Guest", text: newMessage };
     socket.emit("add_user", ownerId);
     socket.emit("communicate", userId, ownerId, newMessage);
     setMessages((prev) => [...prev, message]);
