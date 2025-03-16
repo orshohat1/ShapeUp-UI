@@ -164,14 +164,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleGymUpdatePrices = () => {
-    console.log('Update Prices clicked');
-  };
-
-  const handleGymGeneratePricingSuggestions = () => {
-    console.log('Generate Pricing Suggestions clicked');
-  };
-
   return (
     <div className="container-fluid">
       {(loadingGyms) && <LoadingOverlay />}
@@ -193,8 +185,6 @@ const Dashboard: React.FC = () => {
                   ownerId={gym.owner}
                   onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
-                  onUpdatePrices={handleGymUpdatePrices}
-                  onGeneratePricingSuggestions={handleGymGeneratePricingSuggestions}
                 />
               ))
             )}

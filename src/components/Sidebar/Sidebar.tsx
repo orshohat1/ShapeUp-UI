@@ -47,9 +47,9 @@ const Sidebar: React.FC<{ user?: any }> = () => {
         )}
 
         {userProfile?.role === "gym_owner" && (
-          <div className="menu-item" onClick={() => navigate("/gyms")}>
+          <div className="menu-item" onClick={() => navigate("/dashboard")}>
             <HomeOutlined style={{ marginRight: "auto", color: "purple" }} />
-            <span className="item-title">Gyms</span>
+            <span className="item-title">Dashboard</span>
           </div>
         )}
       </div>
