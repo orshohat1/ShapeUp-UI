@@ -34,7 +34,7 @@ const RegisterUser: React.FC = () => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const userProfile = await refreshUserProfile();
+        const userProfile = await refreshUserProfile(false);
 
         if (userProfile) {
           if (userProfile.role === "gym_owner") {
