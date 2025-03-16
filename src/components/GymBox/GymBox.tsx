@@ -52,7 +52,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   }, [ownerId, selectedUser]);
 
   const fetchChatUsers = () => {
-    socket.emit("get_gym_chats", ownerId, (chatData: any) => {
+    socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
       if (chatData) {
         const uniqueUsers = Array.from(
           new Map(chatData.map((user: any) => [user.userId, user])).values()
@@ -145,6 +145,7 @@ const GymBox: React.FC<GymBoxProps> = ({
               {user.firstName} {user.lastName}
             </List.Item>
           )}
+          locale={{ emptyText: "No Active Chats" }}
         />
         ) : (
           <>

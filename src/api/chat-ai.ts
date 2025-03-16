@@ -5,7 +5,7 @@ const USERS_ROUTE = "/askChatAi";
 
 export const askChatAi = async (userId: string, userBirthDate: Date, userGender: string) => {
     try {
-        let question = 'Please give me a workout plan.';
+        let question = 'Please give me a workout plan. I know you are just an AI model but please send me the best you know.';
         if(userBirthDate != null)
           question += ` I was born in ${userBirthDate.toString()}.`;
         if(userGender != null)
