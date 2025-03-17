@@ -122,7 +122,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   return (
     <div className="gym-box">
       <div className="gym-box-header">
-        <h3>{gymName}</h3>
+        <h4>{gymName}</h4>
         <div className="gym-box-icons">
           <EditOutlined onClick={onEdit} className="gym-box-icon" />
 
