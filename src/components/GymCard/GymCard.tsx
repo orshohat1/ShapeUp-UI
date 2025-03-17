@@ -25,8 +25,8 @@ const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH, 
-  transports: ["websocket", "polling"], 
+  path: PATH,
+  transports: ["websocket", "polling"],
 });
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -56,7 +56,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const reviewsPerPage = 5;
-  
+
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -89,7 +89,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const fetchChatHistory = async () => {
     if (!userId) return;
-    
+
     socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
       if (chatHistory && chatHistory.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
@@ -97,7 +97,7 @@ const GymCard: React.FC<GymCardProps> = ({
           text: msg.text,
           timestamp: msg.timestamp
         }));
-        
+
         setMessages(formattedMessages);
       } else {
         setMessages([]);
@@ -285,15 +285,17 @@ const GymCard: React.FC<GymCardProps> = ({
             )}
           />
         )}
-        <Input.TextArea
-          rows={2}
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-        />
-        <Button type="primary" onClick={sendMessage} block>
-          Send
-        </Button>
+        <div className="chat-input-container">
+          <Input.TextArea
+            rows={2}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+          />
+          <Button type="primary" onClick={sendMessage} block>
+            Send
+          </Button>
+        </div>
       </Modal>
     </div>
   );
