@@ -49,23 +49,36 @@ const GymBox: React.FC<GymBoxProps> = ({
   useEffect(() => {
     const handleIncomingMessage = (message: any) => {
       if (!selectedUser || !message) return;
-
+      if (
+        message.sender !== selectedUser.userId &&
+        message.sender !== ownerId
+      ) {
+        return;
+      }
+  
       message.timestamp = message.timestamp || Date.now();
-
+  
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.timestamp === message.timestamp);
         return exists ? prevMessages : [...prevMessages, message];
       });
+      setTimeout(() => {
+        const chatContainer = document.querySelector(".chat-messages-container");
+        if (chatContainer) {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+      }, 100);
     };
-
+  
     socket.on("message", handleIncomingMessage);
     socket.on("update_messages", handleIncomingMessage);
-
+  
     return () => {
       socket.off("message", handleIncomingMessage);
       socket.off("update_messages", handleIncomingMessage);
     };
-  }, [messages]);
+  }, [selectedUser]);
+  
 
   const fetchChatUsers = () => {
     socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
@@ -102,9 +115,7 @@ const GymBox: React.FC<GymBoxProps> = ({
       })));
     });
   };
-
-
-
+  
   const openChatModal = () => {
     setChatModalVisible(true);
     setSelectedUser(null);
@@ -122,15 +133,11 @@ const GymBox: React.FC<GymBoxProps> = ({
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
-
-    const message = { sender: ownerId, text: newMessage, timestamp: Date.now() };
-
-    setMessages((prev) => [...prev, message]);
-
+  
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
-
     setNewMessage("");
   };
+  
 
   return (
     <div className="gym-box">
