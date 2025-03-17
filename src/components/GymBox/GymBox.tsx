@@ -49,23 +49,23 @@ const GymBox: React.FC<GymBoxProps> = ({
   useEffect(() => {
     const handleIncomingMessage = (message: any) => {
       if (!selectedUser || !message) return;
-  
+
       message.timestamp = message.timestamp || Date.now();
-  
+
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.timestamp === message.timestamp);
         return exists ? prevMessages : [...prevMessages, message];
       });
     };
-  
+
     socket.on("message", handleIncomingMessage);
     socket.on("update_messages", handleIncomingMessage);
-  
+
     return () => {
       socket.off("message", handleIncomingMessage);
       socket.off("update_messages", handleIncomingMessage);
     };
-  }, [messages]); 
+  }, [messages]);
 
   const fetchChatUsers = () => {
     socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
@@ -85,16 +85,16 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
 
   const fetchChatHistory = (userId: string) => {
-    setIsLoading(true); 
-    
+    setIsLoading(true);
+
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
-      setIsLoading(false); 
-      
+      setIsLoading(false);
+
       if (!chatHistory || !chatHistory.messages) {
         setMessages([]);
         return;
       }
-  
+
       setMessages(chatHistory.messages.map((msg: any) => ({
         sender: msg.sender.toString(),
         text: msg.text,
@@ -102,8 +102,8 @@ const GymBox: React.FC<GymBoxProps> = ({
       })));
     });
   };
-  
-  
+
+
 
   const openChatModal = () => {
     setChatModalVisible(true);
@@ -122,14 +122,14 @@ const GymBox: React.FC<GymBoxProps> = ({
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
-  
+
     const message = { sender: ownerId, text: newMessage, timestamp: Date.now() };
-  
+
     setMessages((prev) => [...prev, message]);
-  
+
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
-  
-    setNewMessage(""); 
+
+    setNewMessage("");
   };
 
   return (
@@ -159,6 +159,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         open={isChatModalVisible}
         onCancel={() => setChatModalVisible(false)}
         footer={null}
+        className="chat-modal"
       >
         {!selectedUser ? (
           <List
@@ -173,34 +174,32 @@ const GymBox: React.FC<GymBoxProps> = ({
           />
         ) : (
           <>
-            <Button type="default" onClick={() => setSelectedUser(null)}>
-              Back to User List
-            </Button>
-            {isLoading ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <Spin size="large" />
-                <p>Loading messages...</p>
-              </div>
-            ) : (
-              <List
-                dataSource={messages}
-                renderItem={(msg) => (
-                  <List.Item>
-                    <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
-                  </List.Item>
-                )}
-              />
-            )}
-            <div className="chat-input-container">
-              <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
-              <Button type="primary" onClick={sendMessage} block>
-                Send
-              </Button>
+            <Button type="default" onClick={() => setSelectedUser(null)}>Back to User List</Button>
+
+            {/* Message Container with Scrolling */}
+            <div className="chat-messages-container">
+              {messages.map((msg, index) => (
+                <div key={index} className={`chat-message ${msg.sender === ownerId ? "user-message" : "owner-message"}`}>
+                  <strong>{msg.sender === ownerId ? "You" : "User"}:</strong> {msg.text}
+                </div>
+              ))}
             </div>
 
+            {/* Input & Send Button */}
+            <div className="chat-input-container">
+              <Input.TextArea
+                rows={2}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+              />
+              <Button type="primary" onClick={sendMessage} block>Send</Button>
+            </div>
           </>
         )}
       </Modal>
+
+
     </div>
   );
 };

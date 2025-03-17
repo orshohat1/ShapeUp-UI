@@ -37,3 +37,49 @@
     gap: 10px;
   }
   
+  .chat-modal {
+    .ant-modal-body {
+      display: flex;
+      flex-direction: column;
+      height: 400px; // Keeps chat window fixed & scrollable
+    }
+  
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto; // Enables scrolling when many messages exist
+      padding: 10px;
+      border-radius: 8px;
+      background-color: #f9f9f9; // Soft gray background
+    }
+  
+    .chat-message {
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      max-width: 75%;
+      word-wrap: break-word;
+      font-size: 14px;
+      border: 1px solid #e0e0e0; // Subtle border for clarity
+    }
+  
+    .user-message {
+      align-self: flex-end;
+      background-color: #ffffff; // White background
+      color: black;
+    }
+  
+    .owner-message {
+      align-self: flex-start;
+      background-color: #f1f1f1; // Light gray background
+      color: black;
+    }
+  
+    .chat-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 8px;
+    }
+  }
+  
+  
