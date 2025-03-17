@@ -269,6 +269,7 @@ const GymCard: React.FC<GymCardProps> = ({
         open={isChatModalOpen}
         onCancel={() => setChatModalOpen(false)}
         footer={null}
+        className="chat-modal"
       >
         {isLoading ? (
           <div style={{ textAlign: "center", padding: "20px" }}>
@@ -276,27 +277,35 @@ const GymCard: React.FC<GymCardProps> = ({
             <p>Loading messages...</p>
           </div>
         ) : (
-          <List
-            dataSource={messages}
-            renderItem={(msg) => (
-              <List.Item>
-                <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
-              </List.Item>
-            )}
-          />
+          <div className="chat-container">
+            {/* Scrollable Messages */}
+            <div className="chat-messages-container">
+              <div className="chat-messages">
+                {messages.map((msg, index) => (
+                  <div key={index} className={`chat-message ${msg.sender === userId ? "user-message" : "owner-message"}`}>
+                    {msg.text}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chat Input */}
+            <div className="chat-input-container">
+              <Input.TextArea
+                rows={2}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="chat-input"
+              />
+              <Button type="primary" onClick={sendMessage} block>
+                Send
+              </Button>
+            </div>
+          </div>
         )}
-        <div className="chat-input-container">
-          <Input.TextArea
-            rows={2}
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-          />
-          <Button type="primary" onClick={sendMessage} block>
-            Send
-          </Button>
-        </div>
       </Modal>
+
     </div>
   );
 };

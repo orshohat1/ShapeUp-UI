@@ -174,18 +174,20 @@ const GymBox: React.FC<GymBoxProps> = ({
           />
         ) : (
           <>
-            <Button type="default" onClick={() => setSelectedUser(null)}>Back to User List</Button>
+            <Button type="default" onClick={() => setSelectedUser(null)} className="back-button">
+              Back to User List
+            </Button>
 
-            {/* Message Container with Scrolling */}
+            {/* Chat Messages Section */}
             <div className="chat-messages-container">
               {messages.map((msg, index) => (
                 <div key={index} className={`chat-message ${msg.sender === ownerId ? "user-message" : "owner-message"}`}>
-                  <strong>{msg.sender === ownerId ? "You" : "User"}:</strong> {msg.text}
+                  {msg.text}
                 </div>
               ))}
             </div>
 
-            {/* Input & Send Button */}
+            {/* Chat Input Section */}
             <div className="chat-input-container">
               <Input.TextArea
                 rows={2}
