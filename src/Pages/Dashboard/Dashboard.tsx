@@ -6,6 +6,15 @@ import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import { getGymsByOwner, addGym, updateGymById, deleteGymById} from "../../api/gym-owner";
 import GymBox from '../../components/GymBox/GymBox';
+import { io, Socket } from "socket.io-client";
+
+const CHAT_SERVER_URL = "http://localhost:3002";
+const PATH = "/users-chat";
+
+const socket: Socket = io(CHAT_SERVER_URL, {
+  path: PATH,
+  transports: ["websocket", "polling"],
+});
 
 const Dashboard: React.FC = () => {
   const { userProfile } = useUserProfile();
@@ -138,9 +147,27 @@ const Dashboard: React.FC = () => {
 
       const updatedGym = await updateGymById(formData, selectedGym._id);
 
+      if (selectedGym.name !== gymData.name) {  
+        socket.emit("update_gym_name", userProfile?.id, selectedGym.name, gymData.name, (response: any) => {
+          if (response.success) {
+            notification.success({
+              message: "Gym Name Updated",
+              description: `Successfully updated gym name in ${response.updatedChats} chats.`,
+              placement: "top",
+            });
+          } else {
+            notification.warning({
+              message: "No Chats Found",
+              description: response.message,
+              placement: "top",
+            });
+          }
+        });
+      }
+
       setGyms((prevGyms: any) =>
-        prevGyms.map((gym: any) => (gym._id === selectedGym._id ? updatedGym : gym))
-      );
+        prevGyms.map((gym: any) => (gym._id === selectedGym._id ? { ...gym, name: gymData.name } : gym))
+      );      
 
       handleCloseEditGymModal();
     } catch (error) {
@@ -179,7 +206,7 @@ const Dashboard: React.FC = () => {
             ) : (
               gyms?.map((gym: any) => (
                 <GymBox
-                  key={gym._id}
+                  key={gym._id + gym.name}
                   gymName={gym.name}
                   city={gym.city}
                   ownerId={gym.owner}

@@ -21,19 +21,30 @@ const socket: Socket = io(CHAT_SERVER_URL, {
 });
 
 const GymBox: React.FC<GymBoxProps> = ({
-  gymName,
+  gymName: initialGymName,
   city,
   ownerId,
   onEdit,
   onDelete,
 
 }) => {
+  const [gymName, setGymName] = useState(initialGymName);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [chatUsers, setChatUsers] = useState<{ userId: string; firstName: string; lastName: string }[]>([]);
   const [selectedUser, setSelectedUser] = useState<{ userId: string; firstName: string; lastName: string } | null>(null);
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [prevGymName, setPrevGymName] = useState(initialGymName); // Track previous gymName
+
+
+  useEffect(() => {
+    if (initialGymName !== prevGymName) {
+      setGymName(initialGymName);
+      setForceUpdate(prev => prev + 1);
+    }
+  }, [initialGymName]);
 
   useEffect(() => {
     if (!ownerId) return;
@@ -69,13 +80,14 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
   
   const fetchChatHistory = (userId: string) => {
+    console.log("🔄 [DEBUG] Fetching chat history for gymName:", gymName);
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
       const formattedMessages = chatHistory.messages.map((msg: any) => ({
         sender: msg.sender.toString(),
         text: msg.text,
         timestamp: msg.timestamp
       }));
-      setMessages(formattedMessages || []);
+      setMessages(formattedMessages);
       setIsLoading(false);
     });
   };
