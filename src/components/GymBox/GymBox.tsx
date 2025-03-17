@@ -47,21 +47,22 @@ const GymBox: React.FC<GymBoxProps> = ({
   }, [initialGymName]);
 
   useEffect(() => {
-    if (!ownerId) return;
-
-    socket.on("message", (message) => {
-      if (!selectedUser || message.sender === selectedUser || message.sender === ownerId) {
-        setMessages((prevMessages) => {
-          return [...prevMessages, message];
-        });
+    const handleIncomingMessage = (message: any, senderId: string, receiverId: string) => {
+      if (
+        (senderId === selectedUser?.userId && receiverId === ownerId) ||
+        (senderId === ownerId && selectedUser && selectedUser.userId === senderId)
+      ) {
+        setMessages((prev) => [...prev, message]);
       }
-    });
-
+    };
+  
+    socket.on("message", handleIncomingMessage);
+  
     return () => {
-      socket.off("message");
+      socket.off("message", handleIncomingMessage);
     };
   }, [ownerId, selectedUser]);
-
+  
   const fetchChatUsers = () => {
     socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
       if (chatData) {
@@ -103,7 +104,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   const selectUser = (user: { userId: string; firstName: string; lastName: string }) => {
     setSelectedUser(user);
     setIsLoading(true);
-    setInterval(() => { fetchChatHistory(user.userId); }, 1000);
+    fetchChatHistory(user.userId);
   };
 
   const sendMessage = () => {
