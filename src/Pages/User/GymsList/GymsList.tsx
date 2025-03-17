@@ -303,8 +303,9 @@ const GymsList: React.FC = () => {
         <div className="ChatAI-popup">
           {isChatLoading ? (
             <Spin size="large" />
-          ) : chatAiResponse.length ? (
-            <p>{chatAiResponse}</p>
+          ) : 
+          chatAiResponse.length ? (
+            <pre>{chatAiResponse}</pre>
           ) : (
             <p>Failed to retrieve workout plan from AI!</p>
           )}
