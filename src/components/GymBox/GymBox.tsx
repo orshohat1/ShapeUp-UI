@@ -32,7 +32,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [chatUsers, setChatUsers] = useState<{ userId: string; firstName: string; lastName: string }[]>([]);
   const [selectedUser, setSelectedUser] = useState<{ userId: string; firstName: string; lastName: string } | null>(null);
-  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ sender: string; text: string; timestamp: number }[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -47,20 +47,38 @@ const GymBox: React.FC<GymBoxProps> = ({
   }, [initialGymName]);
 
   useEffect(() => {
-    if (!ownerId) return;
-
-    socket.on("message", (message) => {
-      if (!selectedUser || message.sender === selectedUser || message.sender === ownerId) {
-        setMessages((prevMessages) => {
-          return [...prevMessages, message];
-        });
+    const handleIncomingMessage = (message: any) => {
+      if (!selectedUser || !message) return;
+      if (
+        message.sender !== selectedUser.userId &&
+        message.sender !== ownerId
+      ) {
+        return;
       }
-    });
+
+      message.timestamp = message.timestamp || Date.now();
+
+      setMessages((prevMessages) => {
+        const exists = prevMessages.some((msg) => msg.timestamp === message.timestamp);
+        return exists ? prevMessages : [...prevMessages, message];
+      });
+      setTimeout(() => {
+        const chatContainer = document.querySelector(".chat-messages-container");
+        if (chatContainer) {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+      }, 100);
+    };
+
+    socket.on("message", handleIncomingMessage);
+    socket.on("update_messages", handleIncomingMessage);
 
     return () => {
-      socket.off("message");
+      socket.off("message", handleIncomingMessage);
+      socket.off("update_messages", handleIncomingMessage);
     };
-  }, [ownerId, selectedUser]);
+  }, [selectedUser]);
+
 
   const fetchChatUsers = () => {
     socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
@@ -80,14 +98,21 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
 
   const fetchChatHistory = (userId: string) => {
+    setIsLoading(true);
+
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
-      const formattedMessages = chatHistory.messages.map((msg: any) => ({
+      setIsLoading(false);
+
+      if (!chatHistory || !chatHistory.messages) {
+        setMessages([]);
+        return;
+      }
+
+      setMessages(chatHistory.messages.map((msg: any) => ({
         sender: msg.sender.toString(),
         text: msg.text,
-        timestamp: msg.timestamp
-      }));
-      setMessages(formattedMessages);
-      setIsLoading(false);
+        timestamp: msg.timestamp || Date.now()
+      })));
     });
   };
 
@@ -103,19 +128,13 @@ const GymBox: React.FC<GymBoxProps> = ({
   const selectUser = (user: { userId: string; firstName: string; lastName: string }) => {
     setSelectedUser(user);
     setIsLoading(true);
-    setInterval(() => { fetchChatHistory(user.userId); }, 1000);
+    fetchChatHistory(user.userId);
   };
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
-    const message = { sender: ownerId, text: newMessage };
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
-    setMessages((prev) =>
-      prev.some((msg) => msg.text === newMessage && msg.sender === ownerId)
-        ? prev
-        : [...prev, message]
-    );
     setNewMessage("");
   };
 
@@ -146,6 +165,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         open={isChatModalVisible}
         onCancel={() => setChatModalVisible(false)}
         footer={null}
+        className="chat-modal"
       >
         {!selectedUser ? (
           <List
@@ -160,34 +180,34 @@ const GymBox: React.FC<GymBoxProps> = ({
           />
         ) : (
           <>
-            <Button type="default" onClick={() => setSelectedUser(null)}>
+            <Button type="default" onClick={() => setSelectedUser(null)} className="back-button">
               Back to User List
             </Button>
-            {isLoading ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <Spin size="large" />
-                <p>Loading messages...</p>
-              </div>
-            ) : (
-              <List
-                dataSource={messages}
-                renderItem={(msg) => (
-                  <List.Item>
-                    <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
-                  </List.Item>
-                )}
-              />
-            )}
-            <div className="chat-input-container">
-              <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
-              <Button type="primary" onClick={sendMessage} block>
-                Send
-              </Button>
+
+            {/* Chat Messages Section */}
+            <div className="chat-messages-container">
+              {messages.map((msg, index) => (
+                <div key={index} className={`chat-message ${msg.sender === ownerId ? "user-message" : "owner-message"}`}>
+                  {msg.text}
+                </div>
+              ))}
             </div>
 
+            {/* Chat Input Section */}
+            <div className="chat-input-container">
+              <Input.TextArea
+                rows={2}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+              />
+              <Button type="primary" onClick={sendMessage} block>Send</Button>
+            </div>
           </>
         )}
       </Modal>
+
+
     </div>
   );
 };
