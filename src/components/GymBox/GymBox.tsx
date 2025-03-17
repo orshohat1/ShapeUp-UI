@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Popconfirm, Modal, Input, List, notification } from "antd";
+import { Button, Popconfirm, Modal, Input, List, notification, Spin } from "antd";
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
 import './GymBox.less';
@@ -21,18 +21,30 @@ const socket: Socket = io(CHAT_SERVER_URL, {
 });
 
 const GymBox: React.FC<GymBoxProps> = ({
-  gymName,
+  gymName: initialGymName,
   city,
   ownerId,
   onEdit,
   onDelete,
 
 }) => {
+  const [gymName, setGymName] = useState(initialGymName);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
-  const [chatUsers, setChatUsers] = useState<{ userId: string; name: string }[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [chatUsers, setChatUsers] = useState<{ userId: string; firstName: string; lastName: string }[]>([]);
+  const [selectedUser, setSelectedUser] = useState<{ userId: string; firstName: string; lastName: string } | null>(null);
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [prevGymName, setPrevGymName] = useState(initialGymName);
+
+
+  useEffect(() => {
+    if (initialGymName !== prevGymName) {
+      setGymName(initialGymName);
+      setForceUpdate(prev => prev + 1);
+    }
+  }, [initialGymName]);
 
   useEffect(() => {
     if (!ownerId) return;
@@ -51,9 +63,16 @@ const GymBox: React.FC<GymBoxProps> = ({
   }, [ownerId, selectedUser]);
 
   const fetchChatUsers = () => {
-    socket.emit("get_gym_chats", ownerId, (chatData: any) => {
+    socket.emit("get_gym_chats", ownerId, gymName, (chatData: any) => {
       if (chatData) {
-        setChatUsers(chatData);
+        const uniqueUsers = Array.from(
+          new Map(chatData.map((user: any) => [user.userId, user])).values()
+        );
+        setChatUsers(uniqueUsers.map((user: any) => ({
+          userId: user.userId,
+          firstName: user.firstName,
+          lastName: user.lastName
+        })));
       } else {
         notification.error({ message: "Failed to load chat users." });
       }
@@ -61,8 +80,14 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
 
   const fetchChatHistory = (userId: string) => {
-    socket.emit("get_users_chat", ownerId, userId, (chatHistory: any) => {
-      setMessages(chatHistory.messages || []);
+    socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
+      const formattedMessages = chatHistory.messages.map((msg: any) => ({
+        sender: msg.sender.toString(),
+        text: msg.text,
+        timestamp: msg.timestamp
+      }));
+      setMessages(formattedMessages);
+      setIsLoading(false);
     });
   };
 
@@ -75,17 +100,22 @@ const GymBox: React.FC<GymBoxProps> = ({
     socket.emit("add_user", ownerId);
   };
 
-  const selectUser = (userId: string) => {
-    setSelectedUser(userId);
-    setInterval(() => { fetchChatHistory(userId); }, 1000);
+  const selectUser = (user: { userId: string; firstName: string; lastName: string }) => {
+    setSelectedUser(user);
+    setIsLoading(true);
+    setInterval(() => { fetchChatHistory(user.userId); }, 1000);
   };
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
     const message = { sender: ownerId, text: newMessage };
-    socket.emit("communicate", ownerId, selectedUser, newMessage);
-    setMessages((prev) => [...prev, message]);
+    socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
+    setMessages((prev) =>
+      prev.some((msg) => msg.text === newMessage && msg.sender === ownerId)
+        ? prev
+        : [...prev, message]
+    );
     setNewMessage("");
   };
 
@@ -111,30 +141,43 @@ const GymBox: React.FC<GymBoxProps> = ({
         Chat with Users
       </Button>
 
-      <Modal title="Chat with Users" open={isChatModalVisible} onCancel={() => setChatModalVisible(false)} footer={null}>
+      <Modal
+        title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
+        open={isChatModalVisible}
+        onCancel={() => setChatModalVisible(false)}
+        footer={null}
+      >
         {!selectedUser ? (
           <List
             bordered
             dataSource={chatUsers}
             renderItem={(user) => (
-              <List.Item onClick={() => selectUser(user.userId)} style={{ cursor: "pointer" }}>
-                {user.name}
+              <List.Item onClick={() => selectUser(user)} style={{ cursor: "pointer" }}>
+                {user.firstName} {user.lastName}
               </List.Item>
             )}
+            locale={{ emptyText: "No Active Chats" }}
           />
         ) : (
           <>
             <Button type="default" onClick={() => setSelectedUser(null)}>
               Back to User List
             </Button>
-            <List
-              dataSource={messages}
-              renderItem={(msg) => (
-                <List.Item>
-                  <strong>{msg.sender === ownerId ? "You" : "User"}:</strong> {msg.text}
-                </List.Item>
-              )}
-            />
+            {isLoading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                <Spin size="large" />
+                <p>Loading messages...</p>
+              </div>
+            ) : (
+              <List
+                dataSource={messages}
+                renderItem={(msg) => (
+                  <List.Item>
+                    <strong>{String(msg.sender) === String(ownerId) ? "You" : "User"}:</strong> {msg.text}
+                  </List.Item>
+                )}
+              />
+            )}
             <div className="chat-input-container">
               <Input.TextArea rows={2} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." />
               <Button type="primary" onClick={sendMessage} block>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getGymReviews, addReview } from "../../api/reviews";
 import { getUserProfile } from "../../api/users";
-import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination } from "antd";
+import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination, Spin } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
@@ -25,8 +25,8 @@ const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH, 
-  transports: ["websocket", "polling"], 
+  path: PATH,
+  transports: ["websocket", "polling"],
 });
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -54,8 +54,9 @@ const GymCard: React.FC<GymCardProps> = ({
   const [averageRating, setAverageRating] = useState(parseFloat(rating) || 0);
   const [currentPage, setCurrentPage] = useState(1);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const reviewsPerPage = 5;
-  
+
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -88,25 +89,27 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const fetchChatHistory = async () => {
     if (!userId) return;
-    
-    socket.emit("get_users_chat", userId, ownerId, (chatHistory: any) => {
+
+    socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
       if (chatHistory && chatHistory.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
-          sender: msg.creator.toString(),
+          sender: msg.sender.toString(),
           text: msg.text,
           timestamp: msg.timestamp
         }));
-        
+
         setMessages(formattedMessages);
       } else {
         setMessages([]);
       }
+      setIsLoading(false);
     });
   };
 
   const openChatModal = () => {
     setChatModalOpen(true);
-    fetchChatHistory();
+    setIsLoading(true);
+    setInterval(() => { fetchChatHistory(); }, 1000);
     socket.emit("add_user", userId);
   };
 
@@ -115,7 +118,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
     const message = { sender: userId || "Guest", text: newMessage };
     socket.emit("add_user", ownerId);
-    socket.emit("communicate", userId, ownerId, newMessage);
+    socket.emit("communicate", userId, ownerId, gymName, newMessage);
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
   };
@@ -267,23 +270,32 @@ const GymCard: React.FC<GymCardProps> = ({
         onCancel={() => setChatModalOpen(false)}
         footer={null}
       >
-        <List
-          dataSource={messages}
-          renderItem={(msg) => (
-            <List.Item>
-              <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
-            </List.Item>
-          )}
-        />
-        <Input.TextArea
-          rows={2}
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-        />
-        <Button type="primary" onClick={sendMessage} block>
-          Send
-        </Button>
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <Spin size="large" />
+            <p>Loading messages...</p>
+          </div>
+        ) : (
+          <List
+            dataSource={messages}
+            renderItem={(msg) => (
+              <List.Item>
+                <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
+              </List.Item>
+            )}
+          />
+        )}
+        <div className="chat-input-container">
+          <Input.TextArea
+            rows={2}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+          />
+          <Button type="primary" onClick={sendMessage} block>
+            Send
+          </Button>
+        </div>
       </Modal>
     </div>
   );
