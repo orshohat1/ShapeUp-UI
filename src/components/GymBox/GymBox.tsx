@@ -80,7 +80,6 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
   
   const fetchChatHistory = (userId: string) => {
-    console.log("🔄 [DEBUG] Fetching chat history for gymName:", gymName);
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
       const formattedMessages = chatHistory.messages.map((msg: any) => ({
         sender: msg.sender.toString(),
