@@ -5,6 +5,7 @@ import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Paginatio
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
+import { useUserProfile } from "../../context/useUserProfile";
 
 interface GymCardProps {
   gymId: string;
@@ -56,6 +57,7 @@ const GymCard: React.FC<GymCardProps> = ({
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const reviewsPerPage = 5;
+  const { userProfile } = useUserProfile();
 
 
   useEffect(() => {
@@ -165,7 +167,6 @@ const GymCard: React.FC<GymCardProps> = ({
       notification.error({ message: "Failed to add review. Please try again." });
     }
   };
-
   return (
     <div className="gym-card">
       <div className="gym-header">
@@ -215,7 +216,11 @@ const GymCard: React.FC<GymCardProps> = ({
               renderItem={(review: any) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar src={review.user?.avatarUrl || "/default-avatar.png"} />}
+                    avatar={<Avatar src={
+                      review.user?._id === userProfile?.id
+                        ? userProfile?.avatarUrl || "/default-avatar.png"
+                        : review.user?.avatarUrl || "/default-avatar.png"
+                    } />}
                     title={<b>{review.user?.firstName || "Anonymous User"}</b>}
                     description={
                       <>
