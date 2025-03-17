@@ -4,14 +4,13 @@ import fileRequestAxiosInstance from "./axios-instances/file-axios-request-insta
 
 const USERS_ROUTE = "/users";
 
-export const getUserProfile = async (showNotification = true) => {
+export const getUserProfile = async () => {
   try {
     const response = await axiosInstance.get(`${USERS_ROUTE}/getMyProfile`, {
       withCredentials: true,
     });
     return response.data;
   } catch (error: any) {
-    if (showNotification) {
     notification.error({
       message: "Fetching User Data Failed",
       description:
@@ -20,7 +19,6 @@ export const getUserProfile = async (showNotification = true) => {
       placement: "top",
     });
     throw error;
-  }
   }
 };
 

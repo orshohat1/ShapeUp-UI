@@ -22,9 +22,9 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
     }
   });
 
-  const refreshUserProfile = async (showNotification = true) => {
+  const refreshUserProfile = async () => {
     try {
-      const userProfileData = await getUserProfile(showNotification);
+      const userProfileData = await getUserProfile();
 
       if (!userProfileData || !userProfileData._id) {
         console.warn("Invalid user profile data received:", userProfileData);
