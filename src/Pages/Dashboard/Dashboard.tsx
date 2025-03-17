@@ -4,7 +4,7 @@ import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { Modal, Input, Button, notification } from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
-import { getGymsByOwner, addGym, updateGymById, deleteGymById} from "../../api/gym-owner";
+import { getGymsByOwner, addGym, updateGymById, deleteGymById } from "../../api/gym-owner";
 import GymBox from '../../components/GymBox/GymBox';
 import { io, Socket } from "socket.io-client";
 
@@ -26,20 +26,19 @@ const Dashboard: React.FC = () => {
   const [gymData, setGymData] = useState({ name: "", city: "", description: "" });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
-  
 
   useEffect(() => {
     const fetchProfile = async () => {
-        try {
-          if (userProfile?.id) {
-            const gyms = await getGymsByOwner(userProfile.id);
-            setGyms(gyms);
-          }
-        } catch (error: any) {
-          setGymsError(error.response?.data?.message || "Failed to load gyms data");
-        } finally {
-          setLoadingGyms(false);
+      try {
+        if (userProfile?.id) {
+          const gyms = await getGymsByOwner(userProfile.id);
+          setGyms(gyms);
         }
+      } catch (error: any) {
+        setGymsError(error.response?.data?.message || "Failed to load gyms data");
+      } finally {
+        setLoadingGyms(false);
+      }
     };
 
     fetchProfile();
@@ -147,15 +146,9 @@ const Dashboard: React.FC = () => {
 
       const updatedGym = await updateGymById(formData, selectedGym._id);
 
-      if (selectedGym.name !== gymData.name) {  
+      if (selectedGym.name !== gymData.name) {
         socket.emit("update_gym_name", userProfile?.id, selectedGym.name, gymData.name, (response: any) => {
-          if (response.success) {
-            notification.success({
-              message: "Gym Name Updated",
-              description: `Successfully updated gym name in ${response.updatedChats} chats.`,
-              placement: "top",
-            });
-          } else {
+          if (!response.success) {
             notification.warning({
               message: "No Chats Found",
               description: response.message,
@@ -167,7 +160,7 @@ const Dashboard: React.FC = () => {
 
       setGyms((prevGyms: any) =>
         prevGyms.map((gym: any) => (gym._id === selectedGym._id ? { ...gym, name: gymData.name } : gym))
-      );      
+      );
 
       handleCloseEditGymModal();
     } catch (error) {

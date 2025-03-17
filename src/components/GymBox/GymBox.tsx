@@ -36,7 +36,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [newMessage, setNewMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
-  const [prevGymName, setPrevGymName] = useState(initialGymName); // Track previous gymName
+  const [prevGymName, setPrevGymName] = useState(initialGymName);
 
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const GymBox: React.FC<GymBoxProps> = ({
       }
     });
   };
-  
+
   const fetchChatHistory = (userId: string) => {
     socket.emit("get_users_chat", ownerId, userId, gymName, (chatHistory: any) => {
       const formattedMessages = chatHistory.messages.map((msg: any) => ({
@@ -105,15 +105,15 @@ const GymBox: React.FC<GymBoxProps> = ({
     setIsLoading(true);
     setInterval(() => { fetchChatHistory(user.userId); }, 1000);
   };
-  
+
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
     const message = { sender: ownerId, text: newMessage };
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
-    setMessages((prev) => 
-      prev.some((msg) => msg.text === newMessage && msg.sender === ownerId) 
-        ? prev 
+    setMessages((prev) =>
+      prev.some((msg) => msg.text === newMessage && msg.sender === ownerId)
+        ? prev
         : [...prev, message]
     );
     setNewMessage("");
@@ -141,23 +141,23 @@ const GymBox: React.FC<GymBoxProps> = ({
         Chat with Users
       </Button>
 
-      <Modal 
-          title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"} 
-          open={isChatModalVisible} 
-          onCancel={() => setChatModalVisible(false)} 
-          footer={null}
-        >
+      <Modal
+        title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
+        open={isChatModalVisible}
+        onCancel={() => setChatModalVisible(false)}
+        footer={null}
+      >
         {!selectedUser ? (
           <List
-          bordered
-          dataSource={chatUsers}
-          renderItem={(user) => (
-            <List.Item onClick={() => selectUser(user)} style={{ cursor: "pointer" }}>
-              {user.firstName} {user.lastName}
-            </List.Item>
-          )}
-          locale={{ emptyText: "No Active Chats" }}
-        />
+            bordered
+            dataSource={chatUsers}
+            renderItem={(user) => (
+              <List.Item onClick={() => selectUser(user)} style={{ cursor: "pointer" }}>
+                {user.firstName} {user.lastName}
+              </List.Item>
+            )}
+            locale={{ emptyText: "No Active Chats" }}
+          />
         ) : (
           <>
             <Button type="default" onClick={() => setSelectedUser(null)}>

@@ -4,7 +4,6 @@ import type { FormProps } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
-import { useUserProfile } from "../../../context/useUserProfile";
 import {
   Layout,
   Button,
