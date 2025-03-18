@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port 4000",
     "prod": "vite --port 4000",
-    "build": "tsc -b && vite build && sudo rm -rf /usr/share/nginx/html/* && sudo cp -r dist/* /usr/share/nginx/html/",
+    "build": "tsc -b && vite build && sudo rm -rf /usr/share/nginx/html/* && sudo cp -r dist/* /usr/share/nginx/html/ && pm2 restart shapeup-front-4",
     "lint": "eslint .",
     "preview": "vite preview"
   },

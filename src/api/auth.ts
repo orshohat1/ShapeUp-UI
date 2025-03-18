@@ -24,8 +24,10 @@ export const googleSSO = async () => {
   try {
     console.log("Redirecting to Google SSO...");
 
-    const backend_url = import.meta.env.SERVER_URL
-    window.location.href = `http://${backend_url}:3000/users/auth/google`;
+    const backend_url = import.meta.env.VITE_SERVER_URL
+    console.log(backend_url);
+    // const backend_url = "http://node05.cs.colman.ac.il/api"
+    window.location.href = `${backend_url}/users/auth/google`;
   } catch (error: any) {
     console.error("Google SSO failed:", error);
     notification.error({
