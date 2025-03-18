@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import fileRequestAxiosInstance from "./axios-instances/file-axios-request-instance";
 import { notification } from "antd";
-const AUTH_ROUTE = "/users";
+const AUTH_ROUTE = "/api/users";
 
 export const login = async (email: string, password: string) => {
   try {
@@ -23,7 +23,9 @@ export const login = async (email: string, password: string) => {
 export const googleSSO = async () => {
   try {
     console.log("Redirecting to Google SSO...");
-    window.location.href = "http://localhost:3000/users/auth/google";
+
+    const backend_url = import.meta.env.SERVER_URL
+    window.location.href = `http://${backend_url}:3000/users/auth/google`;
   } catch (error: any) {
     console.error("Google SSO failed:", error);
     notification.error({

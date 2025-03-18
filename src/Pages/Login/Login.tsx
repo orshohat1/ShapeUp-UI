@@ -120,7 +120,7 @@ const Login: React.FC = () => {
       <div className="register-link">
         <span>
           Don't have an account?{" "}
-          <a href={`${CLIENT_URL}/register`}>Register Now</a>
+          <a href={`user/register`}>Register Now</a>
         </span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 
-const USERS_ROUTE = "/askChatAi";
+const USERS_ROUTE = "/api/askChatAi";
 
 export const askChatAi = async (userId: string, userBirthDate: Date, userGender: string) => {
     try {
