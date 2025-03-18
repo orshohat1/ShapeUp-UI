@@ -16,36 +16,12 @@ const Login: React.FC = () => {
   const { refreshUserProfile } = useUserProfile();
 
   useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const userProfile = await refreshUserProfile();
-
-        if (userProfile) {
-          if (userProfile.role === "gym_owner") {
-            navigate("/dashboard");
-          }
-          else
-          {
-            navigate("/gyms");
-          }
-        } else {
-          console.log("No user session found, staying on login page.");
-        }
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    checkUserStatus();
-  }, [navigate, refreshUserProfile]);
-
-  useEffect(() => {
     form
       .validateFields({ validateOnly: true })
       .then(() => setSubmittable(true))
       .catch(() => setSubmittable(false));
   }, [form, values]);
-  
+
   type FieldType = {
     email?: string;
     password?: string;

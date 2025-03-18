@@ -4,6 +4,8 @@
 @border-light: #e5e7eb;
 @text-gray: #6b7280;
 @shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+@user-bg: #d1e7fd;
+@owner-bg: #e2e3e5;
 
 .gym-card {
   background-color: @bg-white;
@@ -136,4 +138,84 @@
     }
   } 
   
+}
+
+.chat-input-container {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@blue-primary: #768ebd;
+@bg-light: #f3f4f6;
+@bg-white: #ffffff;
+@border-light: #e5e7eb;
+@text-gray: #6b7280;
+@shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+@user-bg: #daf5ff;
+@owner-bg: #f1f1f1;
+
+.chat-modal {
+  .ant-modal-body {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    padding: 10px;
+  }
+
+  .chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: @bg-light;
+    border-radius: 8px;
+    max-height: 350px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .chat-message {
+    padding: 12px;
+    border-radius: 18px;
+    margin-bottom: 6px;
+    max-width: 60%;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+    display: inline-block;
+    position: relative;
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background-color: @user-bg;
+    color: black;
+    text-align: right;
+  }
+
+  .owner-message {
+    align-self: flex-start;
+    background-color: @owner-bg;
+    color: black;
+    text-align: left;
+  }
+
+  .chat-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .chat-input {
+    border-radius: 8px;
+  }
 }

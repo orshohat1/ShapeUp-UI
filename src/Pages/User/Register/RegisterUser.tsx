@@ -4,7 +4,6 @@ import type { FormProps } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
-import { useUserProfile } from "../../../context/useUserProfile";
 import {
   Layout,
   Button,
@@ -27,34 +26,7 @@ const RegisterUser: React.FC = () => {
   const values = Form.useWatch([], form);
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
-  const { refreshUserProfile } = useUserProfile();
-  
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const userProfile = await refreshUserProfile();
-
-        if (userProfile) {
-          if (userProfile.role === "gym_owner") {
-            navigate("/dashboard");
-          }
-          else
-          {
-            navigate("/gyms");
-          }
-        } else {
-          console.log("No user session found, staying on login page.");
-        }
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    checkUserStatus();
-  }, [navigate, refreshUserProfile]);
-
 
   useEffect(() => {
     form

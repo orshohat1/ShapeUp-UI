@@ -5,6 +5,7 @@ import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Paginatio
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
+import { useUserProfile } from "../../context/useUserProfile";
 
 interface GymCardProps {
   gymId: string;
@@ -25,8 +26,8 @@ const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH, 
-  transports: ["websocket", "polling"], 
+  path: PATH,
+  transports: ["websocket", "polling"],
 });
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -56,7 +57,8 @@ const GymCard: React.FC<GymCardProps> = ({
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const reviewsPerPage = 5;
-  
+  const { userProfile } = useUserProfile();
+
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -89,7 +91,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
   const fetchChatHistory = async () => {
     if (!userId) return;
-    
+
     socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
       if (chatHistory && chatHistory.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
@@ -97,7 +99,7 @@ const GymCard: React.FC<GymCardProps> = ({
           text: msg.text,
           timestamp: msg.timestamp
         }));
-        
+
         setMessages(formattedMessages);
       } else {
         setMessages([]);
@@ -165,7 +167,6 @@ const GymCard: React.FC<GymCardProps> = ({
       notification.error({ message: "Failed to add review. Please try again." });
     }
   };
-
   return (
     <div className="gym-card">
       <div className="gym-header">
@@ -215,7 +216,11 @@ const GymCard: React.FC<GymCardProps> = ({
               renderItem={(review: any) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar src={review.user?.avatarUrl || "/default-avatar.png"} />}
+                    avatar={<Avatar src={
+                      review.user?._id === userProfile?.id
+                        ? userProfile?.avatarUrl || "/default-avatar.png"
+                        : review.user?.avatarUrl || "/default-avatar.png"
+                    } />}
                     title={<b>{review.user?.firstName || "Anonymous User"}</b>}
                     description={
                       <>
@@ -269,6 +274,7 @@ const GymCard: React.FC<GymCardProps> = ({
         open={isChatModalOpen}
         onCancel={() => setChatModalOpen(false)}
         footer={null}
+        className="chat-modal"
       >
         {isLoading ? (
           <div style={{ textAlign: "center", padding: "20px" }}>
@@ -276,25 +282,35 @@ const GymCard: React.FC<GymCardProps> = ({
             <p>Loading messages...</p>
           </div>
         ) : (
-          <List
-            dataSource={messages}
-            renderItem={(msg) => (
-              <List.Item>
-                <strong>{msg.sender === userId ? "You" : "Owner"}:</strong> {msg.text}
-              </List.Item>
-            )}
-          />
+          <div className="chat-container">
+            {/* Scrollable Messages */}
+            <div className="chat-messages-container">
+              <div className="chat-messages">
+                {messages.map((msg, index) => (
+                  <div key={index} className={`chat-message ${msg.sender === userId ? "user-message" : "owner-message"}`}>
+                    {msg.text}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chat Input */}
+            <div className="chat-input-container">
+              <Input.TextArea
+                rows={2}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="chat-input"
+              />
+              <Button type="primary" onClick={sendMessage} block>
+                Send
+              </Button>
+            </div>
+          </div>
         )}
-        <Input.TextArea
-          rows={2}
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message..."
-        />
-        <Button type="primary" onClick={sendMessage} block>
-          Send
-        </Button>
       </Modal>
+
     </div>
   );
 };

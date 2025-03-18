@@ -5,8 +5,10 @@ import {askChatAi} from "../../../api/chat-ai";
 import GymCard from "../../../components/GymCard/GymCard";
 import { Button, Pagination, Spin, Alert, Modal, List, Rate, Input } from "antd";
 import "./GymsList.less";
+import { useUserProfile } from "../../../context/useUserProfile";
 
 const GymsList: React.FC = () => {
+  const { userProfile } = useUserProfile();
   const [gyms, setGyms] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
 
@@ -181,7 +183,7 @@ const GymsList: React.FC = () => {
       <div className="main-content">
         <div className="header">
           <div className="profile">
-            <span>Hello, {user ? user.firstName : "Guest"}!</span>
+            <span>Hello, {userProfile ? userProfile?.firstName : "Guest"}!</span>
           </div>
           <div className="actions">
 
@@ -301,8 +303,9 @@ const GymsList: React.FC = () => {
         <div className="ChatAI-popup">
           {isChatLoading ? (
             <Spin size="large" />
-          ) : chatAiResponse.length ? (
-            <p>{chatAiResponse}</p>
+          ) : 
+          chatAiResponse.length ? (
+            <pre>{chatAiResponse}</pre>
           ) : (
             <p>Failed to retrieve workout plan from AI!</p>
           )}
