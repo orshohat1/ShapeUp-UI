@@ -38,7 +38,7 @@ const GymsList: React.FC = () => {
         setGyms(fetchedGyms);
         setFilteredGyms(fetchedGyms);
         try {
-          const userData = await getUserProfile();
+          const userData = await getUserProfile(false);
           setUser(userData);
         } catch (err: any) {
           setUser(null);

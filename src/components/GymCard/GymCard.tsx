@@ -63,6 +63,10 @@ const GymCard: React.FC<GymCardProps> = ({
   useEffect(() => {
     const fetchReviews = async () => {
       try {
+        const userData = await getUserProfile(false);
+        setUserId(userData._id);
+        if(userData._id != null)
+        {
         const fetchedReviews = await getGymReviews(gymId);
         setReviews(fetchedReviews);
 
@@ -73,9 +77,7 @@ const GymCard: React.FC<GymCardProps> = ({
         } else {
           setAverageRating(0);
         }
-
-        const userData = await getUserProfile();
-        setUserId(userData._id);
+      }
       } catch (error) {
         console.error("Failed to load reviews or user profile", error);
       }

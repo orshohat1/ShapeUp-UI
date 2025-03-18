@@ -24,7 +24,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
 
   const refreshUserProfile = async () => {
     try {
-      const userProfileData = await getUserProfile();
+      const userProfileData = await getUserProfile(false);
 
       if (!userProfileData || !userProfileData._id) {
         console.warn("Invalid user profile data received:", userProfileData);
