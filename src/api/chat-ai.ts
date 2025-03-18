@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 
-const USERS_ROUTE = "/askChatAi";
+const CHAT_AI_ROUTE = "/askChatAi";
 
 export const askChatAi = async (userId: string, userBirthDate: Date, userGender: string) => {
     try {
@@ -11,7 +11,7 @@ export const askChatAi = async (userId: string, userBirthDate: Date, userGender:
         if(userGender != null)
           question += ` I am a ${userGender}.`
         const response = await axiosInstance.post(
-            `${USERS_ROUTE}/${userId}`,
+            `${CHAT_AI_ROUTE}/${userId}`,
             { question: question },
             { withCredentials: true }
           );
