@@ -22,12 +22,13 @@ interface GymCardProps {
   ownerId?: string;
 }
 
-const CHAT_SERVER_URL = "http://localhost:3002";
-const PATH = "/users-chat";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
+const PATH = import.meta.env.VITE_CHAT_PATH;
 
 const socket: Socket = io(CHAT_SERVER_URL, {
   path: PATH,
   transports: ["websocket", "polling"],
+  withCredentials: true
 });
 
 const GymCard: React.FC<GymCardProps> = ({
@@ -89,17 +90,39 @@ const GymCard: React.FC<GymCardProps> = ({
 
   }, [gymId, reviewsCount]);
 
-  const fetchChatHistory = async () => {
-    if (!userId) return;
+  // const fetchChatHistory = async () => {
+  //   if (!userId) return;
 
+  //   socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
+  //     if (chatHistory && chatHistory.messages) {
+  //       const formattedMessages = chatHistory.messages.map((msg: any) => ({
+  //         sender: msg.sender.toString(),
+  //         text: msg.text,
+  //         timestamp: msg.timestamp
+  //       }));
+
+  //       setMessages(formattedMessages);
+  //     } else {
+  //       setMessages([]);
+  //     }
+  //     setIsLoading(false);
+  //   });
+  // };
+
+  const fetchChatHistory = async () => {
+    if (!userId) {
+      console.log("⚠️ User ID is missing, cannot fetch chat history");
+      return;
+    }
+  
     socket.emit("get_users_chat", userId, ownerId, gymName, (chatHistory: any) => {
-      if (chatHistory && chatHistory.messages) {
+  
+      if (chatHistory?.messages) {
         const formattedMessages = chatHistory.messages.map((msg: any) => ({
           sender: msg.sender.toString(),
           text: msg.text,
-          timestamp: msg.timestamp
+          timestamp: msg.timestamp || Date.now(),
         }));
-
         setMessages(formattedMessages);
       } else {
         setMessages([]);
@@ -107,6 +130,7 @@ const GymCard: React.FC<GymCardProps> = ({
       setIsLoading(false);
     });
   };
+  
 
   const openChatModal = () => {
     setChatModalOpen(true);

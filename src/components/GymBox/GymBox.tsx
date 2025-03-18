@@ -12,12 +12,13 @@ interface GymBoxProps {
   onDelete: () => void;
 }
 
-const CHAT_SERVER_URL = "http://localhost:3002";
-const PATH = "/users-chat";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
+const PATH = import.meta.env.VITE_CHAT_PATH;
 
 const socket: Socket = io(CHAT_SERVER_URL, {
   path: PATH,
   transports: ["websocket", "polling"],
+  withCredentials: true
 });
 
 const GymBox: React.FC<GymBoxProps> = ({
