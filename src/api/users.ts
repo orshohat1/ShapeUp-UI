@@ -2,7 +2,7 @@ import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 import fileRequestAxiosInstance from "./axios-instances/file-axios-request-instance";
 
-const USERS_ROUTE = "/api/users";
+const USERS_ROUTE = "/users";
 
 export const getUserProfile = async () => {
   try {

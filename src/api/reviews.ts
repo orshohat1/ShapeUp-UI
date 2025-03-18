@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 
-const REVIEWS_ROUTE = "/api/reviews";
+const REVIEWS_ROUTE = "/reviews";
 
 interface Review {
   rating: number;

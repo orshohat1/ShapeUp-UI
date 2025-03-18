@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 
-const GYMS_ROUTE = "/api/gyms";
+const GYMS_ROUTE = "/gyms";
 
 export const getGymsByOwner = async (ownerID: string) => {
   try {

@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import fileRequestAxiosInstance from "./axios-instances/file-axios-request-instance";
 import { notification } from "antd";
-const AUTH_ROUTE = "/api/users";
+const AUTH_ROUTE = "/users";
 
 export const login = async (email: string, password: string) => {
   try {
