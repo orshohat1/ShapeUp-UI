@@ -4,9 +4,8 @@ import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input, notification } from "antd";
 import { login, googleSSO } from "../../../api/auth";
-import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 const { Content } = Layout;
 
 const LoginUser: React.FC = () => {
@@ -143,7 +142,7 @@ const LoginUser: React.FC = () => {
       <div className="register-link">
         <span>
           Don't have an account?{" "}
-          <a href={`${CLIENT_URL}/user/register`}>Register Now</a>
+          <Link to="/user/register">Register Now</Link>
         </span>
       </div>
     </div>

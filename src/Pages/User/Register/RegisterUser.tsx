@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import "./RegisterUser.less";
 import type { FormProps } from "antd";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
 import {
   Layout,
@@ -18,7 +18,6 @@ import {
 } from "antd";
 import { RcFile, UploadChangeParam } from "antd/es/upload/interface";
 import { register } from "../../../api/auth";
-import { CLIENT_URL } from "../../../constants/api-config";
 const { Content } = Layout;
 
 const RegisterUser: React.FC = () => {
@@ -281,7 +280,7 @@ const RegisterUser: React.FC = () => {
       <div className="register-link">
         <span>
           Already have an account?{" "}
-          <a href={`${CLIENT_URL}/user/login`}>Login Now</a>
+          <Link to="/user/login">Login Now</Link>
         </span>
       </div>
     </div>

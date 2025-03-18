@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import "./Login.less";
 import type { FormProps } from "antd";
-import { Layout, Button, Form, Input, notification } from "antd";
-import { CLIENT_URL } from "../../constants/api-config";
+import { Layout, Button, Form, Input, notification} from "antd";
 import { login } from "../../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useUserProfile } from "../../context/useUserProfile";
+
 const { Content } = Layout;
 
 const Login: React.FC = () => {
@@ -120,7 +120,7 @@ const Login: React.FC = () => {
       <div className="register-link">
         <span>
           Don't have an account?{" "}
-          <a href={`user/register`}>Register Now</a>
+          <Link to="/register">Register Now</Link>
         </span>
       </div>
     </div>

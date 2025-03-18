@@ -4,7 +4,7 @@ import type { FormProps } from "antd";
 import dayjs from "dayjs";
 import { UserOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useUserProfile } from "../../context/useUserProfile";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Layout,
   Button,
@@ -17,7 +17,6 @@ import {
   message,
   Select,
 } from "antd";
-import { CLIENT_URL } from "../../constants/api-config";
 import { register } from "../../api/auth";
 import { RcFile, UploadChangeParam } from "antd/es/upload/interface";
 const { Content } = Layout;
@@ -330,7 +329,8 @@ const Register: React.FC = () => {
       </Content>
       <div className="register-link">
         <span>
-          Already have an account? <a href={`${CLIENT_URL}/login`}>Login Now</a>
+          Already have an account?
+          <Link to="/login">Login Now</Link>
         </span>
       </div>
     </div>
