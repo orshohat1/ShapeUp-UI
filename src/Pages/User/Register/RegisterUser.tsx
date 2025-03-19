@@ -19,6 +19,7 @@ import {
 import { RcFile, UploadChangeParam } from "antd/es/upload/interface";
 import { register } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
+import { useUserProfile } from "../../../context/useUserProfile";
 const { Content } = Layout;
 
 const RegisterUser: React.FC = () => {
@@ -27,6 +28,7 @@ const RegisterUser: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const avatarFileRef = useRef(null);
   const navigate = useNavigate();
+  const { refreshUserProfile } = useUserProfile();
 
   useEffect(() => {
     form
@@ -75,6 +77,7 @@ const RegisterUser: React.FC = () => {
           values.gender,
           avatarFile
         );
+        refreshUserProfile();
         message.success("Registration successful");
         navigate("/gyms");
       } catch (error: any) {
