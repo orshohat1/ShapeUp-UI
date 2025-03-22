@@ -27,7 +27,7 @@ const Sidebar: React.FC<{ user?: any }> = () => {
       </div>
 
       <div className="menu">
-        {userProfile?.role === "user" && (
+        {(userProfile?.role === "user" || userProfile?.role === "admin") && (
           <div className="menu-item">
             <div style={{ marginRight: "auto" }}>
               <svg
