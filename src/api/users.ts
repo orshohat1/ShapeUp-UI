@@ -146,3 +146,23 @@ export const updateProfile = async (
     throw error;
   }
 };
+
+export const deleteUserById = async (userId: string) => {
+  try {
+    await axiosInstance.delete(`${USERS_ROUTE}/${userId}`, { withCredentials: true });
+    notification.success({
+      message: "User Deleted",
+      description: "The user has been successfully deleted.",
+      placement: "top",
+    });
+  } catch (error: any) {
+    notification.error({
+      message: "Failed to Delete User",
+      description:
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.",
+      placement: "top",
+    });
+    throw error;
+  }
+};

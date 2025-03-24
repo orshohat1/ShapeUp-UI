@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Input, Spin, Pagination, Tooltip, Button, message } from "antd";
+import { Input, Spin, Pagination, Tooltip, Button, message, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { filterGyms, getAllGymsForAdmin } from "../../../api/gyms";
+import { deleteGymById } from "../../../api/gym-owner";
 
 interface GymData {
   _id: string;
@@ -70,6 +71,26 @@ const GymListModalContent: React.FC = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const handleDeleteGym = (gymId: string) => {  
+    Modal.confirm({
+      title: "Are you sure you want to delete this gym?",
+      content: `This action cannot be undone.`,
+      okText: "Yes, delete it",
+      okType: "danger",
+      cancelText: "Cancel",
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          await deleteGymById(gymId);
+          fetchAllGyms();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    });
+  };
+
+  
 
   return (
     <div>
@@ -113,7 +134,12 @@ const GymListModalContent: React.FC = () => {
                       : "Unknown"}
                   </div>
                   <Tooltip title="Delete gym">
-                    <Button type="text" icon={<DeleteOutlined />} danger />
+                    <Button
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      danger
+                      onClick={() => handleDeleteGym(gym._id)}
+                      />
                   </Tooltip>
                 </div>
               ))

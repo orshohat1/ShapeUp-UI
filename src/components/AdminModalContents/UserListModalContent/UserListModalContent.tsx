@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Pagination, Tooltip, Avatar, Spin } from "antd";
+import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import { filterUsers, getAllUsers } from "../../../api/users";
+import { deleteUserById, filterUsers, getAllUsers } from "../../../api/users";
 
 interface UserData {
   _id: string;
@@ -65,6 +65,30 @@ const UserListModalContent: React.FC = () => {
     currentPage * pageSize
   );
 
+  const handleDeleteUser = (userId: string, userRole: string) => {
+    const extraWarning =
+      userRole === "gym_owner"
+        ? " This will also delete all gyms exists under this owner's account."
+        : "";
+
+    Modal.confirm({
+      title: "Are you sure you want to delete this user?",
+      content: `This action cannot be undone.${extraWarning}`,
+      okText: "Yes, delete it",
+      okType: "danger",
+      cancelText: "Cancel",
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          await deleteUserById(userId);
+          fetchAllUsers();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    });
+  };
+
   return (
     <div>
       <Input.Search
@@ -114,7 +138,14 @@ const UserListModalContent: React.FC = () => {
                     {user.role}
                   </div>
                   <Tooltip title="Delete user">
-                    <Button type="text" icon={<DeleteOutlined />} danger />
+                    {user.role !== "admin" && (
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        danger
+                        onClick={() => handleDeleteUser(user._id, user.role)}
+                      />
+                    )}
                   </Tooltip>
                 </div>
               ))
