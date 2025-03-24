@@ -10,16 +10,12 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import UserListModalContent from "../../../components/AdminModalContents/UserListModalContent/UserListModalContent";
 import GymListModalContent from "../../../components/AdminModalContents/GymListModalContent/GymListModalContent";
 import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
 import { fetchDashboardCounts } from "../../../api/admin";
 
-// Types
 interface DailyRevenue {
   day: string;
   revenue: number;
@@ -66,13 +62,6 @@ const DashboardAdmin: React.FC = () => {
     ]);
   }, []);
 
-  const COLORS = {
-    gymOwners: "#E25B4B",
-    users: "#A2E1C8",
-    gyms: "#4B9BD7",
-    pendingOwners: "#FFA500",
-  };
-
   const [counts, setCounts] = useState<AdminStats>({
     userCount: 0,
     gymOwnerCount: 0,
@@ -93,33 +82,31 @@ const DashboardAdmin: React.FC = () => {
     loadCounts();
   }, []);
 
-  const totalAccounts =
-    counts.userCount + counts.gymOwnerCount + counts.adminCount;
+  const totalAccounts = counts
+    ? counts.userCount + counts.gymOwnerCount + counts.adminCount
+    : 0;
+
+  const COLORS = {
+    users: "#A2E1C8",
+    gymOwners: "#E25B4B",
+    gyms: "#4B9BD7",
+  };
+
+  const labels = ["Total Users", "Total Gym Owners", "Total Gyms"];
 
   const dataSets = [
     [
-      { name: "Users", value: counts.userCount },
-      { name: "Remaining", value: totalAccounts - counts.userCount },
+      { name: "Users", value: counts?.userCount },
+      { name: "Remaining", value: totalAccounts - counts?.userCount },
     ],
     [
-      { name: "Gym Owners", value: counts.gymOwnerCount },
-      { name: "Remaining", value: totalAccounts - counts.gymOwnerCount },
+      { name: "Gym Owners", value: counts?.gymOwnerCount },
+      { name: "Remaining", value: totalAccounts - counts?.gymOwnerCount },
     ],
     [
-      { name: "Admins", value: counts.adminCount },
-      { name: "Remaining", value: totalAccounts - counts.adminCount },
-    ],
-    [
-      { name: "Gyms", value: counts.gymCount },
+      { name: "Gyms", value: counts?.gymCount },
       { name: "Remaining", value: 0 },
     ],
-  ];
-
-  const labels = [
-    "Total Users",
-    "Total Gym Owners",
-    "Total Admins",
-    "Total Gyms",
   ];
 
   return (
@@ -132,12 +119,7 @@ const DashboardAdmin: React.FC = () => {
         <Col span={12}>
           <StatisticsCard
             dataSets={dataSets}
-            colors={[
-              COLORS.gymOwners,
-              COLORS.users,
-              COLORS.pendingOwners,
-              COLORS.gyms,
-            ]}
+            colors={[COLORS.gymOwners, COLORS.users, COLORS.gyms]}
             labels={labels}
           />
         </Col>
