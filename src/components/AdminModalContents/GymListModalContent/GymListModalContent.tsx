@@ -157,7 +157,6 @@ const GymListModalContent: React.FC = () => {
               total={gyms.length}
               pageSize={pageSize}
               onChange={(page) => setCurrentPage(page)}
-              size="small"
             />
           </div>
         </>

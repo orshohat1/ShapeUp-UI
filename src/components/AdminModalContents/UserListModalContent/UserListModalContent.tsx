@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./UserListModalContent.less";
 import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { deleteUserById, filterUsers, getAllUsers } from "../../../api/users";
@@ -129,24 +130,37 @@ const UserListModalContent: React.FC = () => {
                     >
                       {user.firstName[0]}
                     </Avatar>
-                    <span style={{ fontWeight: 500 }}>{user.firstName}</span>
+                    <span className="ellipsis" style={{ fontWeight: 500 }}>
+                      {user.firstName}
+                    </span>
                   </div>
-                  <div style={{ flex: 1 }}>{user.lastName}</div>
-                  <div style={{ flex: 2 }}>{user.email}</div>
-                  <div style={{ flex: 1 }}>{user.city}</div>
-                  <div style={{ flex: 1, textTransform: "capitalize" }}>
-                    {user.role}
+                  <div className="ellipsis" style={{ flex: 1 }}>
+                    {user.lastName}
                   </div>
-                  <Tooltip title="Delete user">
+                  <div className="ellipsis" style={{ flex: 2 }}>
+                    {user.email}
+                  </div>
+                  <div className="ellipsis" style={{ flex: 1 }}>
+                    {user.city}
+                  </div>
+                  <div
+                    className="ellipsis"
+                    style={{ flex: 1, textTransform: "capitalize" }}
+                  >
+                    {user.role.replace(/_/g, " ")}
+                  </div>
+                  <div style={{ width: "32px" }}>
                     {user.role !== "admin" && (
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        danger
-                        onClick={() => handleDeleteUser(user._id, user.role)}
-                      />
+                      <Tooltip title="Delete user">
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          danger
+                          onClick={() => handleDeleteUser(user._id, user.role)}
+                        />
+                      </Tooltip>
                     )}
-                  </Tooltip>
+                  </div>
                 </div>
               ))
             ) : (
@@ -162,7 +176,6 @@ const UserListModalContent: React.FC = () => {
               total={users?.length}
               pageSize={pageSize}
               onChange={(page) => setCurrentPage(page)}
-              size="small"
             />
           </div>
         </>

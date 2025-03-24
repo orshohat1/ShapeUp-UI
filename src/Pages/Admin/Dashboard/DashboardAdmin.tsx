@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import UserListModalContent from "../../../components/AdminModalContents/UserListModalContent/UserListModalContent";
 import GymListModalContent from "../../../components/AdminModalContents/GymListModalContent/GymListModalContent";
+import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
+import { fetchDashboardCounts } from "../../../api/admin";
 
 // Types
 interface DailyRevenue {
@@ -29,20 +31,13 @@ interface CityRevenue {
 }
 
 interface AdminStats {
-  totalGymOwners: number;
-  totalUsers: number;
-  totalGyms: number;
-  pendingGymOwners: number;
+  userCount: number;
+  gymOwnerCount: number;
+  adminCount: number;
+  gymCount: number;
 }
 
 const DashboardAdmin: React.FC = () => {
-  const [stats, setStats] = useState<AdminStats>({
-    totalGymOwners: 61,
-    totalUsers: 22,
-    totalGyms: 62,
-    pendingGymOwners: 0,
-  });
-
   const [dailyRevenue, setDailyRevenue] = useState<DailyRevenue[]>([]);
   const [cityRevenue, setCityRevenue] = useState<CityRevenue[]>([]);
   const [activeModal, setActiveModal] = useState<
@@ -78,17 +73,53 @@ const DashboardAdmin: React.FC = () => {
     pendingOwners: "#FFA500",
   };
 
-  const gymOwnerData = [
-    { name: "Gym Owners", value: stats.totalGymOwners },
-    { name: "Empty", value: 100 - stats.totalGymOwners },
+  const [counts, setCounts] = useState<AdminStats>({
+    userCount: 0,
+    gymOwnerCount: 0,
+    adminCount: 0,
+    gymCount: 0,
+  });
+
+  useEffect(() => {
+    const loadCounts = async () => {
+      try {
+        const data: AdminStats = await fetchDashboardCounts(true);
+        setCounts(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadCounts();
+  }, []);
+
+  const totalAccounts =
+    counts.userCount + counts.gymOwnerCount + counts.adminCount;
+
+  const dataSets = [
+    [
+      { name: "Users", value: counts.userCount },
+      { name: "Remaining", value: totalAccounts - counts.userCount },
+    ],
+    [
+      { name: "Gym Owners", value: counts.gymOwnerCount },
+      { name: "Remaining", value: totalAccounts - counts.gymOwnerCount },
+    ],
+    [
+      { name: "Admins", value: counts.adminCount },
+      { name: "Remaining", value: totalAccounts - counts.adminCount },
+    ],
+    [
+      { name: "Gyms", value: counts.gymCount },
+      { name: "Remaining", value: 0 },
+    ],
   ];
-  const userData = [
-    { name: "Users", value: stats.totalUsers },
-    { name: "Empty", value: 100 - stats.totalUsers },
-  ];
-  const gymData = [
-    { name: "Gyms", value: stats.totalGyms },
-    { name: "Empty", value: 100 - stats.totalGyms },
+
+  const labels = [
+    "Total Users",
+    "Total Gym Owners",
+    "Total Admins",
+    "Total Gyms",
   ];
 
   return (
@@ -99,67 +130,20 @@ const DashboardAdmin: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Card title="General statistics">
-            <Row justify="space-around">
-              {[gymOwnerData, userData, gymData].map((data, i) => (
-                <Col span={8} key={i} style={{ textAlign: "center" }}>
-                  <ResponsiveContainer width="100%" height={80}>
-                    <PieChart>
-                      <Pie
-                        data={data}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={25}
-                        outerRadius={35}
-                        startAngle={90}
-                        endAngle={-270}
-                        dataKey="value"
-                      >
-                        <Cell fill={Object.values(COLORS)[i]} />
-                        <Cell fill="#F3F3F3" />
-                      </Pie>
-                      <text
-                        x="50%"
-                        y="50%"
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        style={{ fontSize: 14, fontWeight: 600 }}
-                      >
-                        {data[0].value}
-                      </text>
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div style={{ fontSize: 12, marginTop: 4 }}>
-                    {["Total Gym Owners", "Total Users", "Total Gyms"][i]}
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          </Card>
+          <StatisticsCard
+            dataSets={dataSets}
+            colors={[
+              COLORS.gymOwners,
+              COLORS.users,
+              COLORS.pendingOwners,
+              COLORS.gyms,
+            ]}
+            labels={labels}
+          />
         </Col>
 
         <Col span={12}>
-          <Card title="Revenues">
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={dailyRevenue}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <RechartsTooltip />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#4B9BD7"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-
-        <Col span={12}>
-          <Card title="Quick Actions">
+          <Card title="Quick Actions" style={{ height: "100%" }}>
             <Row gutter={[12, 12]}>
               <Col span={12}>
                 <Button
@@ -193,7 +177,27 @@ const DashboardAdmin: React.FC = () => {
         </Col>
 
         <Col span={12}>
-          <Card title="Revenue by City">
+          <Card title="Revenues" style={{ height: "100%" }}>
+            <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={dailyRevenue}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <RechartsTooltip />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#4B9BD7"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+
+        <Col span={12}>
+          <Card title="Revenue by City" style={{ height: "100%" }}>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={cityRevenue}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -225,7 +229,7 @@ const DashboardAdmin: React.FC = () => {
         {activeModal === "users" && <UserListModalContent />}
         {activeModal === "gyms" && <GymListModalContent />}
         {activeModal === "pending" && <UserListModalContent />}{" "}
-        {/* Change it to new component */}
+        {/* Need to change "pending" to the new component */}
       </Modal>
     </div>
   );
