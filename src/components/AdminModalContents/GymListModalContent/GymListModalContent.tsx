@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input, Spin, Pagination, Tooltip, Button, message, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { filterGyms, getAllGymsForAdmin } from "../../../api/gyms";
@@ -21,6 +21,7 @@ const GymListModalContent: React.FC = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const isFirstRender = useRef(true);
   const pageSize = 5;
 
   const fetchAllGyms = async () => {
@@ -49,14 +50,17 @@ const GymListModalContent: React.FC = () => {
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchAllGyms();
   }, []);
 
-  // Debounced search
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
       if (search.trim()) {
         fetchFilteredGyms(search.trim());
       } else {
@@ -64,14 +68,14 @@ const GymListModalContent: React.FC = () => {
       }
     }, 400);
 
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(delayDebounce);
   }, [search]);
 
   const paginated = gyms.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  const handleDeleteGym = (gymId: string) => {  
+  const handleDeleteGym = (gymId: string) => {
     Modal.confirm({
       title: "Are you sure you want to delete this gym?",
       content: `This action cannot be undone.`,
@@ -89,8 +93,6 @@ const GymListModalContent: React.FC = () => {
       },
     });
   };
-
-  
 
   return (
     <div>
@@ -139,7 +141,7 @@ const GymListModalContent: React.FC = () => {
                       icon={<DeleteOutlined />}
                       danger
                       onClick={() => handleDeleteGym(gym._id)}
-                      />
+                    />
                   </Tooltip>
                 </div>
               ))

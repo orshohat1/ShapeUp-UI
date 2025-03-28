@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./UserListModalContent.less";
 import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -19,9 +19,11 @@ const UserListModalContent: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<UserData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const isFirstRender = useRef(true);
   const pageSize = 5;
 
   const fetchAllUsers = async () => {
+    console.log("Fetch all users...");
     try {
       setLoading(true);
       const users = await getAllUsers();
@@ -50,6 +52,11 @@ const UserListModalContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const delayDebounce = setTimeout(() => {
       if (search.trim()) {
         fetchFilteredUsers(search.trim());
