@@ -4,6 +4,46 @@ import fileRequestAxiosInstance from "./axios-instances/file-axios-request-insta
 
 const USERS_ROUTE = "/users";
 
+export const getAllUsers = async (showNotification = true) => {
+  try {
+    const response = await axiosInstance.get(`${USERS_ROUTE}/getAllUsers`, {
+      withCredentials: true,
+    });
+    return response?.data?.users;
+  } catch (error: any) {
+    if (showNotification) {
+      notification.error({
+        message: "Fetching all users data failed",
+        description:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        placement: "top",
+      });
+    }
+    throw error;
+  }
+};
+
+export const filterUsers = async (query: string, showNotification = true) => {
+  try {
+    const response = await axiosInstance.get(`${USERS_ROUTE}/filter?search=${encodeURIComponent(query)}`, {
+      withCredentials: true,
+    });
+    return response?.data?.users;
+  } catch (error: any) {
+    if (showNotification) {
+      notification.error({
+        message: "Filtering users failed",
+        description:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        placement: "top",
+      });
+    }
+    throw error;
+  }
+};
+
 export const getUserProfile = async (showNotification = true) => {
   try {
     const response = await axiosInstance.get(`${USERS_ROUTE}/getMyProfile`, {
@@ -11,16 +51,15 @@ export const getUserProfile = async (showNotification = true) => {
     });
     return response.data;
   } catch (error: any) {
-    if(showNotification)
-    {
-    notification.error({
-      message: "Fetching User Data Failed",
-      description:
-        error.response?.data?.message ||
-        "Something went wrong. Please try again.",
-      placement: "top",
-    });
-  }
+    if (showNotification) {
+      notification.error({
+        message: "Fetching User Data Failed",
+        description:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        placement: "top",
+      });
+    }
     throw error;
   }
 };
@@ -99,6 +138,26 @@ export const updateProfile = async (
   } catch (error: any) {
     notification.error({
       message: "Profile Update Failed",
+      description:
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.",
+      placement: "top",
+    });
+    throw error;
+  }
+};
+
+export const deleteUserById = async (userId: string) => {
+  try {
+    await axiosInstance.delete(`${USERS_ROUTE}/${userId}`, { withCredentials: true });
+    notification.success({
+      message: "User Deleted",
+      description: "The user has been successfully deleted.",
+      placement: "top",
+    });
+  } catch (error: any) {
+    notification.error({
+      message: "Failed to Delete User",
       description:
         error.response?.data?.message ||
         "Something went wrong. Please try again.",
