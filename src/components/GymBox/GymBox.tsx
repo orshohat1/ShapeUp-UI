@@ -140,9 +140,6 @@ const GymBox: React.FC<GymBoxProps> = ({
     setSuggestModalVisible(true);
     try {
       const suggestion = await askPricingSuggestion(ownerId, prices);
-      console.log("###############");
-      console.log(suggestion);
-      console.log("###############");
       setSuggestedPricing(suggestion);
     } catch (err) {
       setSuggestedPricing("Could not fetch suggestion.");

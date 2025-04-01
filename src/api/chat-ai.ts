@@ -39,10 +39,6 @@ export const askChatAi = async (userId: string, userBirthDate: Date, userGender:
       question = `Please suggest the gym owner how to change the pricing for a gym with the current prices: ${prices.join(", ")}`;
     }
     question += `\n The different pricing are for 1 day pass, 3 day pass, and 5 day pass respectively.`;
-      
-    console.log("@@@@@@@@@@@@");
-    console.log(question);
-    console.log("@@@@@@@@@@@@");
     const response = await axiosInstance.post(
       `${CHAT_AI_ROUTE}/${ownerId}`,
       { question: question },
