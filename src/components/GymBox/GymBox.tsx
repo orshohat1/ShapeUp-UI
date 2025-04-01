@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Button, Popconfirm, Modal, Input, List, notification, Spin } from "antd";
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
+import { askPricingSuggestion } from "../../api/chat-ai";
 import './GymBox.less';
 
 interface GymBoxProps {
   gymName: string;
   city: string;
   ownerId: string;
+  prices: number[];
   onEdit: () => void;
   onDelete: () => void;
 }
@@ -24,9 +26,9 @@ const GymBox: React.FC<GymBoxProps> = ({
   gymName: initialGymName,
   city,
   ownerId,
+  prices,
   onEdit,
   onDelete,
-
 }) => {
   const [gymName, setGymName] = useState(initialGymName);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
@@ -37,6 +39,8 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
   const [prevGymName, setPrevGymName] = useState(initialGymName);
+  const [isSuggestModalVisible, setSuggestModalVisible] = useState(false);
+  const [suggestedPricing, setSuggestedPricing] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -130,6 +134,20 @@ const GymBox: React.FC<GymBoxProps> = ({
     setIsLoading(true);
     fetchChatHistory(user.userId);
   };
+  
+  const openSuggestModal = async () => {
+    setSuggestedPricing(null);
+    setSuggestModalVisible(true);
+    try {
+      const suggestion = await askPricingSuggestion(ownerId, prices);
+      console.log("###############");
+      console.log(suggestion);
+      console.log("###############");
+      setSuggestedPricing(suggestion);
+    } catch (err) {
+      setSuggestedPricing("Could not fetch suggestion.");
+    }
+  };
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;
@@ -159,7 +177,9 @@ const GymBox: React.FC<GymBoxProps> = ({
       <Button type="primary" className="gym-box-button" icon={<MessageOutlined />} onClick={openChatModal}>
         Chat with Users
       </Button>
-
+      <Button onClick={openSuggestModal} style={{ marginTop: 8 }} block>
+        Suggest Pricing Using AI
+      </Button>
       <Modal
         title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
         open={isChatModalVisible}
@@ -206,7 +226,21 @@ const GymBox: React.FC<GymBoxProps> = ({
           </>
         )}
       </Modal>
-
+      <Modal
+        title="AI-Powered Pricing Suggestion"
+        open={isSuggestModalVisible}
+        onCancel={() => setSuggestModalVisible(false)}
+        footer={null}
+      >
+        {suggestedPricing ? (
+          <p>{suggestedPricing}</p>
+        ) : (
+          <div style={{ textAlign: "center" }}>
+            <Spin />
+            <p>Fetching suggestion...</p>
+          </div>
+        )}
+      </Modal>
 
     </div>
   );

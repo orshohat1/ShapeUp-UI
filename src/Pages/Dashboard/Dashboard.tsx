@@ -227,6 +227,7 @@ const Dashboard: React.FC = () => {
                   gymName={gym.name}
                   city={gym.city}
                   ownerId={gym.owner}
+                  prices={gym.prices}
                   onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
                 />

@@ -27,3 +27,34 @@ export const askChatAi = async (userId: string, userBirthDate: Date, userGender:
       throw error;
     }
   };
+
+  export const askPricingSuggestion = async (ownerId: string, prices: number[]) => {
+  try {
+    let question = '';
+    if (prices.length === 0) {
+      question = `Please suggest improved pricing for a gym with no current prices.`;
+    }
+    else
+    {
+      question = `Please suggest the gym owner how to change the pricing for a gym with the current prices: ${prices.join(", ")}`;
+    }
+    question += `\n The different pricing are for 1 day pass, 3 day pass, and 5 day pass respectively.`;
+      
+    console.log("@@@@@@@@@@@@");
+    console.log(question);
+    console.log("@@@@@@@@@@@@");
+    const response = await axiosInstance.post(
+      `${CHAT_AI_ROUTE}/${ownerId}`,
+      { question: question },
+      { withCredentials: true }
+    );
+    return response.data.message;
+  } catch (error: any) {
+    notification.error({
+      message: "Pricing Suggestion Failed",
+      description: error.response?.data?.message || "Something went wrong. Please try again.",
+      placement: "top",
+    });
+  }
+};
+
