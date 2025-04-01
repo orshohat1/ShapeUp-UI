@@ -23,7 +23,7 @@ const Dashboard: React.FC = () => {
   const [gymsError, setGymsError] = useState(null);
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
   const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
-  const [gymData, setGymData] = useState({ name: "", city: "", description: "" });
+  const [gymData, setGymData] = useState({ name: "", city: "", description: "", prices: ["", "", ""] });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
 
@@ -69,13 +69,13 @@ const Dashboard: React.FC = () => {
 
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
-    setGymData({ name: "", city: "", description: "" });
+    setGymData({ name: "", city: "", description: "", prices: ["", "", ""] });
     setGymImages([]);
   };
 
   const handleOpenEditGymModal = (gym: any) => {
     setSelectedGym(gym);
-    setGymData({ name: gym.name, city: gym.city, description: gym.description });
+    setGymData({ name: gym.name, city: gym.city, description: gym.description, prices: gym.prices || ["", "", ""], });
     setGymImages(gym.pictures);
     setIsEditGymModalVisible(true);
   };
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
   const handleCloseEditGymModal = () => {
     setIsEditGymModalVisible(false);
     setSelectedGym(null);
-    setGymData({ name: "", city: "", description: "" });
+    setGymData({ name: "", city: "", description: "", prices: ["", "", ""] });
     setGymImages([]);
   };
 
@@ -93,6 +93,15 @@ const Dashboard: React.FC = () => {
 
   const handleSaveGym = async () => {
     const formData = new FormData();
+    
+    if (gymData.prices.some(price => price === "" || isNaN(Number(price)))) {
+      notification.warning({
+        message: "Invalid Prices",
+        description: "Please fill in all price levels with valid numbers.",
+        placement: "top",
+      });
+      return;
+    }
 
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
@@ -101,6 +110,8 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures", image);
     });
+
+    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!userProfile) {
@@ -120,6 +131,15 @@ const Dashboard: React.FC = () => {
   const handleUpdateGym = async () => {
     const formData = new FormData();
 
+    if (gymData.prices.some(price => price === "" || isNaN(Number(price)))) {
+      notification.warning({
+        message: "Invalid Prices",
+        description: "Please fill in all price levels with valid numbers.",
+        placement: "top",
+      });
+      return;
+    }
+
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
@@ -138,6 +158,8 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures[]", image);
     });
+
+    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!selectedGym) {
@@ -159,7 +181,9 @@ const Dashboard: React.FC = () => {
       }
 
       setGyms((prevGyms: any) =>
-        prevGyms.map((gym: any) => (gym._id === selectedGym._id ? { ...gym, name: gymData.name } : gym))
+        prevGyms.map((gym: any) =>
+          gym._id === selectedGym._id ? updatedGym : gym
+        )
       );
 
       handleCloseEditGymModal();
@@ -226,6 +250,28 @@ const Dashboard: React.FC = () => {
             <Input name="name" placeholder="Name" value={gymData.name} onChange={handleGymDataChange} className="modal-input" />
             <Input name="city" placeholder="City" value={gymData.city} onChange={handleGymDataChange} className="modal-input" />
             <Input.TextArea name="description" placeholder="Description" value={gymData.description} onChange={handleGymDataChange} className="modal-input" autoSize={{ minRows: 3, maxRows: 6 }} />
+            <p>Set Gym Prices (3 Pricing Programs):</p>
+            <Input
+              type="number"
+              placeholder="Price for 1 day"
+              value={gymData.prices[0]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [e.target.value, prev.prices[1], prev.prices[2]] }))}
+              style={{ marginBottom: '10px' }}
+            />
+            <Input
+              type="number"
+              placeholder="Price for 3 days"
+              value={gymData.prices[1]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [prev.prices[0], e.target.value, prev.prices[2]] }))}
+              style={{ marginBottom: '10px' }}
+            />
+            <Input
+              type="number"
+              placeholder="Price for 5 days"
+              value={gymData.prices[2]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [prev.prices[0], prev.prices[1], e.target.value] }))}
+              style={{ marginBottom: '10px' }}
+            />
           </div>
 
           {/* Right Side - Image Upload */}
@@ -271,6 +317,28 @@ const Dashboard: React.FC = () => {
             <Input name="name" placeholder="Name" value={gymData.name} onChange={handleGymDataChange} className="modal-input" />
             <Input name="city" placeholder="City" value={gymData.city} onChange={handleGymDataChange} className="modal-input" />
             <Input.TextArea name="description" placeholder="Description" value={gymData.description} onChange={handleGymDataChange} className="modal-input" autoSize={{ minRows: 3, maxRows: 6 }} />
+            <p>Set Gym Prices (3 Pricing Programs):</p>
+            <Input
+              type="number"
+              placeholder="Price for 1 day"
+              value={gymData.prices[0]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [e.target.value, prev.prices[1], prev.prices[2]] }))}
+              style={{ marginBottom: '10px' }}
+            />
+            <Input
+              type="number"
+              placeholder="Price for 3 days"
+              value={gymData.prices[1]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [prev.prices[0], e.target.value, prev.prices[2]] }))}
+              style={{ marginBottom: '10px' }}
+            />
+            <Input
+              type="number"
+              placeholder="Price for 5 days"
+              value={gymData.prices[2]}
+              onChange={(e) => setGymData(prev => ({ ...prev, prices: [prev.prices[0], prev.prices[1], e.target.value] }))}
+              style={{ marginBottom: '10px' }}
+            />
           </div>
 
           {/* Right Side - Image Upload */}
