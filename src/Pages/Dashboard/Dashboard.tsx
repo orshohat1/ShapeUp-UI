@@ -5,6 +5,7 @@ import { Modal, Input, Button, notification } from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import { getGymsByOwner, addGym, updateGymById, deleteGymById } from "../../api/gym-owner";
+import { getGymReviews } from "../../api/reviews";
 import GymBox from '../../components/GymBox/GymBox';
 import { io, Socket } from "socket.io-client";
 
@@ -26,6 +27,7 @@ const Dashboard: React.FC = () => {
   const [gymData, setGymData] = useState({ name: "", city: "", description: "", prices: ["", "", ""] });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,6 +35,23 @@ const Dashboard: React.FC = () => {
         if (userProfile?.id) {
           const gyms = await getGymsByOwner(userProfile.id);
           setGyms(gyms);
+          let totalRating = 0;
+          let totalReviews = 0;
+
+          for (const gym of gyms) {
+            const reviews = await getGymReviews(gym._id);
+            if (reviews.length > 0) {
+              const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+              totalRating += sum;
+              totalReviews += reviews.length;
+            }
+          }
+
+          if (totalReviews > 0) {
+            setAverageRating(Number((totalRating / totalReviews).toFixed(2)));
+          } else {
+            setAverageRating(null);
+          }
         }
       } catch (error: any) {
         setGymsError(error.response?.data?.message || "Failed to load gyms data");
@@ -215,6 +234,12 @@ const Dashboard: React.FC = () => {
         {/* Main Content */}
         <main className="col bg-white p-3">
           <h1>Overview</h1>
+          {averageRating !== null && (
+            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
+              Average Review Rating: ⭐ {averageRating}
+            </p>
+          )}
+
           <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
           <PlusCircleOutlined className="plus-icon" onClick={handleOpenAddGymModal} />
           <div className="my-gyms-header">
