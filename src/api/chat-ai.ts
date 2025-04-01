@@ -51,6 +51,7 @@ export const askChatAi = async (userId: string, userBirthDate: Date, userGender:
       description: error.response?.data?.message || "Something went wrong. Please try again.",
       placement: "top",
     });
+    throw error;
   }
 };
 
