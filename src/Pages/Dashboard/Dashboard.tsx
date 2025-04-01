@@ -236,7 +236,7 @@ const Dashboard: React.FC = () => {
           <h1>Overview</h1>
           {averageRating !== null && (
             <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-              Average Review Rating: ⭐ {averageRating}
+              Average Review Rating: {averageRating}
             </p>
           )}
 
