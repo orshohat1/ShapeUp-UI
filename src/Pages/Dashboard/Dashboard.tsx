@@ -23,7 +23,7 @@ const Dashboard: React.FC = () => {
   const [gymsError, setGymsError] = useState(null);
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
   const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
-  const [gymData, setGymData] = useState({ name: "", city: "", description: "", prices: ["", "", ""] });
+  const [gymData, setGymData] = useState({ name: "", city: "", description: "", prices: [0, 0, 0] });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
 
@@ -227,6 +227,7 @@ const Dashboard: React.FC = () => {
                   gymName={gym.name}
                   city={gym.city}
                   ownerId={gym.owner}
+                  prices={gym.prices}
                   onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
                 />
