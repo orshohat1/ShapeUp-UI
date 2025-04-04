@@ -10,14 +10,19 @@ import { UserProfileProvider } from "./context/UserProfileProvider";
 import Sidebar from "./components/Sidebar/Sidebar";
 import LoginAdmin from "./Pages/Admin/Login/LoginAdmin";
 import DashboardAdmin from "./Pages/Admin/Dashboard/DashboardAdmin";
+import UserListModalContent from "./components/AdminModalContents/UserListModalContent/UserListModalContent";
+import GymListModalContent from "./components/AdminModalContents/GymListModalContent/GymListModalContent";
+import PendingListModalContent from "./components/AdminModalContents/PendingListModalContent/PendingListModalContent";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
+const sidebarRoutes = ["/dashboard", "/gyms", "/admin/dashboard", "/admin/users", "/admin/gyms", "/admin/pending"];
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const showSidebar = location.pathname === "/dashboard" || location.pathname === "/gyms" || location.pathname === "/admin/dashboard";
+  const showSidebar = sidebarRoutes.includes(location.pathname);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
@@ -44,6 +49,9 @@ const App = () => {
             <Route path="/gyms" element={<GymsList />} />
             <Route path="/admin/login" element={<LoginAdmin />} />
             <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+            <Route path="/admin/users" element={<UserListModalContent />} />
+            <Route path="/admin/gyms" element={<GymListModalContent />} />
+            <Route path="/admin/pending" element={<PendingListModalContent />} />
           </Routes>
         </Layout>
       </BrowserRouter>

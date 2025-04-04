@@ -1,57 +1,66 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./UserListModalContent.less";
 import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
-import { deleteUserById, filterUsers, getAllUsers } from "../../../api/users";
 import { useNavigate } from "react-router-dom";
+import { getGymOwnersStatus, updateGymOwnerStatus } from "../../../api/admin";
 
-interface UserData {
+interface GymOwners {
   _id: string;
   firstName: string;
   lastName: string;
   email: string;
   city: string;
-  role: string;
+  gymOwnerLicenseImage: string;
+  gymOwnerStatus: string;
   avatarUrl?: string;
 }
 
-const UserListModalContent: React.FC = () => {
+const PendingListModalContent: React.FC = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [gymOwners, setGymOwners] = useState<GymOwners[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const isFirstRender = useRef(true);
   const pageSize = 5;
   const navigate = useNavigate();
 
-  const fetchAllUsers = async () => {
-    console.log("Fetch all users...");
+  const fetchAllGymOwners = async () => {
+    console.log("Fetch all gym owners...");
     try {
       setLoading(true);
-      const users = await getAllUsers();
-      setUsers(users || []);
+      const gymOwners = await getGymOwnersStatus();
+      setGymOwners(gymOwners || []);
     } catch (err) {
-      setUsers([]);
+      setGymOwners([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchFilteredUsers = async (query: string) => {
+  const fetchFilteredGymOwners = async (query: string) => {
     try {
       setLoading(true);
-      const users = await filterUsers(query);
-      setUsers(users || []);
+      // TODO
+      const gymOwners = await getGymOwnersStatus();
+      setGymOwners(gymOwners || []);
     } catch (err) {
-      setUsers([]);
+      setGymOwners([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAllUsers();
+    fetchAllGymOwners();
   }, []);
+
+  const handleGymOwnersFetch = () => {
+    if (search.trim()) {
+      fetchFilteredGymOwners(search.trim());
+    } else {
+      fetchAllGymOwners();
+    }
+  };
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -60,47 +69,58 @@ const UserListModalContent: React.FC = () => {
     }
 
     const delayDebounce = setTimeout(() => {
-      handleUserFetch();
+      handleGymOwnersFetch();
     }, 400);
 
     return () => clearTimeout(delayDebounce);
   }, [search]);
 
-  const paginated = users?.slice(
+  const paginated = gymOwners?.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const handleUserFetch = () => {
-    if (search.trim()) {
-      fetchFilteredUsers(search.trim());
-    } else {
-      fetchAllUsers();
+  const handleUpdateGymOwnerStatus = async (
+    gymOwnerId: string,
+    status: string
+  ) => {
+    try {
+      await updateGymOwnerStatus(gymOwnerId, status, true);
+      handleGymOwnersFetch();
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleDeleteUser = (userId: string, userRole: string) => {
-    const extraWarning =
-      userRole === "gym_owner"
-        ? " This will also delete all gyms exists under this owner's account."
-        : "";
-
-    Modal.confirm({
-      title: "Are you sure you want to delete this user?",
-      content: `This action cannot be undone.${extraWarning}`,
-      okText: "Yes, delete it",
-      okType: "danger",
-      cancelText: "Cancel",
-      maskClosable: true,
-      onOk: async () => {
-        try {
-          await deleteUserById(userId);
-          handleUserFetch();
-        } catch (error) {
-          console.error(error);
-        }
-      },
-    });
+  const buttonStyles = (status: string, active: boolean) => {
+    const baseStyle = {
+      margin: "0 4px",
+      fontWeight: active ? "bold" : "normal",
+      borderWidth: active ? 2 : 1,
+      borderStyle: "solid",
+    };
+    switch (status) {
+      case "approved":
+        return {
+          ...baseStyle,
+          color: "green",
+          borderColor: active ? "darkgreen" : "lightgreen",
+        };
+      case "pending":
+        return {
+          ...baseStyle,
+          color: "blue",
+          borderColor: active ? "darkblue" : "lightblue",
+        };
+      case "declined":
+        return {
+          ...baseStyle,
+          color: "red",
+          borderColor: active ? "darkred" : "lightcoral",
+        };
+      default:
+        return baseStyle;
+    }
   };
 
   return (
@@ -150,8 +170,8 @@ const UserListModalContent: React.FC = () => {
               <div style={{ flex: 1 }}>Last Name</div>
               <div style={{ flex: 2 }}>Email</div>
               <div style={{ flex: 1 }}>City</div>
-              <div style={{ flex: 1 }}>Role</div>
-              <div style={{ flex: 0.5 }}>Actions</div>
+              <div style={{ flex: 1 }}>Gym License</div>
+              <div style={{ flex: 2 }}>Status</div>
             </div>
 
             {paginated?.length > 0 ? (
@@ -176,41 +196,44 @@ const UserListModalContent: React.FC = () => {
                       {user.firstName[0]}
                     </Avatar>
                   </div>
-                  <div className="ellipsis" style={{ flex: 1 }}>
+                  <div style={{ flex: 1 }}>
                     <span style={{ fontWeight: 500 }}>{user.firstName}</span>
                   </div>
-                  <div className="ellipsis" style={{ flex: 1 }}>
-                    {user.lastName}
-                  </div>
-                  <div className="ellipsis" style={{ flex: 2 }}>
-                    {user.email}
-                  </div>
-                  <div className="ellipsis" style={{ flex: 1 }}>
-                    {user.city}
-                  </div>
-                  <div
-                    className="ellipsis"
-                    style={{ flex: 1, textTransform: "capitalize" }}
-                  >
-                    {user.role.replace(/_/g, " ")}
-                  </div>
-                  <div style={{ flex: 0.5 }}>
-                    {user.role !== "admin" && (
-                      <Tooltip title="Delete user">
-                        <Button
-                          type="text"
-                          icon={<DeleteOutlined />}
-                          danger
-                          onClick={() => handleDeleteUser(user._id, user.role)}
-                        />
-                      </Tooltip>
+                  <div style={{ flex: 1 }}>{user.lastName}</div>
+                  <div style={{ flex: 2 }}>{user.email}</div>
+                  <div style={{ flex: 1 }}>{user.city}</div>
+                  <div style={{ flex: 1 }}>
+                    {user.gymOwnerLicenseImage ? (
+                      <Avatar
+                        src={user.gymOwnerLicenseImage}
+                        size={32}
+                        style={{ marginRight: 12 }}
+                      />
+                    ) : (
+                      <span style={{ color: "#999" }}>No Image</span>
                     )}
+                  </div>
+                  <div style={{ flex: 2 }}>
+                    {["approved", "pending", "declined"].map((status) => (
+                      <Button
+                        key={status}
+                        style={buttonStyles(
+                          status,
+                          user.gymOwnerStatus === status
+                        )}
+                        onClick={() =>
+                          handleUpdateGymOwnerStatus(user._id, status)
+                        }
+                      >
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               ))
             ) : (
               <div style={{ padding: 24, textAlign: "center", color: "#999" }}>
-                No users found.
+                No gym owners found.
               </div>
             )}
           </div>
@@ -218,7 +241,7 @@ const UserListModalContent: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: 20 }}>
             <Pagination
               current={currentPage}
-              total={users?.length}
+              total={gymOwners?.length}
               pageSize={pageSize}
               onChange={(page) => setCurrentPage(page)}
             />
@@ -229,4 +252,4 @@ const UserListModalContent: React.FC = () => {
   );
 };
 
-export default UserListModalContent;
+export default PendingListModalContent;
