@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import './PendingListModalContent.less';
 import { Button, Input, Pagination, Avatar, Spin } from "antd";
 import { ArrowLeftOutlined, FileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -226,6 +227,7 @@ const PendingListModalContent: React.FC = () => {
                     {["approved", "pending", "declined"].map((status) => (
                       <Button
                         key={status}
+                        className="status-button"
                         style={{
                           ...buttonStyles(
                             status,

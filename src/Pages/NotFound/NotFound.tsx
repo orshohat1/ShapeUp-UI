@@ -1,5 +1,3 @@
-// NotFound.tsx
-import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "antd";
 import { FireOutlined } from "@ant-design/icons";
