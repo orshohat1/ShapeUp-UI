@@ -443,7 +443,9 @@ const Dashboard: React.FC = () => {
               color: "white",
               position: "relative",
               overflow: "hidden",
-              width: "30%"
+              width: "30%",
+              marginLeft: "auto",
+              textAlign: "right"
             }}
           >
             <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
