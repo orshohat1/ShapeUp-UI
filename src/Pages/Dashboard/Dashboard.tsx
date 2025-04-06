@@ -246,11 +246,6 @@ const Dashboard: React.FC = () => {
         {/* Main Content */}
         <main className="col bg-white p-3">
           <h1>Overview</h1>
-          {averageRating !== null && (
-            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-              Average Review Rating: {averageRating}
-            </p>
-          )}
 
           <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
           <PlusCircleOutlined className="plus-icon" onClick={handleOpenAddGymModal} />
@@ -439,6 +434,65 @@ const Dashboard: React.FC = () => {
           <Button type="primary" onClick={handleUpdateGym} className="save-btn">Save Changes</Button>
         </div>
       </Modal>
+      <div
+            style={{
+              background: "#829cd3",
+              borderRadius: "20px",
+              padding: "20px",
+              margin: "20px 0",
+              color: "white",
+              position: "relative",
+              overflow: "hidden",
+              width: "30%"
+            }}
+          >
+            <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
+            <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
+              {averageRating ?? "N/A"}/5
+            </h2>
+            <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
+
+            {/* Avatar Row */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {/* Star badge */}
+              <div
+                style={{
+                  marginLeft: "auto",
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  background: "#ffd70033",
+                  border: "2px solid #ffd700",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span role="img" aria-label="star" style={{ fontSize: "16px" }}>
+                  ⭐
+                </span>
+              </div>
+            </div>
+
+            {/* Background wave effect (decorative) */}
+            <svg
+              viewBox="0 0 500 150"
+              preserveAspectRatio="none"
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                height: "40px",
+                opacity: 0.3,
+              }}
+            >
+              <path
+                d="M0.00,49.98 C150.00,150.00 349.94,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+                style={{ stroke: "none", fill: "#ffffff" }}
+              />
+            </svg>
+          </div>
     </div>
   );
 };
