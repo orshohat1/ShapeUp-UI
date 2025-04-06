@@ -148,7 +148,7 @@ const DashboardAdmin: React.FC = () => {
                   type="primary"
                   onClick={() => navigate("/admin/pending")}
                 >
-                  Review Pending
+                  Manage Gym Owners Status
                 </Button>
               </Col>
             </Row>

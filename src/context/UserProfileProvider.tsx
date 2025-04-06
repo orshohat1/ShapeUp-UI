@@ -14,10 +14,10 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
 }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
-      const storedProfile = localStorage.getItem("userProfile");
+      const storedProfile = sessionStorage.getItem("userProfile");
       return storedProfile ? JSON.parse(storedProfile) : null;
     } catch (error) {
-      console.error("Failed to parse user profile from localStorage:", error);
+      console.error("Failed to parse user profile from sessionStorage:", error);
       return null;
     }
   });
@@ -44,10 +44,11 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
         id: userProfileData._id,
         street: userProfileData.street || "",
         city: userProfileData.city || "",
+        gymOwnerStatus: userProfileData.gymOwnerStatus || null,
       };
 
       setUserProfile(userProfile);
-      localStorage.setItem("userProfile", JSON.stringify(userProfile));
+      sessionStorage.setItem("userProfile", JSON.stringify(userProfile));
       return userProfile;
     } catch (error) {
       console.error("Error fetching user profile:", error);
@@ -63,7 +64,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
       }
 
       await logoutServer(refreshToken);
-      localStorage.removeItem("userProfile");
+      sessionStorage.removeItem("userProfile");
       setUserProfile(null);
     } catch (error) {
       console.error("Error during logout:", error);
@@ -73,7 +74,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
   // Auto-refresh user profile on mount
   useEffect(() => {
     if (!userProfile) {
-      if (location.pathname !== "/login" && location.pathname !== "/user/login") {
+      if (location.pathname !== "/login" && location.pathname !== "/user/login" && location.pathname !== "/admin/login") {
         refreshUserProfile();
       }
     }

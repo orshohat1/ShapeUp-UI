@@ -10,6 +10,7 @@ export interface UserProfile {
     street: string;
     city: string;
     id: string;
+    gymOwnerStatus: string;
 }
 
 export interface UserProfileContextType {
