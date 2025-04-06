@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
-import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Input, Pagination, Avatar, Spin } from "antd";
+import { ArrowLeftOutlined, FileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getGymOwnersStatus, updateGymOwnerStatus } from "../../../api/admin";
 
@@ -40,8 +40,7 @@ const PendingListModalContent: React.FC = () => {
   const fetchFilteredGymOwners = async (query: string) => {
     try {
       setLoading(true);
-      // TODO
-      const gymOwners = await getGymOwnersStatus();
+      const gymOwners = await getGymOwnersStatus(query);
       setGymOwners(gymOwners || []);
     } catch (err) {
       setGymOwners([]);
@@ -98,6 +97,7 @@ const PendingListModalContent: React.FC = () => {
       fontWeight: active ? "bold" : "normal",
       borderWidth: active ? 2 : 1,
       borderStyle: "solid",
+      backgroundColor: "transparent",
     };
     switch (status) {
       case "approved":
@@ -105,18 +105,21 @@ const PendingListModalContent: React.FC = () => {
           ...baseStyle,
           color: "green",
           borderColor: active ? "darkgreen" : "lightgreen",
+          ...(active && { backgroundColor: "rgba(0,128,0,0.1)" }),
         };
       case "pending":
         return {
           ...baseStyle,
           color: "blue",
           borderColor: active ? "darkblue" : "lightblue",
+          ...(active && { backgroundColor: "rgba(0,0,255,0.1)" }),
         };
       case "declined":
         return {
           ...baseStyle,
           color: "red",
           borderColor: active ? "darkred" : "lightcoral",
+          ...(active && { backgroundColor: "rgba(255,0,0,0.1)" }),
         };
       default:
         return baseStyle;
@@ -204,11 +207,17 @@ const PendingListModalContent: React.FC = () => {
                   <div style={{ flex: 1 }}>{user.city}</div>
                   <div style={{ flex: 1 }}>
                     {user.gymOwnerLicenseImage ? (
-                      <Avatar
-                        src={user.gymOwnerLicenseImage}
-                        size={32}
-                        style={{ marginRight: 12 }}
-                      />
+                      <a
+                        href={user.gymOwnerLicenseImage}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          textDecoration: "none",
+                        }}
+                      >
+                        <FileOutlined style={{ marginRight: 6 }} />
+                        License File
+                      </a>
                     ) : (
                       <span style={{ color: "#999" }}>No Image</span>
                     )}
@@ -217,10 +226,13 @@ const PendingListModalContent: React.FC = () => {
                     {["approved", "pending", "declined"].map((status) => (
                       <Button
                         key={status}
-                        style={buttonStyles(
-                          status,
-                          user.gymOwnerStatus === status
-                        )}
+                        style={{
+                          ...buttonStyles(
+                            status,
+                            user.gymOwnerStatus === status
+                          ),
+                          marginBottom: 8,
+                        }}
                         onClick={() =>
                           handleUpdateGymOwnerStatus(user._id, status)
                         }

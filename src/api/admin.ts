@@ -53,12 +53,16 @@ export const updateGymOwnerStatus = async (
   }
 };
 
-export const getGymOwnersStatus = async (showNotification?: boolean) => {
+export const getGymOwnersStatus = async (
+  query?: string,
+  showNotification?: boolean
+) => {
   try {
     const response = await axiosInstance.get(
       `${ADMIN_ROUTE}/getGymOwnersStatus`,
       {
         withCredentials: true,
+        params: query ? { search: query } : {},
       }
     );
     return response?.data;
