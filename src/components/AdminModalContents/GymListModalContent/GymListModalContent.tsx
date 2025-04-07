@@ -1,14 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Input, Spin, Pagination, Tooltip, Button, Modal } from "antd";
+import {
+  Input,
+  Spin,
+  Pagination,
+  Tooltip,
+  Button,
+  Modal,
+  Space,
+  Avatar,
+} from "antd";
+import "./GymListModalContent.less";
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 import { filterGyms, getAllGymsForAdmin } from "../../../api/gyms";
 import { deleteGymById } from "../../../api/gym-owner";
 import { useNavigate } from "react-router-dom";
+import fallbackImage from '../../../assets/athlete-avatar-gym-icon.jpg'
 
 interface GymData {
   _id: string;
   name: string;
   city: string;
+  pictures: string[];
   amountOfReviews: number;
   owner: {
     firstName: string;
@@ -144,9 +156,9 @@ const GymListModalContent: React.FC = () => {
                 fontWeight: "bold",
               }}
             >
+              <div style={{ flex: 1 }}></div>
               <div style={{ flex: 2 }}>Name</div>
               <div style={{ flex: 2 }}>City</div>
-              <div style={{ flex: 1 }}>Reviews</div>
               <div style={{ flex: 2 }}>Owner</div>
               <div style={{ flex: 0.5 }}>Actions</div>
             </div>
@@ -164,9 +176,29 @@ const GymListModalContent: React.FC = () => {
                     borderRadius: 8,
                   }}
                 >
+                  <div style={{ flex: 1 }}>
+                    <Space size="small">
+                      <div className="avatar-group" id={`gym-${gym._id}-picture`}>
+                        {gym?.pictures.map((url, index) => (
+                          <div key={index} className="avatar-wrapper">
+                            <Avatar
+                              src={url}
+                              size="large"
+                              onError={() => {
+                                const avatar = document.querySelectorAll(`#gym-${gym._id}-picture .avatar-wrapper img`)[index];
+                                if (avatar) {
+                                  (avatar as HTMLImageElement).src = fallbackImage
+                                }
+                                return false;
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </Space>
+                  </div>
                   <div style={{ flex: 2, fontWeight: 500 }}>{gym.name}</div>
                   <div style={{ flex: 2 }}>{gym.city}</div>
-                  <div style={{ flex: 1 }}>{gym.amountOfReviews}</div>
                   <div style={{ flex: 2 }}>
                     {gym.owner
                       ? `${gym.owner.firstName} ${gym.owner.lastName}`

@@ -108,13 +108,6 @@ const PendingListModalContent: React.FC = () => {
           borderColor: active ? "darkgreen" : "lightgreen",
           ...(active && { backgroundColor: "rgba(0,128,0,0.1)" }),
         };
-      case "pending":
-        return {
-          ...baseStyle,
-          color: "blue",
-          borderColor: active ? "darkblue" : "lightblue",
-          ...(active && { backgroundColor: "rgba(0,0,255,0.1)" }),
-        };
       case "declined":
         return {
           ...baseStyle,
@@ -224,7 +217,7 @@ const PendingListModalContent: React.FC = () => {
                     )}
                   </div>
                   <div style={{ flex: 2 }}>
-                    {["approved", "pending", "declined"].map((status) => (
+                    {["approved", "declined"].map((status) => (
                       <Button
                         key={status}
                         className="status-button"

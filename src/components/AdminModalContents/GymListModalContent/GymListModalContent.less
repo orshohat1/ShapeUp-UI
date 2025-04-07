@@ -1,0 +1,25 @@
+.avatar-group {
+  display: flex;
+  align-items: center;
+
+  .avatar-wrapper {
+    margin-left: -20px;
+    position: relative;
+    transition: margin 0.3s ease;
+    border: 1px solid gray;
+    border-radius: 50%;
+    
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:hover {
+      margin-left: 0;
+      z-index: 10;
+    }
+
+    &:hover + .avatar-wrapper {
+      margin-left: 0;
+    }
+  }
+}
