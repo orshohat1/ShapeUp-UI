@@ -11,10 +11,9 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import UserListModalContent from "../../../components/AdminModalContents/UserListModalContent/UserListModalContent";
-import GymListModalContent from "../../../components/AdminModalContents/GymListModalContent/GymListModalContent";
 import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
 import { fetchDashboardCounts } from "../../../api/admin";
+import { useNavigate } from "react-router-dom";
 
 interface DailyRevenue {
   day: string;
@@ -36,9 +35,7 @@ interface AdminStats {
 const DashboardAdmin: React.FC = () => {
   const [dailyRevenue, setDailyRevenue] = useState<DailyRevenue[]>([]);
   const [cityRevenue, setCityRevenue] = useState<CityRevenue[]>([]);
-  const [activeModal, setActiveModal] = useState<
-    "users" | "gyms" | "pending" | null
-  >(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setDailyRevenue([
@@ -131,7 +128,7 @@ const DashboardAdmin: React.FC = () => {
                 <Button
                   block
                   type="primary"
-                  onClick={() => setActiveModal("users")}
+                  onClick={() => navigate("/admin/users")}
                 >
                   Manage Users
                 </Button>
@@ -140,7 +137,7 @@ const DashboardAdmin: React.FC = () => {
                 <Button
                   block
                   type="primary"
-                  onClick={() => setActiveModal("gyms")}
+                  onClick={() => navigate("/admin/gyms")}
                 >
                   Manage Gyms
                 </Button>
@@ -149,9 +146,9 @@ const DashboardAdmin: React.FC = () => {
                 <Button
                   block
                   type="primary"
-                  onClick={() => setActiveModal("pending")}
+                  onClick={() => navigate("/admin/pending")}
                 >
-                  Review Pending
+                  Manage Gym Owners Status
                 </Button>
               </Col>
             </Row>
@@ -192,27 +189,6 @@ const DashboardAdmin: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
-      <Modal
-        title={
-          activeModal === "users"
-            ? "Manage Users"
-            : activeModal === "gyms"
-            ? "Manage Gyms"
-            : activeModal === "pending"
-            ? "Pending Gym Owners"
-            : ""
-        }
-        open={!!activeModal}
-        onCancel={() => setActiveModal(null)}
-        footer={null}
-        width={700}
-      >
-        {activeModal === "users" && <UserListModalContent />}
-        {activeModal === "gyms" && <GymListModalContent />}
-        {activeModal === "pending" && <UserListModalContent />}{" "}
-        {/* Need to change "pending" to the new component */}
-      </Modal>
     </div>
   );
 };

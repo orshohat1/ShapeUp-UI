@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./UserListModalContent.less";
 import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 import { deleteUserById, filterUsers, getAllUsers } from "../../../api/users";
+import { useNavigate } from "react-router-dom";
 
 interface UserData {
   _id: string;
@@ -21,6 +22,7 @@ const UserListModalContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const isFirstRender = useRef(true);
   const pageSize = 5;
+  const navigate = useNavigate();
 
   const fetchAllUsers = async () => {
     console.log("Fetch all users...");
@@ -58,11 +60,7 @@ const UserListModalContent: React.FC = () => {
     }
 
     const delayDebounce = setTimeout(() => {
-      if (search.trim()) {
-        fetchFilteredUsers(search.trim());
-      } else {
-        fetchAllUsers();
-      }
+      handleUserFetch();
     }, 400);
 
     return () => clearTimeout(delayDebounce);
@@ -72,6 +70,14 @@ const UserListModalContent: React.FC = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  const handleUserFetch = () => {
+    if (search.trim()) {
+      fetchFilteredUsers(search.trim());
+    } else {
+      fetchAllUsers();
+    }
+  };
 
   const handleDeleteUser = (userId: string, userRole: string) => {
     const extraWarning =
@@ -89,7 +95,7 @@ const UserListModalContent: React.FC = () => {
       onOk: async () => {
         try {
           await deleteUserById(userId);
-          fetchAllUsers();
+          handleUserFetch();
         } catch (error) {
           console.error(error);
         }
@@ -98,7 +104,18 @@ const UserListModalContent: React.FC = () => {
   };
 
   return (
-    <div>
+    <div style={{ padding: 20 }}>
+      <div style={{ marginBottom: 16 }}>
+        <Button
+          type="link"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/admin/dashboard")}
+          style={{ padding: 0 }}
+        >
+          Back to Dashboard
+        </Button>
+      </div>
+
       <Input.Search
         placeholder="Search users"
         allowClear
@@ -113,7 +130,30 @@ const UserListModalContent: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* User Rows */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Table Headers */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                border: "1px solid #f0f0f0",
+                padding: "12px 16px",
+                borderRadius: 8,
+                backgroundColor: "#e0e0e0",
+                fontWeight: "bold",
+              }}
+            >
+              <div style={{ flex: 0.5 }}></div>
+              <div style={{ flex: 1 }}>First Name</div>
+              <div style={{ flex: 1 }}>Last Name</div>
+              <div style={{ flex: 2 }}>Email</div>
+              <div style={{ flex: 1 }}>City</div>
+              <div style={{ flex: 1 }}>Role</div>
+              <div style={{ flex: 0.5 }}>Actions</div>
+            </div>
+
             {paginated?.length > 0 ? (
               paginated.map((user) => (
                 <div
@@ -127,9 +167,7 @@ const UserListModalContent: React.FC = () => {
                     borderRadius: 8,
                   }}
                 >
-                  <div
-                    style={{ display: "flex", alignItems: "center", flex: 2 }}
-                  >
+                  <div style={{ flex: 0.5 }}>
                     <Avatar
                       src={user.avatarUrl}
                       size={32}
@@ -137,9 +175,9 @@ const UserListModalContent: React.FC = () => {
                     >
                       {user.firstName[0]}
                     </Avatar>
-                    <span className="ellipsis" style={{ fontWeight: 500 }}>
-                      {user.firstName}
-                    </span>
+                  </div>
+                  <div className="ellipsis" style={{ flex: 1 }}>
+                    <span style={{ fontWeight: 500 }}>{user.firstName}</span>
                   </div>
                   <div className="ellipsis" style={{ flex: 1 }}>
                     {user.lastName}
@@ -156,7 +194,7 @@ const UserListModalContent: React.FC = () => {
                   >
                     {user.role.replace(/_/g, " ")}
                   </div>
-                  <div style={{ width: "32px" }}>
+                  <div style={{ flex: 0.5 }}>
                     {user.role !== "admin" && (
                       <Tooltip title="Delete user">
                         <Button

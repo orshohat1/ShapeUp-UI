@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.less";
 import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
-import { Modal, Input, Button, notification } from "antd";
+import { Modal, Input, Button, notification, Tooltip } from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
-import { getGymsByOwner, addGym, updateGymById, deleteGymById } from "../../api/gym-owner";
+import {
+  getGymsByOwner,
+  addGym,
+  updateGymById,
+  deleteGymById,
+} from "../../api/gym-owner";
 import { getGymReviews } from "../../api/reviews";
-import GymBox from '../../components/GymBox/GymBox';
+import GymBox from "../../components/GymBox/GymBox";
 import { io, Socket } from "socket.io-client";
+import { IGymOwnerStatus } from "../../constants/enum/IGymOwnerStatus";
 
 const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
@@ -24,7 +30,12 @@ const Dashboard: React.FC = () => {
   const [gymsError, setGymsError] = useState(null);
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
   const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
-  const [gymData, setGymData] = useState({ name: "", city: "", description: "", prices: [0, 0, 0] });
+  const [gymData, setGymData] = useState({
+    name: "",
+    city: "",
+    description: "",
+    prices: [0, 0, 0],
+  });
   const [gymImages, setGymImages] = useState<any[]>([]);
   const [selectedGym, setSelectedGym] = useState<any>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
@@ -43,7 +54,10 @@ const Dashboard: React.FC = () => {
           for (const gym of gyms) {
             const reviews = await getGymReviews(gym._id);
             if (reviews.length > 0) {
-              const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+              const sum = reviews.reduce(
+                (acc, review) => acc + review.rating,
+                0
+              );
               totalRating += sum;
               totalReviews += reviews.length;
             }
@@ -56,7 +70,9 @@ const Dashboard: React.FC = () => {
           }
         }
       } catch (error: any) {
-        setGymsError(error.response?.data?.message || "Failed to load gyms data");
+        setGymsError(
+          error.response?.data?.message || "Failed to load gyms data"
+        );
       } finally {
         setLoadingGyms(false);
       }
@@ -83,7 +99,9 @@ const Dashboard: React.FC = () => {
   };
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
-    setGymImages(gymImages.filter((_, currentIndex) => currentIndex !== imageIndexToDelete));
+    setGymImages(
+      gymImages.filter((_, currentIndex) => currentIndex !== imageIndexToDelete)
+    );
   };
 
   const handleOpenAddGymModal = () => setIsAddGymModalVisible(true);
@@ -106,7 +124,12 @@ const Dashboard: React.FC = () => {
 
   const handleOpenEditGymModal = (gym: any) => {
     setSelectedGym(gym);
-    setGymData({ name: gym.name, city: gym.city, description: gym.description, prices: gym.prices || ["", "", ""], });
+    setGymData({
+      name: gym.name,
+      city: gym.city,
+      description: gym.description,
+      prices: gym.prices || ["", "", ""],
+    });
     setGymImages(gym.pictures);
     setIsEditGymModalVisible(true);
   };
@@ -118,14 +141,16 @@ const Dashboard: React.FC = () => {
     setGymImages([]);
   };
 
-  const handleGymDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleGymDataChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setGymData({ ...gymData, [e.target.name]: e.target.value });
   };
 
   const handleSaveGym = async () => {
     const formData = new FormData();
-    
-    if (gymData.prices.some(price => price === "" || isNaN(Number(price)))) {
+
+    if (gymData.prices.some((price) => price === "" || isNaN(Number(price)))) {
       notification.warning({
         message: "Invalid Prices",
         description: "Please fill in all price levels with valid numbers.",
@@ -162,7 +187,7 @@ const Dashboard: React.FC = () => {
   const handleUpdateGym = async () => {
     const formData = new FormData();
 
-    if (gymData.prices.some(price => price === "" || isNaN(Number(price)))) {
+    if (gymData.prices.some((price) => price === "" || isNaN(Number(price)))) {
       notification.warning({
         message: "Invalid Prices",
         description: "Please fill in all price levels with valid numbers.",
@@ -200,15 +225,21 @@ const Dashboard: React.FC = () => {
       const updatedGym = await updateGymById(formData, selectedGym._id);
 
       if (selectedGym.name !== gymData.name) {
-        socket.emit("update_gym_name", userProfile?.id, selectedGym.name, gymData.name, (response: any) => {
-          if (!response.success) {
-            notification.warning({
-              message: "No Chats Found",
-              description: response.message,
-              placement: "top",
-            });
+        socket.emit(
+          "update_gym_name",
+          userProfile?.id,
+          selectedGym.name,
+          gymData.name,
+          (response: any) => {
+            if (!response.success) {
+              notification.warning({
+                message: "No Chats Found",
+                description: response.message,
+                placement: "top",
+              });
+            }
           }
-        });
+        );
       }
 
       setGyms((prevGyms: any) =>
@@ -228,7 +259,9 @@ const Dashboard: React.FC = () => {
   const handleGymDelete = async (gymId: string) => {
     try {
       await deleteGymById(gymId);
-      setGyms((prevGyms: any) => prevGyms.filter((gym: any) => gym._id !== gymId));
+      setGyms((prevGyms: any) =>
+        prevGyms.filter((gym: any) => gym._id !== gymId)
+      );
     } catch (error) {
       console.error("Error deleting gym:", error);
       notification.error({
@@ -241,14 +274,41 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="container-fluid">
-      {(loadingGyms) && <LoadingOverlay />}
+      {loadingGyms && <LoadingOverlay />}
       <div className="row">
         {/* Main Content */}
         <main className="col bg-white p-3">
           <h1>Overview</h1>
 
+          {averageRating !== null && (
+            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
+              Average Review Rating: {averageRating}
+            </p>
+          )}
+
           <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
-          <PlusCircleOutlined className="plus-icon" onClick={handleOpenAddGymModal} />
+          <Tooltip
+            title={
+              userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+                ? `Your status is ${userProfile?.gymOwnerStatus}`
+                : null
+            }
+            placement="bottom"
+            color="red"
+          >
+            <PlusCircleOutlined
+              className={`plus-icon ${
+                userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+                  ? "disabled"
+                  : ""
+              }`}
+              onClick={
+                userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
+                  ? handleOpenAddGymModal
+                  : undefined
+              }
+            />
+          </Tooltip>
           <div className="my-gyms-header">
             {gymsError ? (
               <p style={{ color: "red" }}>{gymsError}</p>
@@ -355,9 +415,29 @@ const Dashboard: React.FC = () => {
         <div style={{ display: "flex", gap: "20px" }}>
           {/* Left Side - Gym Inputs */}
           <div style={{ flex: "0 0 300px" }}>
-            <Input name="name" placeholder="Name" value={gymData.name} onChange={handleGymDataChange} className="modal-input" />
-            <Input name="city" placeholder="City" value={gymData.city} onChange={handleGymDataChange} className="modal-input" />
-            <Input.TextArea name="description" placeholder="Description" value={gymData.description} onChange={handleGymDataChange} className="modal-input" autoSize={{ minRows: 3, maxRows: 6 }} />
+
+            <Input
+              name="name"
+              placeholder="Name"
+              value={gymData.name}
+              onChange={handleGymDataChange}
+              className="modal-input"
+            />
+            <Input
+              name="city"
+              placeholder="City"
+              value={gymData.city}
+              onChange={handleGymDataChange}
+              className="modal-input"
+            />
+            <Input.TextArea
+              name="description"
+              placeholder="Description"
+              value={gymData.description}
+              onChange={handleGymDataChange}
+              className="modal-input"
+              autoSize={{ minRows: 3, maxRows: 6 }}
+            />
           </div>
 
           {/* Right Side - Image Upload */}
@@ -365,7 +445,14 @@ const Dashboard: React.FC = () => {
             <p>Upload Gym Images (Max: 5)</p>
 
             <label className="custom-file-upload">
-              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={gymImages.length >= 5} style={{ display: "none" }} />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                disabled={gymImages.length >= 5}
+                style={{ display: "none" }}
+              />
               <UploadOutlined style={{ fontSize: 24, cursor: "pointer" }} />
             </label>
 
@@ -374,18 +461,32 @@ const Dashboard: React.FC = () => {
                 <div key={index} className="image-preview">
                   {/* Check if the image is a File object or a URL */}
                   <img
-                    src={typeof image === "string" ? image : URL.createObjectURL(image)}
+                    src={
+                      typeof image === "string"
+                        ? image
+                        : URL.createObjectURL(image)
+                    }
                     alt={`Gym Image ${index}`}
                   />
-                  <button onClick={() => handleRemoveImage(index)} className="remove-image-btn">✖</button>
+                  <button
+                    onClick={() => handleRemoveImage(index)}
+                    className="remove-image-btn"
+                  >
+                    ✖
+                  </button>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="modal-actions" style={{ marginTop: "20px", textAlign: "right" }}>
-          <Button type="primary" onClick={handleSaveGym} className="save-btn">Save</Button>
+        <div
+          className="modal-actions"
+          style={{ marginTop: "20px", textAlign: "right" }}
+        >
+          <Button type="primary" onClick={handleSaveGym} className="save-btn">
+            Save
+          </Button>
         </div>
       </Modal>
 
@@ -400,9 +501,29 @@ const Dashboard: React.FC = () => {
         <div style={{ display: "flex", gap: "20px" }}>
           {/* Left Side - Gym Inputs */}
           <div style={{ flex: "0 0 300px" }}>
-            <Input name="name" placeholder="Name" value={gymData.name} onChange={handleGymDataChange} className="modal-input" />
-            <Input name="city" placeholder="City" value={gymData.city} onChange={handleGymDataChange} className="modal-input" />
-            <Input.TextArea name="description" placeholder="Description" value={gymData.description} onChange={handleGymDataChange} className="modal-input" autoSize={{ minRows: 3, maxRows: 6 }} />
+
+            <Input
+              name="name"
+              placeholder="Name"
+              value={gymData.name}
+              onChange={handleGymDataChange}
+              className="modal-input"
+            />
+            <Input
+              name="city"
+              placeholder="City"
+              value={gymData.city}
+              onChange={handleGymDataChange}
+              className="modal-input"
+            />
+            <Input.TextArea
+              name="description"
+              placeholder="Description"
+              value={gymData.description}
+              onChange={handleGymDataChange}
+              className="modal-input"
+              autoSize={{ minRows: 3, maxRows: 6 }}
+            />
           </div>
 
           {/* Right Side - Image Upload */}
@@ -410,7 +531,14 @@ const Dashboard: React.FC = () => {
             <p>Upload Gym Images (Max: 5)</p>
 
             <label className="custom-file-upload">
-              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={gymImages.length >= 5} style={{ display: "none" }} />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                disabled={gymImages.length >= 5}
+                style={{ display: "none" }}
+              />
               <UploadOutlined style={{ fontSize: 24, cursor: "pointer" }} />
             </label>
 
@@ -419,19 +547,32 @@ const Dashboard: React.FC = () => {
                 <div key={index} className="image-preview">
                   {/* Check if the image is a File object or a URL */}
                   <img
-                    src={typeof image === "string" ? image : URL.createObjectURL(image)}
+                    src={
+                      typeof image === "string"
+                        ? image
+                        : URL.createObjectURL(image)
+                    }
                     alt={`Gym Image ${index}`}
                   />
-                  <button onClick={() => handleRemoveImage(index)} className="remove-image-btn">✖</button>
+                  <button
+                    onClick={() => handleRemoveImage(index)}
+                    className="remove-image-btn"
+                  >
+                    ✖
+                  </button>
                 </div>
               ))}
             </div>
-
           </div>
         </div>
 
-        <div className="modal-actions" style={{ marginTop: "20px", textAlign: "right" }}>
-          <Button type="primary" onClick={handleUpdateGym} className="save-btn">Save Changes</Button>
+        <div
+          className="modal-actions"
+          style={{ marginTop: "20px", textAlign: "right" }}
+        >
+          <Button type="primary" onClick={handleUpdateGym} className="save-btn">
+            Save Changes
+          </Button>
         </div>
       </Modal>
       <div
