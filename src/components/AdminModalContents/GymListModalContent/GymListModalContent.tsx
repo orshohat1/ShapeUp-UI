@@ -21,7 +21,6 @@ interface GymData {
   name: string;
   city: string;
   pictures: string[];
-  amountOfReviews: number;
   owner: {
     firstName: string;
     lastName: string;
