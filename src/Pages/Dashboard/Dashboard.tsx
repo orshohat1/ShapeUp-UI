@@ -280,12 +280,6 @@ const Dashboard: React.FC = () => {
         <main className="col bg-white p-3">
           <h1>Overview</h1>
 
-          {averageRating !== null && (
-            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-              Average Review Rating: {averageRating}
-            </p>
-          )}
-
           <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
           <Tooltip
             title={
