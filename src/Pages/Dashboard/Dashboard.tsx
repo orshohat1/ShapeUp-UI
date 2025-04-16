@@ -150,15 +150,6 @@ const Dashboard: React.FC = () => {
   const handleSaveGym = async () => {
     const formData = new FormData();
 
-    if (gymData.prices.some((price) => price === 0 || isNaN(Number(price)))) {
-      notification.warning({
-        message: "Invalid Prices",
-        description: "Please fill in all price levels with valid numbers.",
-        placement: "top",
-      });
-      return;
-    }
-
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
@@ -166,8 +157,6 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures", image);
     });
-
-    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!userProfile) {
@@ -187,15 +176,6 @@ const Dashboard: React.FC = () => {
   const handleUpdateGym = async () => {
     const formData = new FormData();
 
-    if (gymData.prices.some((price) => price === 0 || isNaN(Number(price)))) {
-      notification.warning({
-        message: "Invalid Prices",
-        description: "Please fill in all price levels with valid numbers.",
-        placement: "top",
-      });
-      return;
-    }
-
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
@@ -214,8 +194,6 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures[]", image);
     });
-
-    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!selectedGym) {
