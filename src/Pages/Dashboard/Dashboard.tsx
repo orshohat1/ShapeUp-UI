@@ -345,10 +345,13 @@ const Dashboard: React.FC = () => {
                 
                 const prices = priceUpdateTargetGym.prices.map(Number);
 
-                if (prices.some((p) => isNaN(p) || p <= 0)) {
+                if (prices.some((p) => {
+                  const num = Number(p);
+                  return isNaN(num) || num <= 0;
+                })) {
                   notification.error({
                     message: "Invalid Prices",
-                    description: "All prices must be numbers greater than 0.",
+                    description: "All prices must be valid numbers greater than 0.",
                     placement: "top",
                   });
                   return;
