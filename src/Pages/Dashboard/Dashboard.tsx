@@ -342,9 +342,21 @@ const Dashboard: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: "40px" }}>
             <Button
               onClick={async () => {
+                
+                const prices = priceUpdateTargetGym.prices.map(Number);
+
+                if (prices.some((p) => isNaN(p) || p <= 0)) {
+                  notification.error({
+                    message: "Invalid Prices",
+                    description: "All prices must be numbers greater than 0.",
+                    placement: "top",
+                  });
+                  return;
+                }
+
                 try {
                   const formData = new FormData();
-                  formData.append("prices", JSON.stringify(priceUpdateTargetGym.prices.map(Number)));
+                  formData.append("prices", JSON.stringify(prices));
                   await updateGymById(formData, priceUpdateTargetGym._id);
 
                   setGyms((prev: any) =>
