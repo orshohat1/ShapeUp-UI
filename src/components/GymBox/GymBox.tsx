@@ -6,6 +6,12 @@ import { askPricingSuggestion } from "../../api/chat-ai";
 import ChatAILogo from "../../assets/Logo/chatAI.png";
 import './GymBox.less';
 
+type OpeningHours = {
+  sundayToThursday: { from: string; to: string };
+  friday: { from: string; to: string };
+  saturday: { from: string; to: string };
+};
+
 interface GymBoxProps {
   gymName: string;
   city: string;
@@ -16,7 +22,7 @@ interface GymBoxProps {
     friday: { from: string; to: string };
     saturday: { from: string; to: string };
   };
-  onUpdateOpeningHours: (updatedHours: typeof openingHours) => void;
+  onUpdateOpeningHours: (updatedHours: OpeningHours) => void;
   onEdit: () => void;
   onDelete: () => void;
   onUpdatePrice: () => void;
@@ -29,6 +35,12 @@ const socket: Socket = io(CHAT_SERVER_URL, {
   path: PATH,
   transports: ["websocket", "polling"],
 });
+
+const defaultHours = {
+  sundayToThursday: { from: "", to: "" },
+  friday: { from: "", to: "" },
+  saturday: { from: "", to: "" },
+};
 
 const GymBox: React.FC<GymBoxProps> = ({
   gymName: initialGymName,
@@ -49,15 +61,9 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [newMessage, setNewMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
-  const [prevGymName, setPrevGymName] = useState(initialGymName);
   const [isSuggestModalVisible, setSuggestModalVisible] = useState(false);
   const [suggestedPricing, setSuggestedPricing] = useState<string | null>(null);
   const [isHoursModalVisible, setHoursModalVisible] = useState(false);
-  const defaultHours = {
-    sundayToThursday: { from: "", to: "" },
-    friday: { from: "", to: "" },
-    saturday: { from: "", to: "" },
-  };
   
   const [hours, setHours] = useState(openingHours || defaultHours);
     
@@ -67,10 +73,8 @@ const GymBox: React.FC<GymBoxProps> = ({
   
 
   useEffect(() => {
-    if (initialGymName !== prevGymName) {
-      setGymName(initialGymName);
-      setForceUpdate(prev => prev + 1);
-    }
+    setGymName(initialGymName);
+    setForceUpdate(prev => prev + 1);
   }, [initialGymName]);
 
   useEffect(() => {
@@ -104,7 +108,7 @@ const GymBox: React.FC<GymBoxProps> = ({
       socket.off("message", handleIncomingMessage);
       socket.off("update_messages", handleIncomingMessage);
     };
-  }, [selectedUser]);
+  }, [selectedUser, ownerId]);
 
 
   const fetchChatUsers = () => {
@@ -297,11 +301,41 @@ const GymBox: React.FC<GymBoxProps> = ({
         open={isHoursModalVisible}
         onCancel={() => setHoursModalVisible(false)}
         onOk={() => {
+          const isValidTime = (time: string) => /^([01]\d|2[0-3]):([0-5]\d)$/.test(time);
+          const isStartBeforeEnd = (start: string, end: string) => {
+            const [sh, sm] = start.split(":").map(Number);
+            const [eh, em] = end.split(":").map(Number);
+            return sh < eh || (sh === eh && sm < em);
+          };
+        
+          type DayKey = keyof OpeningHours;
+
+          for (const day of ["sundayToThursday", "friday", "saturday"] as DayKey[]) {
+            const { from, to } = hours[day];
+        
+            if (!isValidTime(from) || !isValidTime(to)) {
+              notification.error({
+                message: "Invalid Time Format",
+                description: `Opening hours for ${day} must be in HH:MM format.`,
+                placement: "top",
+              });
+              return;
+            }
+        
+            if (!isStartBeforeEnd(from, to)) {
+              notification.error({
+                message: "Invalid Time Range",
+                description: `Opening time must be earlier than closing time for ${day}.`,
+                placement: "top",
+              });
+              return;
+            }
+          }
           onUpdateOpeningHours(hours);
           setHoursModalVisible(false);
         }}
       >
-      {hours && ["sundayToThursday", "friday", "saturday"].map((day) => (
+        {hours && (["sundayToThursday", "friday", "saturday"] as (keyof OpeningHours)[]).map((day) => (
           <div key={day} style={{ marginBottom: "12px" }}>
             <strong style={{ textTransform: "capitalize" }}>{day}</strong>
             <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
