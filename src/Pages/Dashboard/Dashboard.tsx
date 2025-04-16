@@ -563,7 +563,7 @@ const Dashboard: React.FC = () => {
           >
             <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
             <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
-              {averageRating ?? "N/A"}/5
+              {averageRating != null ? `${averageRating} / 5` : "N/A"}
             </h2>
             <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
 
