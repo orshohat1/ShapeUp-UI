@@ -11,6 +11,12 @@ interface GymBoxProps {
   city: string;
   ownerId: string;
   prices: number[];
+  openingHours: {
+    sundayToThursday: { from: string; to: string };
+    friday: { from: string; to: string };
+    saturday: { from: string; to: string };
+  };
+  onUpdateOpeningHours: (updatedHours: typeof openingHours) => void;
   onEdit: () => void;
   onDelete: () => void;
   onUpdatePrice: () => void;
@@ -29,6 +35,8 @@ const GymBox: React.FC<GymBoxProps> = ({
   city,
   ownerId,
   prices,
+  openingHours,
+  onUpdateOpeningHours,
   onEdit,
   onDelete,
   onUpdatePrice,
@@ -44,7 +52,19 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [prevGymName, setPrevGymName] = useState(initialGymName);
   const [isSuggestModalVisible, setSuggestModalVisible] = useState(false);
   const [suggestedPricing, setSuggestedPricing] = useState<string | null>(null);
-
+  const [isHoursModalVisible, setHoursModalVisible] = useState(false);
+  const defaultHours = {
+    sundayToThursday: { from: "", to: "" },
+    friday: { from: "", to: "" },
+    saturday: { from: "", to: "" },
+  };
+  
+  const [hours, setHours] = useState(openingHours || defaultHours);
+    
+  useEffect(() => {
+    setHours(openingHours || defaultHours);
+  }, [openingHours]);
+  
 
   useEffect(() => {
     if (initialGymName !== prevGymName) {
@@ -213,6 +233,18 @@ const GymBox: React.FC<GymBoxProps> = ({
       >
         Update Price
       </p>
+      <p
+        onClick={() => setHoursModalVisible(true)}
+        style={{
+          color: "#6c7080",
+          cursor: "pointer",
+          margin: "6px 0",
+          fontSize: "14px",
+          fontWeight: 400,
+        }}
+      >
+        Update Opening Hours
+      </p>
 
       <Modal
         title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
@@ -259,6 +291,43 @@ const GymBox: React.FC<GymBoxProps> = ({
             </div>
           </>
         )}
+      </Modal>
+      <Modal
+        title="Update Opening Hours"
+        open={isHoursModalVisible}
+        onCancel={() => setHoursModalVisible(false)}
+        onOk={() => {
+          onUpdateOpeningHours(hours);
+          setHoursModalVisible(false);
+        }}
+      >
+      {hours && ["sundayToThursday", "friday", "saturday"].map((day) => (
+          <div key={day} style={{ marginBottom: "12px" }}>
+            <strong style={{ textTransform: "capitalize" }}>{day}</strong>
+            <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+              <Input
+                placeholder="From"
+                value={hours[day].from}
+                onChange={(e) =>
+                  setHours((prev) => ({
+                    ...prev,
+                    [day]: { ...prev[day], from: e.target.value },
+                  }))
+                }
+              />
+              <Input
+                placeholder="To"
+                value={hours[day].to}
+                onChange={(e) =>
+                  setHours((prev) => ({
+                    ...prev,
+                    [day]: { ...prev[day], to: e.target.value },
+                  }))
+                }
+              />
+            </div>
+          </div>
+        ))}
       </Modal>
       <Modal
         title="AI-Powered Pricing Suggestion"

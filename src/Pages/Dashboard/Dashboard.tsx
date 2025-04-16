@@ -41,6 +41,9 @@ const Dashboard: React.FC = () => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
   const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
+  const [isHoursModalVisible, setIsHoursModalVisible] = useState(false);
+  const [hoursUpdateTargetGym, setHoursUpdateTargetGym] = useState<any>(null);
+  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -121,6 +124,17 @@ const Dashboard: React.FC = () => {
     setGymData({ name: "", city: "", description: "", prices: ["", "", ""] });
     setGymImages([]);
   };
+
+  const handleOpenHoursModal = (gym: any) => {
+    setHoursUpdateTargetGym(gym);
+    setIsHoursModalVisible(true);
+  };
+  
+  const handleCloseHoursModal = () => {
+    setIsHoursModalVisible(false);
+    setHoursUpdateTargetGym(null);
+  };
+  
 
   const handleOpenEditGymModal = (gym: any) => {
     setSelectedGym(gym);
@@ -320,15 +334,30 @@ const Dashboard: React.FC = () => {
                   city={gym.city}
                   ownerId={gym.owner}
                   prices={gym.prices}
+                  openingHours={gym.openingHours}
                   onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
                   onUpdatePrice={() => handleOpenPriceModal(gym)}
+                  onUpdateOpeningHours={(updatedHours) => {
+                    const formData = new FormData();
+                    formData.append("openingHours", JSON.stringify(updatedHours));
+                    updateGymById(formData, gym._id).then(() => {
+                      setGyms((prev: any) =>
+                        prev.map((g: any) =>
+                          g._id === gym._id ? { ...g, openingHours: updatedHours } : g
+                        )
+                      );
+                    }).catch(() => {
+                      notification.error({ message: "Failed to update opening hours" });
+                    });
+                  }}
                 />
               ))
             )}
           </div>
         </main>
       </div>
+
       <Modal
         open={isPriceModalVisible}
         onCancel={handleClosePriceModal}
