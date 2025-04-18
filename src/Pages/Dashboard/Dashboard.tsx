@@ -42,18 +42,9 @@ const Dashboard: React.FC = () => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
   const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
-  const normalizeCityName = (city: string) => {
-    return city
-      .trim()
-      .replace(/-/g, " ")
-      .replace(/\s+/g, " ")
-      .split(" ")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-  
   const [cityOptions, setCityOptions] = useState<string[]>([]);
-  
+  const [allCities, setAllCities] = useState<string[]>([]);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -94,6 +85,11 @@ const Dashboard: React.FC = () => {
     fetchProfile();
   }, [userProfile]);
 
+  useEffect(() => {
+    fetchAllCities();
+  }, []);
+  
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -111,24 +107,41 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleCitySearch = async (input: string) => {
-    if (input.length < 2) return; // Avoid flooding the API
-  
+  const fetchAllCities = async () => {
     try {
       const response = await fetch(
-        `https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&q=${input}`
+        "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
       );
-      const data = await response.json();
-      const cities = data.result.records
-        .map((record: any) => record["שם_ישוב_לועזי"])
-        .filter((city: string | undefined) => !!city)
-        .map(normalizeCityName);
-
-      const unique = Array.from(new Set(cities));
-      setCityOptions(unique);
-    } catch (error) {
-      console.error("Failed to fetch city suggestions:", error);
+      const json = await response.json();
+  
+      const cities = json.result.records
+        .map((r: any) => r["שם_ישוב_לועזי"])
+        .filter((name: string | undefined) => !!name && name.trim() !== "")
+        .map((name: string) => name.trim()
+        .replace(/-/g, " ")
+        .replace(/\s+/g, " ")
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+        .join(" "));
+  
+      const uniqueCities = Array.from(new Set(cities));
+      setAllCities(uniqueCities);
+    } catch (err) {
+      console.error("Failed to load cities:", err);
     }
+  };
+  
+  const handleCitySearch = (input: string) => {
+    if (!input || input.length < 1) {
+      setCityOptions([]);
+      return;
+    }
+  
+    const filtered = allCities.filter((city) =>
+      city.toLowerCase().includes(input.toLowerCase())
+    );
+  
+    setCityOptions(filtered.slice(0, 10)); // top 10 matches
   };
   
 
@@ -457,8 +470,9 @@ const Dashboard: React.FC = () => {
               onChange={handleGymDataChange}
               className="modal-input"
             />
+
             <AutoComplete
-              options={cityOptions.map(city => ({ value: city }))}
+              options={cityOptions.map((city) => ({ label: city, value: city }))}
               value={gymData.city}
               onSearch={handleCitySearch}
               onSelect={(value) =>
@@ -469,7 +483,11 @@ const Dashboard: React.FC = () => {
               }
               placeholder="City"
               className="modal-input"
+              allowClear
+              filterOption={false}
+              style={{ width: "100%" }}
             />
+
             <Input.TextArea
               name="description"
               placeholder="Description"
