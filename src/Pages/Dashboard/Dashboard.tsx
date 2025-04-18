@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
 
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
-    setGymData({ name: "", city: "", description: "", prices: ["", "", ""] });
+    setGymData({ name: "", city: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
 
@@ -151,7 +151,7 @@ const Dashboard: React.FC = () => {
   const handleCloseEditGymModal = () => {
     setIsEditGymModalVisible(false);
     setSelectedGym(null);
-    setGymData({ name: "", city: "", description: "", prices: ["", "", ""] });
+    setGymData({ name: "", city: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
 
@@ -164,15 +164,6 @@ const Dashboard: React.FC = () => {
   const handleSaveGym = async () => {
     const formData = new FormData();
 
-    if (gymData.prices.some((price) => price === "" || isNaN(Number(price)))) {
-      notification.warning({
-        message: "Invalid Prices",
-        description: "Please fill in all price levels with valid numbers.",
-        placement: "top",
-      });
-      return;
-    }
-
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
@@ -180,8 +171,6 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures", image);
     });
-
-    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!userProfile) {
@@ -201,15 +190,6 @@ const Dashboard: React.FC = () => {
   const handleUpdateGym = async () => {
     const formData = new FormData();
 
-    if (gymData.prices.some((price) => price === "" || isNaN(Number(price)))) {
-      notification.warning({
-        message: "Invalid Prices",
-        description: "Please fill in all price levels with valid numbers.",
-        placement: "top",
-      });
-      return;
-    }
-
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
     formData.append("description", gymData.description);
@@ -228,8 +208,6 @@ const Dashboard: React.FC = () => {
     gymImages.forEach((image) => {
       formData.append("pictures[]", image);
     });
-
-    formData.append("prices", JSON.stringify(gymData.prices.map(Number)));
 
     try {
       if (!selectedGym) {
@@ -293,12 +271,6 @@ const Dashboard: React.FC = () => {
         {/* Main Content */}
         <main className="col bg-white p-3">
           <h1>Overview</h1>
-
-          {averageRating !== null && (
-            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-              Average Review Rating: {averageRating}
-            </p>
-          )}
 
           <p className="my-gyms-text">My Gyms ({gyms?.length})</p>
           <Tooltip
@@ -399,9 +371,24 @@ const Dashboard: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: "40px" }}>
             <Button
               onClick={async () => {
+                
+                const prices = priceUpdateTargetGym.prices.map(Number);
+
+                if (prices.some((p) => {
+                  const num = Number(p);
+                  return isNaN(num) || num <= 0;
+                })) {
+                  notification.error({
+                    message: "Invalid Prices",
+                    description: "All prices must be valid numbers greater than 0.",
+                    placement: "top",
+                  });
+                  return;
+                }
+
                 try {
                   const formData = new FormData();
-                  formData.append("prices", JSON.stringify(priceUpdateTargetGym.prices.map(Number)));
+                  formData.append("prices", JSON.stringify(prices));
                   await updateGymById(formData, priceUpdateTargetGym._id);
 
                   setGyms((prev: any) =>
@@ -620,7 +607,7 @@ const Dashboard: React.FC = () => {
           >
             <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
             <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
-              {averageRating ?? "N/A"}/5
+              {averageRating != null ? `${averageRating} / 5` : "N/A"}
             </h2>
             <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
 
