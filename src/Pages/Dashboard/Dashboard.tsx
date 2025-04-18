@@ -374,7 +374,7 @@ const Dashboard: React.FC = () => {
                 
                 const prices = priceUpdateTargetGym.prices.map(Number);
 
-                if (prices.some((p) => {
+                if (prices.some((p: string) => {
                   const num = Number(p);
                   return isNaN(num) || num <= 0;
                 })) {
