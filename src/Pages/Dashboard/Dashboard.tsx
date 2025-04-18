@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.less";
 import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
-import { Modal, Input, Button, notification, Tooltip } from "antd";
+import { Modal, Input, Button, notification, Tooltip, AutoComplete } from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import {
@@ -14,6 +14,7 @@ import { getGymReviews } from "../../api/reviews";
 import GymBox from "../../components/GymBox/GymBox";
 import { io, Socket } from "socket.io-client";
 import { IGymOwnerStatus } from "../../constants/enum/IGymOwnerStatus";
+
 
 const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
@@ -41,6 +42,18 @@ const Dashboard: React.FC = () => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
   const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
+  const normalizeCityName = (city: string) => {
+    return city
+      .trim()
+      .replace(/-/g, " ")
+      .replace(/\s+/g, " ")
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+  
+  const [cityOptions, setCityOptions] = useState<string[]>([]);
+  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -97,6 +110,27 @@ const Dashboard: React.FC = () => {
       setGymImages((prevImages) => [...prevImages, ...filesArray]);
     }
   };
+
+  const handleCitySearch = async (input: string) => {
+    if (input.length < 2) return; // Avoid flooding the API
+  
+    try {
+      const response = await fetch(
+        `https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&q=${input}`
+      );
+      const data = await response.json();
+      const cities = data.result.records
+        .map((record: any) => record["שם_ישוב_לועזי"])
+        .filter((city: string | undefined) => !!city)
+        .map(normalizeCityName);
+
+      const unique = Array.from(new Set(cities));
+      setCityOptions(unique);
+    } catch (error) {
+      console.error("Failed to fetch city suggestions:", error);
+    }
+  };
+  
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
     setGymImages(
@@ -423,11 +457,17 @@ const Dashboard: React.FC = () => {
               onChange={handleGymDataChange}
               className="modal-input"
             />
-            <Input
-              name="city"
-              placeholder="City"
+            <AutoComplete
+              options={cityOptions.map(city => ({ value: city }))}
               value={gymData.city}
-              onChange={handleGymDataChange}
+              onSearch={handleCitySearch}
+              onSelect={(value) =>
+                setGymData((prev) => ({ ...prev, city: value }))
+              }
+              onChange={(value) =>
+                setGymData((prev) => ({ ...prev, city: value }))
+              }
+              placeholder="City"
               className="modal-input"
             />
             <Input.TextArea
