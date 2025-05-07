@@ -14,6 +14,21 @@ import { getGymReviews } from "../../api/reviews";
 import GymBox from "../../components/GymBox/GymBox";
 import { io, Socket } from "socket.io-client";
 import { IGymOwnerStatus } from "../../constants/enum/IGymOwnerStatus";
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+} from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, Legend);
+import axiosInstance from "../../api/axios-instances/axios-instance";
+
+
 
 
 const CHAT_SERVER_URL = "http://localhost:3002";
@@ -46,6 +61,37 @@ const Dashboard: React.FC = () => {
   const [allCities, setAllCities] = useState<string[]>([]);
   const [isHoursModalVisible, setIsHoursModalVisible] = useState(false);
   const [hoursUpdateTargetGym, setHoursUpdateTargetGym] = useState<any>(null);
+  const [purchaseStats, setPurchaseStats] = useState<{ date: string, count: number }[]>([]);
+
+  useEffect(() => {
+    const fetchPurchaseData = async () => {
+      try {
+        const res = await axiosInstance.get("http://localhost:3000/purchase/getAllPurchases");
+        const data = res.data;
+
+        const last7Days = Array.from({ length: 7 }).map((_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (6 - i));
+          const isoDate = date.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+          return isoDate;
+        });
+
+        const counts = last7Days.map(date => {
+          const count = data.allPurchases.filter((p: any) =>
+            p.purchaseDate.slice(0, 10) === date
+          ).length;
+          return { date, count };
+        });
+
+        setPurchaseStats(counts);
+      } catch (err) {
+        console.error("Failed to fetch purchases:", err);
+      }
+    };
+
+    fetchPurchaseData();
+  }, []);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -329,8 +375,8 @@ const Dashboard: React.FC = () => {
           >
             <PlusCircleOutlined
               className={`plus-icon ${userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
-                  ? "disabled"
-                  : ""
+                ? "disabled"
+                : ""
                 }`}
               onClick={
                 userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
@@ -646,6 +692,57 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </Modal>
+
+      {purchaseStats.length > 0 && (
+        <div style={{ maxWidth: "500px", marginTop: "20px" }}>
+          <h3>Purchases in Last 7 Days</h3>
+          <Line
+            data={{
+              labels: purchaseStats.map((d) =>
+                new Date(d.date).toLocaleDateString("en-GB", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                })
+              ),
+              datasets: [
+                {
+                  label: "Number of Purchases",
+                  data: purchaseStats.map((d) => d.count),
+                  borderColor: "#1890ff",
+                  backgroundColor: "rgba(24, 144, 255, 0.3)",
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: "#1890ff",
+                  pointBorderColor: "#1890ff",
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  mode: "index",
+                  intersect: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0,
+                  },
+                },
+              },
+            }}
+          />
+        </div>
+      )}
+
+
       <div
         style={{
           background: "#829cd3",
