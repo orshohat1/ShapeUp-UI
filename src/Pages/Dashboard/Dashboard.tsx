@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
   const [allCities, setAllCities] = useState<string[]>([]);
   const [isHoursModalVisible, setIsHoursModalVisible] = useState(false);
   const [hoursUpdateTargetGym, setHoursUpdateTargetGym] = useState<any>(null);
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchAllCities();
   }, []);
-  
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -114,37 +114,37 @@ const Dashboard: React.FC = () => {
         "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
       );
       const json = await response.json();
-  
+
       const cities = json.result.records
         .map((r: any) => r["שם_ישוב_לועזי"])
         .filter((name: string | undefined) => !!name && name.trim() !== "")
         .map((name: string) => name.trim()
-        .replace(/-/g, " ")
-        .replace(/\s+/g, " ")
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
-        .join(" "));
-  
+          .replace(/-/g, " ")
+          .replace(/\s+/g, " ")
+          .split(" ")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+          .join(" "));
+
       const uniqueCities = Array.from(new Set(cities));
       setAllCities(uniqueCities);
     } catch (err) {
       console.error("Failed to load cities:", err);
     }
   };
-  
+
   const handleCitySearch = (input: string) => {
     if (!input || input.length < 1) {
       setCityOptions([]);
       return;
     }
-  
+
     const filtered = allCities.filter((city) =>
       city.toLowerCase().includes(input.toLowerCase())
     );
-  
+
     setCityOptions(filtered.slice(0, 10)); // top 10 matches
   };
-  
+
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
     setGymImages(
@@ -158,11 +158,11 @@ const Dashboard: React.FC = () => {
     setPriceUpdateTargetGym(gym);
     setIsPriceModalVisible(true);
   };
-  
+
   const handleClosePriceModal = () => {
     setIsPriceModalVisible(false);
     setPriceUpdateTargetGym(null);
-  };  
+  };
 
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
@@ -174,12 +174,12 @@ const Dashboard: React.FC = () => {
     setHoursUpdateTargetGym(gym);
     setIsHoursModalVisible(true);
   };
-  
+
   const handleCloseHoursModal = () => {
     setIsHoursModalVisible(false);
     setHoursUpdateTargetGym(null);
   };
-  
+
 
   const handleOpenEditGymModal = (gym: any) => {
     setSelectedGym(gym);
@@ -328,11 +328,10 @@ const Dashboard: React.FC = () => {
             color="red"
           >
             <PlusCircleOutlined
-              className={`plus-icon ${
-                userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+              className={`plus-icon ${userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
                   ? "disabled"
                   : ""
-              }`}
+                }`}
               onClick={
                 userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
                   ? handleOpenAddGymModal
@@ -416,7 +415,7 @@ const Dashboard: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: "40px" }}>
             <Button
               onClick={async () => {
-                
+
                 const prices = priceUpdateTargetGym.prices.map(Number);
 
                 if (prices.some((p: string) => {
@@ -648,66 +647,66 @@ const Dashboard: React.FC = () => {
         </div>
       </Modal>
       <div
+        style={{
+          background: "#829cd3",
+          borderRadius: "20px",
+          padding: "20px",
+          margin: "20px 0",
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+          width: "30%",
+          marginLeft: "auto",
+          textAlign: "right"
+        }}
+      >
+        <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
+        <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
+          {averageRating != null ? `${averageRating} / 5` : "N/A"}
+        </h2>
+        <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
+
+        {/* Avatar Row */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Star badge */}
+          <div
             style={{
-              background: "#829cd3",
-              borderRadius: "20px",
-              padding: "20px",
-              margin: "20px 0",
-              color: "white",
-              position: "relative",
-              overflow: "hidden",
-              width: "30%",
               marginLeft: "auto",
-              textAlign: "right"
+              width: "30px",
+              height: "30px",
+              borderRadius: "50%",
+              background: "#ffd70033",
+              border: "2px solid #ffd700",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
-            <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
-              {averageRating != null ? `${averageRating} / 5` : "N/A"}
-            </h2>
-            <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
-
-            {/* Avatar Row */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {/* Star badge */}
-              <div
-                style={{
-                  marginLeft: "auto",
-                  width: "30px",
-                  height: "30px",
-                  borderRadius: "50%",
-                  background: "#ffd70033",
-                  border: "2px solid #ffd700",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span role="img" aria-label="star" style={{ fontSize: "16px" }}>
-                  ⭐
-                </span>
-              </div>
-            </div>
-
-            {/* Background wave effect (decorative) */}
-            <svg
-              viewBox="0 0 500 150"
-              preserveAspectRatio="none"
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                width: "100%",
-                height: "40px",
-                opacity: 0.3,
-              }}
-            >
-              <path
-                d="M0.00,49.98 C150.00,150.00 349.94,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
-                style={{ stroke: "none", fill: "#ffffff" }}
-              />
-            </svg>
+            <span role="img" aria-label="star" style={{ fontSize: "16px" }}>
+              ⭐
+            </span>
           </div>
+        </div>
+
+        {/* Background wave effect (decorative) */}
+        <svg
+          viewBox="0 0 500 150"
+          preserveAspectRatio="none"
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "40px",
+            opacity: 0.3,
+          }}
+        >
+          <path
+            d="M0.00,49.98 C150.00,150.00 349.94,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+            style={{ stroke: "none", fill: "#ffffff" }}
+          />
+        </svg>
+      </div>
     </div>
   );
 };
