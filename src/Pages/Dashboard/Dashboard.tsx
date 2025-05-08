@@ -693,116 +693,120 @@ const Dashboard: React.FC = () => {
         </div>
       </Modal>
 
-      {purchaseStats.length > 0 && (
-        <div style={{ maxWidth: "500px", marginTop: "20px" }}>
-          <h3>Purchases in Last 7 Days</h3>
-          <Line
-            data={{
-              labels: purchaseStats.map((d) =>
-                new Date(d.date).toLocaleDateString("en-GB", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                })
-              ),
-              datasets: [
-                {
-                  label: "Number of Purchases",
-                  data: purchaseStats.map((d) => d.count),
-                  borderColor: "#1890ff",
-                  backgroundColor: "rgba(24, 144, 255, 0.3)",
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: "#1890ff",
-                  pointBorderColor: "#1890ff",
-                },
-              ],
-            }}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                tooltip: {
-                  mode: "index",
-                  intersect: false,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    precision: 0,
+      <div className="chart-and-rating">
+
+        {purchaseStats.length > 0 && (
+          <div className="chart-container" style={{ maxWidth: "500px", marginTop: "20px" }}>
+            <h3>Purchases in Last 7 Days</h3>
+            <Line
+              data={{
+                labels: purchaseStats.map((d) =>
+                  new Date(d.date).toLocaleDateString("en-GB", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                  })
+                ),
+                datasets: [
+                  {
+                    label: "Number of Purchases",
+                    data: purchaseStats.map((d) => d.count),
+                    borderColor: "#1890ff",
+                    backgroundColor: "rgba(24, 144, 255, 0.3)",
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: "#1890ff",
+                    pointBorderColor: "#1890ff",
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
                   },
                 },
-              },
-            }}
-          />
-        </div>
-      )}
-
-
-      <div
-        style={{
-          background: "#829cd3",
-          borderRadius: "20px",
-          padding: "20px",
-          margin: "20px 0",
-          color: "white",
-          position: "relative",
-          overflow: "hidden",
-          width: "30%",
-          marginLeft: "auto",
-          textAlign: "right"
-        }}
-      >
-        <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
-        <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
-          {averageRating != null ? `${averageRating} / 5` : "N/A"}
-        </h2>
-        <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
-
-        {/* Avatar Row */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Star badge */}
-          <div
-            style={{
-              marginLeft: "auto",
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              background: "#ffd70033",
-              border: "2px solid #ffd700",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span role="img" aria-label="star" style={{ fontSize: "16px" }}>
-              ⭐
-            </span>
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      precision: 0,
+                    },
+                  },
+                },
+              }}
+            />
           </div>
-        </div>
+        )}
 
-        {/* Background wave effect (decorative) */}
-        <svg
-          viewBox="0 0 500 150"
-          preserveAspectRatio="none"
+
+        <div
+          className="rating-container"
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "40px",
-            opacity: 0.3,
+            background: "#829cd3",
+            borderRadius: "20px",
+            padding: "20px",
+            margin: "20px 0",
+            color: "white",
+            position: "relative",
+            overflow: "hidden",
+            width: "30%",
+            marginLeft: "auto",
+            textAlign: "right"
           }}
         >
-          <path
-            d="M0.00,49.98 C150.00,150.00 349.94,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
-            style={{ stroke: "none", fill: "#ffffff" }}
-          />
-        </svg>
+          <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
+          <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
+            {averageRating != null ? `${averageRating} / 5` : "N/A"}
+          </h2>
+          <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
+
+          {/* Avatar Row */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Star badge */}
+            <div
+              style={{
+                marginLeft: "auto",
+                width: "30px",
+                height: "30px",
+                borderRadius: "50%",
+                background: "#ffd70033",
+                border: "2px solid #ffd700",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span role="img" aria-label="star" style={{ fontSize: "16px" }}>
+                ⭐
+              </span>
+            </div>
+          </div>
+
+          {/* Background wave effect (decorative) */}
+          <svg
+            viewBox="0 0 500 150"
+            preserveAspectRatio="none"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "40px",
+              opacity: 0.3,
+            }}
+          >
+            <path
+              d="M0.00,49.98 C150.00,150.00 349.94,-50.00 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+              style={{ stroke: "none", fill: "#ffffff" }}
+            />
+          </svg>
+        </div>
       </div>
     </div>
   );
