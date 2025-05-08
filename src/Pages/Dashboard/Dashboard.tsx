@@ -66,7 +66,9 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchPurchaseData = async () => {
       try {
-        const res = await axiosInstance.get("http://localhost:3000/purchase/getAllPurchases");
+        const res = await axiosInstance.get("http://localhost:3000/purchase/getGymOwnerPurchases", {
+          withCredentials: true,
+        });
         const data = res.data;
 
         const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -77,7 +79,7 @@ const Dashboard: React.FC = () => {
         });
 
         const counts = last7Days.map(date => {
-          const count = data.allPurchases.filter((p: any) =>
+          const count = data.filteredPurchases.filter((p: any) =>
             p.purchaseDate.slice(0, 10) === date
           ).length;
           return { date, count };
@@ -697,7 +699,7 @@ const Dashboard: React.FC = () => {
 
         {purchaseStats.length > 0 && (
           <div className="chart-container" style={{ maxWidth: "500px", marginTop: "20px" }}>
-            <h3>Purchases in Last 7 Days</h3>
+            <h3>Number of bookings in last 7 days</h3>
             <Line
               data={{
                 labels: purchaseStats.map((d) =>
@@ -709,7 +711,7 @@ const Dashboard: React.FC = () => {
                 ),
                 datasets: [
                   {
-                    label: "Number of Purchases",
+                    label: "Bookings",
                     data: purchaseStats.map((d) => d.count),
                     borderColor: "#1890ff",
                     backgroundColor: "rgba(24, 144, 255, 0.3)",
@@ -757,14 +759,12 @@ const Dashboard: React.FC = () => {
             overflow: "hidden",
             width: "30%",
             marginLeft: "auto",
-            textAlign: "right"
           }}
         >
-          <p style={{ fontSize: "14px", margin: 0 }}>Rating average</p>
-          <h2 style={{ fontSize: "32px", fontWeight: "bold", margin: "5px 0" }}>
-            {averageRating != null ? `${averageRating} / 5` : "N/A"}
+          <p style={{ fontSize: "24px", margin: 0 }}>Average gyms rating</p>
+          <h2 style={{ fontSize: "24px", fontWeight: "bold", margin: "5px 0" }}>
+            {averageRating != null ? `${averageRating} / 5 ⭐` : "N/A"}
           </h2>
-          <p style={{ fontSize: "14px", marginBottom: "20px" }}>Achieved</p>
 
           {/* Avatar Row */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
