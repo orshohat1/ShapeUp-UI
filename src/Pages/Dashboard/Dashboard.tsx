@@ -173,7 +173,7 @@ const Dashboard: React.FC = () => {
           .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
           .join(" "));
 
-      const uniqueCities = Array.from(new Set(cities));
+      const uniqueCities: string[] = Array.from(new Set(cities));
       setAllCities(uniqueCities);
     } catch (err) {
       console.error("Failed to load cities:", err);
@@ -699,7 +699,7 @@ const Dashboard: React.FC = () => {
 
         {purchaseStats.length > 0 && (
           <div className="chart-container" style={{ maxWidth: "500px", marginTop: "20px" }}>
-            <h3>Number of bookings in last 7 days</h3>
+            <h3>Weekly Summary: Bookings at My Gyms</h3>
             <Line
               data={{
                 labels: purchaseStats.map((d) =>
