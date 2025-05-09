@@ -12,7 +12,7 @@ import {
   Bar,
 } from "recharts";
 import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
-import { fetchDashboardCounts, getRevenueByCity } from "../../../api/admin";
+import { fetchDashboardCounts, getRevenueByCity, getRevenueByDate } from "../../../api/admin";
 import { useNavigate } from "react-router-dom";
 
 interface DailyRevenue {
@@ -38,17 +38,22 @@ const DashboardAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCityRevenue = async () => {
+    const fetchRevenues = async () => {
       try {
-        const data = await getRevenueByCity();
-        setCityRevenue(data);
-      } catch (error) {
-        console.error("Error loading city revenue", error);
+        const [cityData, dailyData] = await Promise.all([
+          getRevenueByCity(),
+          getRevenueByDate()
+        ]);
+        setCityRevenue(cityData);
+        setDailyRevenue(dailyData);
+      } catch (err) {
+        console.error("Failed to load revenues", err);
       }
     };
   
-    fetchCityRevenue();
+    fetchRevenues();
   }, []);
+  
 
   const [counts, setCounts] = useState<AdminStats>({
     userCount: 0,
@@ -151,7 +156,7 @@ const DashboardAdmin: React.FC = () => {
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={dailyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="day" />
+                <XAxis dataKey="date" />
                 <YAxis />
                 <RechartsTooltip />
                 <Line
