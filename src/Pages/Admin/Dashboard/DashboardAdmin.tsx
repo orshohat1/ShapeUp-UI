@@ -12,7 +12,7 @@ import {
   Bar,
 } from "recharts";
 import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
-import { fetchDashboardCounts } from "../../../api/admin";
+import { fetchDashboardCounts, getRevenueByCity } from "../../../api/admin";
 import { useNavigate } from "react-router-dom";
 
 interface DailyRevenue {
@@ -38,25 +38,16 @@ const DashboardAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setDailyRevenue([
-      { day: "Sunday", revenue: 1200 },
-      { day: "Monday", revenue: 1500 },
-      { day: "Tuesday", revenue: 2000 },
-      { day: "Wednesday", revenue: 1600 },
-      { day: "Thursday", revenue: 1800 },
-      { day: "Friday", revenue: 2100 },
-      { day: "Saturday", revenue: 1900 },
-    ]);
-
-    setCityRevenue([
-      { city: "City 1", revenue: 35 },
-      { city: "City 2", revenue: 45 },
-      { city: "City 3", revenue: 30 },
-      { city: "City 4", revenue: 50 },
-      { city: "City 5", revenue: 25 },
-      { city: "City 6", revenue: 40 },
-      { city: "City 7", revenue: 35 },
-    ]);
+    const fetchCityRevenue = async () => {
+      try {
+        const data = await getRevenueByCity();
+        setCityRevenue(data);
+      } catch (error) {
+        console.error("Error loading city revenue", error);
+      }
+    };
+  
+    fetchCityRevenue();
   }, []);
 
   const [counts, setCounts] = useState<AdminStats>({
