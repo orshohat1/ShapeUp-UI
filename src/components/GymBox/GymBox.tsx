@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Popconfirm, Modal, Input, List, notification, Spin } from "antd";
+import { Button, Popconfirm, Modal, Input, List, notification, Spin, Pagination } from "antd";
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
 import { askPricingSuggestion } from "../../api/chat-ai";
@@ -71,6 +71,12 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [isHoursModalVisible, setHoursModalVisible] = useState(false);
 
   const [hours, setHours] = useState(openingHours || defaultHours);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(5);
+  const paginatedUsers = purchasedUsers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   useEffect(() => {
     setHours(openingHours || defaultHours);
@@ -299,7 +305,7 @@ const GymBox: React.FC<GymBoxProps> = ({
             <span>Valid until</span>
           </div>
 
-          {purchasedUsers.map((user, index) => (
+          {paginatedUsers.map((user, index) => (
             <div key={index} className="table-row">
               <img src={user.avatarUrl} alt="avatar" className="avatar" />
               <span>{user.firstName}</span>
@@ -310,10 +316,16 @@ const GymBox: React.FC<GymBoxProps> = ({
             </div>
           ))}
         </div>
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={purchasedUsers.length}
+            onChange={(page) => setCurrentPage(page)}
+            showSizeChanger={false}
+          />
+        </div>
       </Modal>
-
-
-
       <Modal
         title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
         open={isChatModalVisible}
