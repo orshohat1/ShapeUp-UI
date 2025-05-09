@@ -3,6 +3,7 @@ import { Button, Popconfirm, Modal, Input, List, notification, Spin } from "antd
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { io, Socket } from "socket.io-client";
 import { askPricingSuggestion } from "../../api/chat-ai";
+import { getPurchasedUsersForGym } from "../../api/gym-owner";
 import ChatAILogo from "../../assets/Logo/chatAI.png";
 import './GymBox.less';
 
@@ -16,6 +17,7 @@ interface GymBoxProps {
   gymName: string;
   city: string;
   ownerId: string;
+  gymId: string;
   prices: number[];
   openingHours: {
     sundayToThursday: { from: string; to: string };
@@ -45,14 +47,17 @@ const defaultHours = {
 const GymBox: React.FC<GymBoxProps> = ({
   gymName: initialGymName,
   city,
-  ownerId,
+  gymId,
   prices,
   openingHours,
   onUpdateOpeningHours,
   onEdit,
   onDelete,
   onUpdatePrice,
+  ownerId,
 }) => {
+  const [isTraineesModalVisible, setTraineesModalVisible] = useState(false);
+  const [purchasedUsers, setPurchasedUsers] = useState<any[]>([]);
   const [gymName, setGymName] = useState(initialGymName);
   const [isChatModalVisible, setChatModalVisible] = useState(false);
   const [chatUsers, setChatUsers] = useState<{ userId: string; firstName: string; lastName: string }[]>([]);
@@ -64,13 +69,13 @@ const GymBox: React.FC<GymBoxProps> = ({
   const [isSuggestModalVisible, setSuggestModalVisible] = useState(false);
   const [suggestedPricing, setSuggestedPricing] = useState<string | null>(null);
   const [isHoursModalVisible, setHoursModalVisible] = useState(false);
-  
+
   const [hours, setHours] = useState(openingHours || defaultHours);
-    
+
   useEffect(() => {
     setHours(openingHours || defaultHours);
   }, [openingHours]);
-  
+
 
   useEffect(() => {
     setGymName(initialGymName);
@@ -161,7 +166,7 @@ const GymBox: React.FC<GymBoxProps> = ({
     setIsLoading(true);
     fetchChatHistory(user.userId);
   };
-  
+
   const openSuggestModal = async () => {
     setSuggestedPricing(null);
     setSuggestModalVisible(true);
@@ -179,6 +184,17 @@ const GymBox: React.FC<GymBoxProps> = ({
     socket.emit("communicate", ownerId, selectedUser.userId, gymName, newMessage);
     setNewMessage("");
   };
+
+  const fetchPurchasedUsers = async () => {
+    try {
+      const users = await getPurchasedUsersForGym(gymId);
+      setPurchasedUsers(users);
+      setTraineesModalVisible(true);
+    } catch (err) {
+      // notification already handled inside getPurchasedUsersForGym
+    }
+  };
+
 
   return (
     <div className="gym-box">
@@ -249,6 +265,54 @@ const GymBox: React.FC<GymBoxProps> = ({
       >
         Update Opening Hours
       </p>
+      <p
+        onClick={fetchPurchasedUsers}
+        style={{
+          color: "#6c7080",
+          cursor: "pointer",
+          margin: "6px 0",
+          fontSize: "14px",
+          fontWeight: 400,
+        }}
+      >
+        View trainees
+      </p>
+
+      <Modal
+        title={gymName}
+        open={isTraineesModalVisible}
+        onCancel={() => setTraineesModalVisible(false)}
+        footer={null}
+        width={900}
+      >
+        <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Input.Search placeholder="Search" style={{ width: 300 }} />
+        </div>
+
+        <div className="trainees-table">
+          <div className="table-header">
+            <span>Avatar</span>
+            <span>First name</span>
+            <span>Last name</span>
+            <span>Email</span>
+            <span>Code</span>
+            <span>Valid until</span>
+          </div>
+
+          {purchasedUsers.map((user, index) => (
+            <div key={index} className="table-row">
+              <img src={user.avatarUrl} alt="avatar" className="avatar" />
+              <span>{user.firstName}</span>
+              <span>{user.lastName}</span>
+              <span>{user.email}</span>
+              <span>{user.code}</span>
+              <span>{new Date(user.validUntil).toLocaleDateString()}</span>
+            </div>
+          ))}
+        </div>
+      </Modal>
+
+
 
       <Modal
         title={selectedUser ? `Chat with ${selectedUser.firstName} ${selectedUser.lastName}` : "Chat with Users"}
@@ -307,12 +371,12 @@ const GymBox: React.FC<GymBoxProps> = ({
             const [eh, em] = end.split(":").map(Number);
             return sh < eh || (sh === eh && sm < em);
           };
-        
+
           type DayKey = keyof OpeningHours;
 
           for (const day of ["sundayToThursday", "friday", "saturday"] as DayKey[]) {
             const { from, to } = hours[day];
-        
+
             if (!isValidTime(from) || !isValidTime(to)) {
               notification.error({
                 message: "Invalid Time Format",
@@ -321,7 +385,7 @@ const GymBox: React.FC<GymBoxProps> = ({
               });
               return;
             }
-        
+
             if (!isStartBeforeEnd(from, to)) {
               notification.error({
                 message: "Invalid Time Range",
@@ -370,36 +434,36 @@ const GymBox: React.FC<GymBoxProps> = ({
         footer={null}
       >
         <div style={{ padding: "10px 5px", fontFamily: "'Segoe UI', sans-serif" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-          <img
-            src={ChatAILogo}
-            alt="ChatGPT"
-            style={{ width: "20px", height: "20px" }}
-          />
-          <span style={{ fontWeight: 600, fontSize: "15px" }}>Chat AI</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+            <img
+              src={ChatAILogo}
+              alt="ChatGPT"
+              style={{ width: "20px", height: "20px" }}
+            />
+            <span style={{ fontWeight: 600, fontSize: "15px" }}>Chat AI</span>
+          </div>
+
+          {suggestedPricing ? (
+            <div style={{ lineHeight: "1.6", color: "#333", fontSize: "15px" }}>
+              <p style={{ marginBottom: "12px" }}>
+                {suggestedPricing.split('\n').slice(0, 1)}
+              </p>
+
+              <ul style={{ paddingLeft: "20px", marginBottom: "12px" }}>
+                {suggestedPricing.match(/•.*?\$[\d.]+/g)?.map((line, i) => (
+                  <li key={i}>{line.replace(/^•\s*/, "")}</li>
+                ))}
+              </ul>
+
+              <p>{suggestedPricing.split('\n').slice(-1)}</p>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center" }}>
+              <Spin />
+              <p>Fetching suggestion...</p>
+            </div>
+          )}
         </div>
-
-        {suggestedPricing ? (
-          <div style={{ lineHeight: "1.6", color: "#333", fontSize: "15px" }}>
-            <p style={{ marginBottom: "12px" }}>
-              {suggestedPricing.split('\n').slice(0, 1)}
-            </p>
-
-            <ul style={{ paddingLeft: "20px", marginBottom: "12px" }}>
-              {suggestedPricing.match(/•.*?\$[\d.]+/g)?.map((line, i) => (
-                <li key={i}>{line.replace(/^•\s*/, "")}</li>
-              ))}
-            </ul>
-
-            <p>{suggestedPricing.split('\n').slice(-1)}</p>
-          </div>
-        ) : (
-          <div style={{ textAlign: "center" }}>
-            <Spin />
-            <p>Fetching suggestion...</p>
-          </div>
-        )}
-      </div>
 
       </Modal>
 
