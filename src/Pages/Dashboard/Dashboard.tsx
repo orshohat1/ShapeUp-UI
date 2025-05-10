@@ -699,7 +699,7 @@ const Dashboard: React.FC = () => {
 
         {purchaseStats.length > 0 && (
           <div className="chart-container" style={{ maxWidth: "500px", marginTop: "20px" }}>
-            <h3>Weekly Summary: Bookings at My Gyms</h3>
+            <h3 className="chart-title">Weekly Summary: Bookings at My Gyms</h3>
             <Line
               data={{
                 labels: purchaseStats.map((d) =>
