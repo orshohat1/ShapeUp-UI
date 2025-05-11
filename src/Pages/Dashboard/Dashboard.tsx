@@ -156,29 +156,32 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchAllCities = async () => {
-    try {
-      const response = await fetch(
-        "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
-      );
-      const json = await response.json();
+const fetchAllCities = async () => {
+  try {
+    const response = await fetch(
+      "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
+    );
+    const json = await response.json();
 
-      const cities = json.result.records
-        .map((r: any) => r["שם_ישוב_לועזי"])
-        .filter((name: string | undefined) => !!name && name.trim() !== "")
-        .map((name: string) => name.trim()
+    const cities = json.result.records
+      .map((r: any) => r["שם_ישוב_לועזי"])
+      .filter((name: string | undefined) => !!name && name.trim() !== "")
+      .map((name: string) =>
+        name
+          .trim()
           .replace(/-/g, " ")
           .replace(/\s+/g, " ")
           .split(" ")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
-          .join(" "));
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ")
+      );
 
-      const uniqueCities: string[] = Array.from(new Set(cities));
-      setAllCities(uniqueCities);
-    } catch (err) {
-      console.error("Failed to load cities:", err);
-    }
-  };
+    const uniqueCities: string[] = Array.from(new Set(cities));
+    setAllCities(uniqueCities);
+  } catch (err) {
+    console.error("Failed to load cities:", err);
+  }
+};
 
   const handleCitySearch = (input: string) => {
     if (!input || input.length < 1) {
@@ -394,6 +397,7 @@ const Dashboard: React.FC = () => {
               gyms?.map((gym: any) => (
                 <GymBox
                   key={gym._id + gym.name}
+                  gymId={gym._id}
                   gymName={gym.name}
                   city={gym.city}
                   ownerId={gym.owner}
