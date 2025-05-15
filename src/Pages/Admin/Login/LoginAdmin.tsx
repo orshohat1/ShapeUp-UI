@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 import "./LoginAdmin.less";
 import type { FormProps } from "antd";
-import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input, notification } from "antd";
-import { login, googleSSO } from "../../../api/auth";
+import { login } from "../../../api/auth";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
 const { Content } = Layout;
@@ -25,14 +24,6 @@ const LoginAdmin: React.FC = () => {
   type FieldType = {
     email?: string;
     password?: string;
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      await googleSSO();
-    } catch (error) {
-      console.error("Login error:", error);
-    }
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
@@ -112,19 +103,6 @@ const LoginAdmin: React.FC = () => {
           >
             <Input.Password className="login-input" placeholder="Password " />
           </Form.Item>
-
-          <div className="or-divider">
-            <span>Or</span>
-          </div>
-
-          <Button className="google-login-button" onClick={handleGoogleLogin}>
-            <img
-              src={googleLogo}
-              alt="Google"
-              style={{ width: "20px", height: "20px" }}
-            />
-            Sign In with Google
-          </Button>
 
           <Form.Item style={{ marginTop: "3rem" }}>
             <Button
