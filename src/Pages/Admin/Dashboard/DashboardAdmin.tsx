@@ -128,11 +128,68 @@ const DashboardAdmin: React.FC = () => {
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
           <Card title="Platform Overview" bordered={false}>
-            <StatisticsCard
-              dataSets={dataSets}
-              colors={[COLORS.gymOwners, COLORS.users, COLORS.gyms]}
-              labels={labels}
-            />
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <Card
+                  style={{
+                    backgroundColor: "#A2E1C8",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Space direction="vertical" align="center">
+                    <UserOutlined style={{ fontSize: 32, color: "#fff" }} />
+                    <Typography.Text style={{ fontSize: 16, color: "#fff" }}>
+                      Users
+                    </Typography.Text>
+                    <Typography.Text strong style={{ fontSize: 24, color: "#fff" }}>
+                      {counts.userCount}
+                    </Typography.Text>
+                  </Space>
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card
+                  style={{
+                    backgroundColor: "#E25B4B",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Space direction="vertical" align="center">
+                    <CheckCircleOutlined style={{ fontSize: 32, color: "#fff" }} />
+                    <Typography.Text style={{ fontSize: 16, color: "#fff" }}>
+                      Gym Owners
+                    </Typography.Text>
+                    <Typography.Text strong style={{ fontSize: 24, color: "#fff" }}>
+                      {counts.gymOwnerCount}
+                    </Typography.Text>
+                  </Space>
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card
+                  style={{
+                    backgroundColor: "#4B9BD7",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Space direction="vertical" align="center">
+                    <ShopOutlined style={{ fontSize: 32, color: "#fff" }} />
+                    <Typography.Text style={{ fontSize: 16, color: "#fff" }}>
+                      Gyms
+                    </Typography.Text>
+                    <Typography.Text strong style={{ fontSize: 24, color: "#fff" }}>
+                      {counts.gymCount}
+                    </Typography.Text>
+                  </Space>
+                </Card>
+              </Col>
+            </Row>
           </Card>
         </Col>
 
