@@ -192,7 +192,7 @@ const DashboardAdmin: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="Quick Actions" style={{ height: "100%" }}>
+          <Card title="Quick Actions" style={{ height: "100%" }} bordered={false}>
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12}>
                 <Button
