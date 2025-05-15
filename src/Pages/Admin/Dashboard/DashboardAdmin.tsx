@@ -271,18 +271,18 @@ const DashboardAdmin: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card title="Revenue by City" bordered={false}>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={cityRevenue}>
+              <BarChart data={[...cityRevenue].sort((a, b) => a.city.localeCompare(b.city))}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="city" />
                 <YAxis />
                 <RechartsTooltip
                   formatter={(value: number) => [`${value.toFixed(2)}$`, "Revenue"]}
                 />
-
                 <Bar dataKey="revenue" fill="#F0AD4E" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
+
         </Col>
       </Row>
     </div>
