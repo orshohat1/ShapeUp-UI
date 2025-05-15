@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Space,
-  Divider,
 } from "antd";
 import {
   UserOutlined,
@@ -24,7 +23,6 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import StatisticsCard from "../../../components/AdminModalContents/StatisticsCard/StatisticsCard";
 import {
   fetchDashboardCounts,
   getRevenueByCity,
