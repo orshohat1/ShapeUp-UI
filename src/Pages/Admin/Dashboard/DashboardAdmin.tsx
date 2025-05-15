@@ -271,7 +271,7 @@ const DashboardAdmin: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card title="Revenue by City" bordered={false}>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[...cityRevenue].sort((a, b) => a.city.localeCompare(b.city))}>
+              <BarChart data={[...cityRevenue].sort((a, b) => (a.city > b.city ? 1 : -1))}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="city" />
                 <YAxis />
