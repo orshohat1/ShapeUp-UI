@@ -5,6 +5,7 @@ import { Layout, Button, Form, Input, notification } from "antd";
 import { login } from "../../../api/auth";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
+import { IUserType } from "../../../constants/enum/IUserType";
 const { Content } = Layout;
 
 const LoginAdmin: React.FC = () => {
@@ -31,7 +32,7 @@ const LoginAdmin: React.FC = () => {
       try {
         await login(values.email, values.password);
         const userProfile = await refreshUserProfile();
-        if (userProfile && userProfile.role !== 'admin') {
+        if (userProfile && userProfile.role !== IUserType.ADMIN) {
           notification.warning({
             message: "Unauthorized",
             description: "This page is only for admins.",

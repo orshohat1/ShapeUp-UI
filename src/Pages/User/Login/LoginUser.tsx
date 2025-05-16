@@ -7,6 +7,7 @@ import { login, googleSSO } from "../../../api/auth";
 import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
+import { IUserType } from "../../../constants/enum/IUserType";
 const { Content } = Layout;
 
 const LoginUser: React.FC = () => {
@@ -41,7 +42,7 @@ const LoginUser: React.FC = () => {
       try {
         await login(values.email, values.password);
         const userProfile = await refreshUserProfile();
-        if (userProfile && userProfile.role !== 'user') {
+        if (userProfile && userProfile.role !== IUserType.USER) {
           notification.warning({
             message: "Unauthorized",
             description: "This page is only for users.",
