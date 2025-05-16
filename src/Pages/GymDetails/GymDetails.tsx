@@ -477,7 +477,6 @@ const Dashboard: React.FC = () => {
         <h6 style={{ marginTop: "10px", color: "#6c7080" }}>{gymData.city}</h6>
         <p style={{ marginTop: "20px", marginBottom: "50px", color: "#6c7080" }}>{gymData.description}</p>
 
-        {/* Image Grid (No Carousel) */}
         <div className="gym-image-grid">
           {gymData.pictures.slice(0, 5).map((img: string, i: number) => (
             <img key={i} src={img} alt={`gym-${i}`} />
