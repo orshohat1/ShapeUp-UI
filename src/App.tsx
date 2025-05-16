@@ -16,6 +16,7 @@ import PendingListModalContent from "./components/AdminModalContents/PendingList
 import { useUserProfile } from "./context/useUserProfile";
 import { useEffect } from "react";
 import NotFound from "./Pages/NotFound/NotFound";
+import GymDetails from "./Pages/GymDetails/GymDetails";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,7 +33,7 @@ const sidebarRoutes = [
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const showSidebar = sidebarRoutes.includes(location.pathname);
+  const showSidebar = sidebarRoutes.includes(location.pathname) || location.pathname.startsWith("/gyms/");
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
@@ -61,6 +62,7 @@ const AppContent = () => {
           <Route path="/user/login" element={<LoginUser />} />
           <Route path="/user/register" element={<RegisterUser />} />
           <Route path="/gyms" element={<GymsList />} />
+          <Route path="/gyms/:gymId" element={<GymDetails />} />
           <Route path="/admin/login" element={<LoginAdmin />} />
           <Route path="/admin/dashboard" element={<DashboardAdmin />} />
           <Route path="/admin/users" element={<UserListModalContent />} />

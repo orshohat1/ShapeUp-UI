@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.less";
 import { PlusCircleOutlined, UploadOutlined } from "@ant-design/icons";
-import { Modal, Input, Button, notification, Tooltip, AutoComplete } from "antd";
+import {
+  Modal,
+  Input,
+  Button,
+  notification,
+  Tooltip,
+  AutoComplete,
+} from "antd";
 import { useUserProfile } from "../../context/useUserProfile";
 import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import {
@@ -14,7 +21,7 @@ import { getGymReviews } from "../../api/reviews";
 import GymBox from "../../components/GymBox/GymBox";
 import { io, Socket } from "socket.io-client";
 import { IGymOwnerStatus } from "../../constants/enum/IGymOwnerStatus";
-import { Line } from 'react-chartjs-2';
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,12 +31,17 @@ import {
   Title,
   Tooltip as ChartTooltip,
   Legend,
-} from 'chart.js';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, Legend);
+} from "chart.js";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend
+);
 import axiosInstance from "../../api/axios-instances/axios-instance";
-
-
-
 
 const CHAT_SERVER_URL = "http://localhost:3002";
 const PATH = "/users-chat";
@@ -59,16 +71,19 @@ const Dashboard: React.FC = () => {
   const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
   const [cityOptions, setCityOptions] = useState<string[]>([]);
   const [allCities, setAllCities] = useState<string[]>([]);
-  const [isHoursModalVisible, setIsHoursModalVisible] = useState(false);
-  const [hoursUpdateTargetGym, setHoursUpdateTargetGym] = useState<any>(null);
-  const [purchaseStats, setPurchaseStats] = useState<{ date: string, count: number }[]>([]);
+  const [purchaseStats, setPurchaseStats] = useState<
+    { date: string; count: number }[]
+  >([]);
 
   useEffect(() => {
     const fetchPurchaseData = async () => {
       try {
-        const res = await axiosInstance.get("http://localhost:3000/purchase/getGymOwnerPurchases", {
-          withCredentials: true,
-        });
+        const res = await axiosInstance.get(
+          "http://localhost:3000/purchase/getGymOwnerPurchases",
+          {
+            withCredentials: true,
+          }
+        );
         const data = res.data;
 
         const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -78,9 +93,9 @@ const Dashboard: React.FC = () => {
           return isoDate;
         });
 
-        const counts = last7Days.map(date => {
-          const count = data.filteredPurchases.filter((p: any) =>
-            p.purchaseDate.slice(0, 10) === date
+        const counts = last7Days.map((date) => {
+          const count = data.filteredPurchases.filter(
+            (p: any) => p.purchaseDate.slice(0, 10) === date
           ).length;
           return { date, count };
         });
@@ -93,7 +108,6 @@ const Dashboard: React.FC = () => {
 
     fetchPurchaseData();
   }, []);
-
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -138,7 +152,6 @@ const Dashboard: React.FC = () => {
     fetchAllCities();
   }, []);
 
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -172,7 +185,10 @@ const Dashboard: React.FC = () => {
             .replace(/-/g, " ")
             .replace(/\s+/g, " ")
             .split(" ")
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
             .join(" ")
         );
 
@@ -195,7 +211,6 @@ const Dashboard: React.FC = () => {
 
     setCityOptions(filtered.slice(0, 20));
   };
-
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
     setGymImages(
@@ -221,28 +236,7 @@ const Dashboard: React.FC = () => {
     setGymImages([]);
   };
 
-  const handleOpenHoursModal = (gym: any) => {
-    setHoursUpdateTargetGym(gym);
-    setIsHoursModalVisible(true);
-  };
 
-  const handleCloseHoursModal = () => {
-    setIsHoursModalVisible(false);
-    setHoursUpdateTargetGym(null);
-  };
-
-
-  const handleOpenEditGymModal = (gym: any) => {
-    setSelectedGym(gym);
-    setGymData({
-      name: gym.name,
-      city: gym.city,
-      description: gym.description,
-      prices: gym.prices || ["", "", ""],
-    });
-    setGymImages(gym.pictures);
-    setIsEditGymModalVisible(true);
-  };
 
   const handleCloseEditGymModal = () => {
     setIsEditGymModalVisible(false);
@@ -342,7 +336,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleGymEdit = (gym: any) => handleOpenEditGymModal(gym);
 
   const handleGymDelete = async (gymId: string) => {
     try {
@@ -361,7 +354,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid" style={{ padding: "2rem 5rem" }}>
       {loadingGyms && <LoadingOverlay />}
       <div className="row">
         {/* Main Content */}
@@ -379,10 +372,11 @@ const Dashboard: React.FC = () => {
             color="red"
           >
             <PlusCircleOutlined
-              className={`plus-icon ${userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
-                ? "disabled"
-                : ""
-                }`}
+              className={`plus-icon ${
+                userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+                  ? "disabled"
+                  : ""
+              }`}
               onClick={
                 userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
                   ? handleOpenAddGymModal
@@ -399,26 +393,10 @@ const Dashboard: React.FC = () => {
                   key={gym._id + gym.name}
                   gymId={gym._id}
                   gymName={gym.name}
+                  images={gym.pictures || []}
+                  description={gym.description}
                   city={gym.city}
-                  ownerId={gym.owner}
-                  prices={gym.prices}
-                  openingHours={gym.openingHours}
-                  onEdit={() => handleGymEdit(gym)}
                   onDelete={() => handleGymDelete(gym._id)}
-                  onUpdatePrice={() => handleOpenPriceModal(gym)}
-                  onUpdateOpeningHours={(updatedHours) => {
-                    const formData = new FormData();
-                    formData.append("openingHours", JSON.stringify(updatedHours));
-                    updateGymById(formData, gym._id).then(() => {
-                      setGyms((prev: any) =>
-                        prev.map((g: any) =>
-                          g._id === gym._id ? { ...g, openingHours: updatedHours } : g
-                        )
-                      );
-                    }).catch(() => {
-                      notification.error({ message: "Failed to update opening hours" });
-                    });
-                  }}
                 />
               ))
             )}
@@ -434,13 +412,29 @@ const Dashboard: React.FC = () => {
         closable
       >
         <div style={{ padding: "20px 30px" }}>
-          <h3 style={{ fontSize: "18px", fontWeight: 500, color: "#6c7080", marginBottom: "30px" }}>
+          <h3
+            style={{
+              fontSize: "18px",
+              fontWeight: 500,
+              color: "#6c7080",
+              marginBottom: "30px",
+            }}
+          >
             Update prices
           </h3>
 
           {["1 day", "3 day", "5 day"].map((label, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", marginBottom: "25px" }}>
-              <label style={{ width: "120px", fontWeight: 500, color: "#6c7080" }}>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "25px",
+              }}
+            >
+              <label
+                style={{ width: "120px", fontWeight: 500, color: "#6c7080" }}
+              >
                 {label} plan
               </label>
               <Input
@@ -448,9 +442,14 @@ const Dashboard: React.FC = () => {
                 placeholder="Price"
                 value={priceUpdateTargetGym?.prices?.[i] ?? ""}
                 onChange={(e) => {
-                  const updatedPrices = [...(priceUpdateTargetGym?.prices || [])];
+                  const updatedPrices = [
+                    ...(priceUpdateTargetGym?.prices || []),
+                  ];
                   updatedPrices[i] = e.target.value;
-                  setPriceUpdateTargetGym({ ...priceUpdateTargetGym, prices: updatedPrices });
+                  setPriceUpdateTargetGym({
+                    ...priceUpdateTargetGym,
+                    prices: updatedPrices,
+                  });
                 }}
                 style={{
                   flex: 1,
@@ -467,16 +466,18 @@ const Dashboard: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: "40px" }}>
             <Button
               onClick={async () => {
-
                 const prices = priceUpdateTargetGym.prices.map(Number);
 
-                if (prices.some((p: string) => {
-                  const num = Number(p);
-                  return isNaN(num) || num <= 0;
-                })) {
+                if (
+                  prices.some((p: string) => {
+                    const num = Number(p);
+                    return isNaN(num) || num <= 0;
+                  })
+                ) {
                   notification.error({
                     message: "Invalid Prices",
-                    description: "All prices must be valid numbers greater than 0.",
+                    description:
+                      "All prices must be valid numbers greater than 0.",
                     placement: "top",
                   });
                   return;
@@ -489,7 +490,9 @@ const Dashboard: React.FC = () => {
 
                   setGyms((prev: any) =>
                     prev.map((g: any) =>
-                      g._id === priceUpdateTargetGym._id ? { ...g, prices: priceUpdateTargetGym.prices } : g
+                      g._id === priceUpdateTargetGym._id
+                        ? { ...g, prices: priceUpdateTargetGym.prices }
+                        : g
                     )
                   );
 
@@ -515,7 +518,6 @@ const Dashboard: React.FC = () => {
         </div>
       </Modal>
 
-
       {/* Add Gym Modal */}
       <Modal
         title="Add Gym"
@@ -527,7 +529,6 @@ const Dashboard: React.FC = () => {
         <div style={{ display: "flex", gap: "20px" }}>
           {/* Left Side - Gym Inputs */}
           <div style={{ flex: "0 0 300px" }}>
-
             <Input
               name="name"
               placeholder="Name"
@@ -537,7 +538,10 @@ const Dashboard: React.FC = () => {
             />
 
             <AutoComplete
-              options={cityOptions.map((city) => ({ label: city, value: city }))}
+              options={cityOptions.map((city) => ({
+                label: city,
+                value: city,
+              }))}
               value={gymData.city}
               onSearch={handleCitySearch}
               onSelect={(value) =>
@@ -624,7 +628,6 @@ const Dashboard: React.FC = () => {
         <div style={{ display: "flex", gap: "20px" }}>
           {/* Left Side - Gym Inputs */}
           <div style={{ flex: "0 0 300px" }}>
-
             <Input
               name="name"
               placeholder="Name"
@@ -633,7 +636,10 @@ const Dashboard: React.FC = () => {
               className="modal-input"
             />
             <AutoComplete
-              options={cityOptions.map((city) => ({ label: city, value: city }))}
+              options={cityOptions.map((city) => ({
+                label: city,
+                value: city,
+              }))}
               value={gymData.city}
               onSearch={handleCitySearch}
               onSelect={(value) =>
@@ -709,9 +715,11 @@ const Dashboard: React.FC = () => {
       </Modal>
 
       <div className="chart-and-rating">
-
         {purchaseStats.length > 0 && (
-          <div className="chart-container" style={{ maxWidth: "500px", marginTop: "20px" }}>
+          <div
+            className="chart-container"
+            style={{ maxWidth: "500px", marginTop: "20px" }}
+          >
             <h3 className="chart-title">Weekly Summary: Bookings at My Gyms</h3>
             <Line
               data={{
@@ -758,7 +766,6 @@ const Dashboard: React.FC = () => {
             />
           </div>
         )}
-
 
         <div
           className="rating-container"

@@ -4,6 +4,7 @@ import { UserProfileContext } from "./useUserProfile";
 import { getUserProfile } from "../api/users";
 import Cookies from "js-cookie";
 import { logoutServer } from "../api/auth";
+import { IUserType } from "../constants/enum/IUserType";
 
 interface UserProfileProviderProps {
   children: ReactNode;
@@ -40,7 +41,7 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
         firstName: userProfileData.firstName || "",
         gender: userProfileData.gender || "",
         lastName: userProfileData.lastName || "",
-        role: userProfileData.role || "user",
+        role: userProfileData.role || IUserType.USER,
         id: userProfileData._id,
         street: userProfileData.street || "",
         city: userProfileData.city || "",
@@ -74,14 +75,20 @@ export const UserProfileProvider: React.FC<UserProfileProviderProps> = ({
   // Auto-refresh user profile on mount
   useEffect(() => {
     if (!userProfile) {
-      if (location.pathname !== "/login" && location.pathname !== "/user/login" && location.pathname !== "/admin/login") {
+      if (
+        location.pathname !== "/login" &&
+        location.pathname !== "/user/login" &&
+        location.pathname !== "/admin/login"
+      ) {
         refreshUserProfile();
       }
     }
   }, []);
 
   return (
-    <UserProfileContext.Provider value={{ userProfile, refreshUserProfile, logout }}>
+    <UserProfileContext.Provider
+      value={{ userProfile, refreshUserProfile, logout }}
+    >
       {children}
     </UserProfileContext.Provider>
   );

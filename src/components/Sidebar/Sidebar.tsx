@@ -5,6 +5,7 @@ import { HomeOutlined, EditOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useUserProfile } from "../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
 import UpdateProfileModal from "../UpdateProfileModal/UpdateProfileModal";
+import { IUserType } from "../../constants/enum/IUserType";
 
 const Sidebar: React.FC<{ user?: any }> = () => {
   const { userProfile, logout } = useUserProfile();
@@ -17,7 +18,14 @@ const Sidebar: React.FC<{ user?: any }> = () => {
 
   const handleLogout = async () => {
     logout();
-    userProfile?.role === "gym_owner" ? navigate("/login") : navigate("/user/login");
+    if (userProfile?.role === IUserType.ADMIN) {
+      navigate("/admin/login");
+    } 
+    if (userProfile?.role === IUserType.USER) {
+      navigate("/user/login");
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -27,7 +35,8 @@ const Sidebar: React.FC<{ user?: any }> = () => {
       </div>
 
       <div className="menu">
-        {(userProfile?.role === "user" || userProfile?.role === "admin") && (
+        {(userProfile?.role === IUserType.USER ||
+          userProfile?.role === IUserType.ADMIN) && (
           <div className="menu-item">
             <div style={{ marginRight: "auto" }}>
               <svg
@@ -46,7 +55,7 @@ const Sidebar: React.FC<{ user?: any }> = () => {
           </div>
         )}
 
-        {userProfile?.role === "gym_owner" && (
+        {userProfile?.role === IUserType.GYM_OWNER && (
           <div className="menu-item" onClick={() => navigate("/dashboard")}>
             <HomeOutlined style={{ marginRight: "auto", color: "purple" }} />
             <span className="item-title">Dashboard</span>

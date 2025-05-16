@@ -6,6 +6,7 @@ import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../context/useUserProfile";
+import { IUserType } from "../../constants/enum/IUserType";
 const { Content } = Layout;
 
 const Login: React.FC = () => {
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
       try {
         await login(values.email, values.password);
         const userProfile = await refreshUserProfile();
-        if (userProfile && userProfile.role !== 'gym_owner') {
+        if (userProfile && userProfile.role !== IUserType.GYM_OWNER) {
           notification.warning({
             message: "Unauthorized",
             description: "This page is only for gym owner.",
