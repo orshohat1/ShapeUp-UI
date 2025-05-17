@@ -573,33 +573,48 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
 
-        <>
-          {/* Purchases chart */}
-          <div style={{ width: "100%", height: 200, marginTop: 50 }}>
-            <h3>Purchases in the Last 7 Days</h3>
-            <ResponsiveContainer>
-              <BarChart data={purchaseData} style={{ background: "transparent" }}>
-                <XAxis dataKey="date" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="chart-container">
+          <h3 className="chart-title">Purchases in the Last 7 Days</h3>
+          <ResponsiveContainer>
+            <BarChart data={purchaseData}>
+              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis allowDecimals={false} tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ borderRadius: 10, fontSize: 13 }}
+                formatter={(value) => [`${value}`, "Purchases"]}
+              />
+              <Bar
+                dataKey="count"
+                fill="#3b82f6"
+                radius={[6, 6, 0, 0]}
+                barSize={28}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-          {/* Revenues chart */}
-          <div style={{ width: "100%", height: 200, marginTop: 50 }}>
-            <h3>Revenue in the Last 7 Days</h3>
-            <ResponsiveContainer>
-              <BarChart data={purchaseData} style={{ background: "transparent" }}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => `${value.toFixed(2)}$`} />
-                <Bar dataKey="revenue" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </>
+        <div className="chart-container">
+          <h3 className="chart-title">Revenue in the Last 7 Days</h3>
+          <ResponsiveContainer>
+            <BarChart data={purchaseData}>
+              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis
+                tickFormatter={(v) => `${v}$`}
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+              />
+              <Tooltip
+                contentStyle={{ borderRadius: 10, fontSize: 13 }}
+                formatter={(value) => [`${value}$`, "Revenue"]}
+              />
+              <Bar
+                dataKey="revenue"
+                fill="#10b981"
+                radius={[6, 6, 0, 0]}
+                barSize={28}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
         {/* Price Suggestion Modal */}
         <Modal
