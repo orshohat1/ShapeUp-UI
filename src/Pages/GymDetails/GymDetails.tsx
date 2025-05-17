@@ -110,7 +110,7 @@ const Dashboard: React.FC = () => {
     { sender: string; text: string; timestamp: number }[]
   >([]);
   const [newMessage, setNewMessage] = useState<string>("");
-  const [chartData, setChartData] = useState<{ date: string; count: number }[]>([]);
+  const [purchaseData, setPurchaseData] = useState<{ date: string; count: number; revenue: number }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,26 +128,32 @@ const Dashboard: React.FC = () => {
           today.subtract(6 - i, "day").format("YYYY-MM-DD")
         );
 
-        const counts: Record<string, number> = past7Days.reduce((acc, date) => {
-          acc[date] = 0;
-          return acc;
-        }, {} as Record<string, number>);
+        // Initialize counters
+        const summary: Record<string, { count: number; revenue: number }> = past7Days.reduce(
+          (acc, date) => {
+            acc[date] = { count: 0, revenue: 0 };
+            return acc;
+          },
+          {} as Record<string, { count: number; revenue: number }>
+        );
 
         purchases.forEach((purchase: any) => {
-          const purchaseDate = dayjs(purchase.purchaseDate).format("YYYY-MM-DD");
-          if (purchaseDate in counts) {
-            counts[purchaseDate]++;
+          const date = dayjs(purchase.purchaseDate).format("YYYY-MM-DD");
+          if (summary[date]) {
+            summary[date].count++;
+            summary[date].revenue += purchase.price;
           }
         });
 
-        const formattedChartData = past7Days.map((date) => ({
+        const formattedData = past7Days.map((date) => ({
           date,
-          count: counts[date],
+          count: summary[date].count,
+          revenue: summary[date].revenue,
         }));
 
-        setChartData(formattedChartData);
-      } catch (error) {
-        console.error("Failed to fetch purchases", error);
+        setPurchaseData(formattedData);
+      } catch (err) {
+        console.error("Error fetching data", err);
       }
     };
 
@@ -567,17 +573,33 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
 
-        <div style={{ width: "100%", height: 200, marginTop: 50 }}>
-          <h3>Purchases in the Last 7 Days</h3>
-          <ResponsiveContainer>
-            <BarChart data={chartData}>
-              <XAxis dataKey="date" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <>
+          {/* Purchases chart */}
+          <div style={{ width: "100%", height: 200, marginTop: 50 }}>
+            <h3>Purchases in the Last 7 Days</h3>
+            <ResponsiveContainer>
+              <BarChart data={purchaseData} style={{ background: "transparent" }}>
+                <XAxis dataKey="date" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Revenues chart */}
+          <div style={{ width: "100%", height: 200, marginTop: 50 }}>
+            <h3>Revenue in the Last 7 Days</h3>
+            <ResponsiveContainer>
+              <BarChart data={purchaseData} style={{ background: "transparent" }}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => `${value.toFixed(2)}$`} />
+                <Bar dataKey="revenue" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </>
 
         {/* Price Suggestion Modal */}
         <Modal
