@@ -17,6 +17,17 @@ import {
   Pagination,
   Spin,
 } from "antd";
+import axios from "axios";
+import {
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+  Bar,
+  BarChart,
+} from "recharts";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { getPurchasedUsersForGym, updateGymById } from "../../api/gym-owner";
@@ -99,6 +110,56 @@ const Dashboard: React.FC = () => {
     { sender: string; text: string; timestamp: number }[]
   >([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [purchaseData, setPurchaseData] = useState<{ date: string; count: number; revenue: number }[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://localhost:3000/purchase/getGymPurchases/${gymId}`, {
+          withCredentials: true,
+        }
+        );
+
+        const purchases = data.filteredPurchases;
+
+        const today = dayjs();
+        const past7Days = Array.from({ length: 7 }).map((_, i) =>
+          today.subtract(6 - i, "day").format("YYYY-MM-DD")
+        );
+
+        // Initialize counters
+        const summary: Record<string, { count: number; revenue: number }> = past7Days.reduce(
+          (acc, date) => {
+            acc[date] = { count: 0, revenue: 0 };
+            return acc;
+          },
+          {} as Record<string, { count: number; revenue: number }>
+        );
+
+        purchases.forEach((purchase: any) => {
+          const date = dayjs(purchase.purchaseDate).format("YYYY-MM-DD");
+          if (summary[date]) {
+            summary[date].count++;
+            summary[date].revenue += purchase.price;
+          }
+        });
+
+        const formattedData = past7Days.map((date) => ({
+          date,
+          count: summary[date].count,
+          revenue: summary[date].revenue,
+        }));
+
+        setPurchaseData(formattedData);
+      } catch (err) {
+        console.error("Error fetching data", err);
+      }
+    };
+
+    fetchData();
+  }, [gymId]);
 
   useEffect(() => {
     if (!gymId) {
@@ -479,9 +540,21 @@ const Dashboard: React.FC = () => {
 
         <div className="gym-image-grid">
           {gymData.pictures.slice(0, 5).map((img: string, i: number) => (
-            <img key={i} src={img} alt={`gym-${i}`} />
+            <img
+              key={i}
+              src={img}
+              alt={`gym-${i}`}
+              onClick={() => setSelectedImage(img)}
+              className="clickable-image"
+            />
           ))}
         </div>
+
+        {selectedImage && (
+          <div className="image-modal" onClick={() => setSelectedImage(null)}>
+            <img src={selectedImage} alt="Expanded gym" />
+          </div>
+        )}
 
         {/* Action buttons */}
         <div className="gym-actions">
@@ -511,6 +584,49 @@ const Dashboard: React.FC = () => {
           >
             View Trainees
           </Button>
+        </div>
+
+        <div className="chart-container">
+          <h3 className="chart-title">Purchases in the Last 7 Days</h3>
+          <ResponsiveContainer>
+            <BarChart data={purchaseData}>
+              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis allowDecimals={false} tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ borderRadius: 10, fontSize: 13 }}
+                formatter={(value) => [`${value}`, "Purchases"]}
+              />
+              <Bar
+                dataKey="count"
+                fill="#3b82f6"
+                radius={[6, 6, 0, 0]}
+                barSize={28}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="chart-container">
+          <h3 className="chart-title">Revenue in the Last 7 Days</h3>
+          <ResponsiveContainer>
+            <BarChart data={purchaseData}>
+              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis
+                tickFormatter={(v) => `${v}$`}
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+              />
+              <Tooltip
+                contentStyle={{ borderRadius: 10, fontSize: 13 }}
+                formatter={(value) => [`${value}$`, "Revenue"]}
+              />
+              <Bar
+                dataKey="revenue"
+                fill="#10b981"
+                radius={[6, 6, 0, 0]}
+                barSize={28}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Price Suggestion Modal */}
@@ -715,11 +831,10 @@ const Dashboard: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${
-                      msg.sender === gymData.owner
-                        ? "user-message"
-                        : "owner-message"
-                    }`}
+                    className={`chat-message ${msg.sender === gymData.owner
+                      ? "user-message"
+                      : "owner-message"
+                      }`}
                   >
                     {msg.text}
                   </div>

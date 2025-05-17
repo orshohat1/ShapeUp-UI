@@ -372,11 +372,10 @@ const Dashboard: React.FC = () => {
             color="red"
           >
             <PlusCircleOutlined
-              className={`plus-icon ${
-                userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
-                  ? "disabled"
-                  : ""
-              }`}
+              className={`plus-icon ${userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+                ? "disabled"
+                : ""
+                }`}
               onClick={
                 userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
                   ? handleOpenAddGymModal
@@ -403,120 +402,6 @@ const Dashboard: React.FC = () => {
           </div>
         </main>
       </div>
-
-      <Modal
-        open={isPriceModalVisible}
-        onCancel={handleClosePriceModal}
-        footer={null}
-        width={600}
-        closable
-      >
-        <div style={{ padding: "20px 30px" }}>
-          <h3
-            style={{
-              fontSize: "18px",
-              fontWeight: 500,
-              color: "#6c7080",
-              marginBottom: "30px",
-            }}
-          >
-            Update prices
-          </h3>
-
-          {["1 day", "3 day", "5 day"].map((label, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "25px",
-              }}
-            >
-              <label
-                style={{ width: "120px", fontWeight: 500, color: "#6c7080" }}
-              >
-                {label} plan
-              </label>
-              <Input
-                type="number"
-                placeholder="Price"
-                value={priceUpdateTargetGym?.prices?.[i] ?? ""}
-                onChange={(e) => {
-                  const updatedPrices = [
-                    ...(priceUpdateTargetGym?.prices || []),
-                  ];
-                  updatedPrices[i] = e.target.value;
-                  setPriceUpdateTargetGym({
-                    ...priceUpdateTargetGym,
-                    prices: updatedPrices,
-                  });
-                }}
-                style={{
-                  flex: 1,
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.06)",
-                  border: "1px solid #eee",
-                  fontSize: "16px",
-                }}
-              />
-            </div>
-          ))}
-
-          <div style={{ textAlign: "center", marginTop: "40px" }}>
-            <Button
-              onClick={async () => {
-                const prices = priceUpdateTargetGym.prices.map(Number);
-
-                if (
-                  prices.some((p: string) => {
-                    const num = Number(p);
-                    return isNaN(num) || num <= 0;
-                  })
-                ) {
-                  notification.error({
-                    message: "Invalid Prices",
-                    description:
-                      "All prices must be valid numbers greater than 0.",
-                    placement: "top",
-                  });
-                  return;
-                }
-
-                try {
-                  const formData = new FormData();
-                  formData.append("prices", JSON.stringify(prices));
-                  await updateGymById(formData, priceUpdateTargetGym._id);
-
-                  setGyms((prev: any) =>
-                    prev.map((g: any) =>
-                      g._id === priceUpdateTargetGym._id
-                        ? { ...g, prices: priceUpdateTargetGym.prices }
-                        : g
-                    )
-                  );
-
-                  handleClosePriceModal();
-                } catch (err) {
-                  notification.error({ message: "Failed to update prices" });
-                }
-              }}
-              style={{
-                background: "#1d1f23",
-                color: "#fff",
-                border: "none",
-                borderRadius: "12px",
-                padding: "12px 50px",
-                fontWeight: 600,
-                fontSize: "18px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      </Modal>
 
       {/* Add Gym Modal */}
       <Modal
@@ -613,103 +498,6 @@ const Dashboard: React.FC = () => {
         >
           <Button type="primary" onClick={handleSaveGym} className="save-btn">
             Save
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Edit Gym Modal */}
-      <Modal
-        title="Edit Gym"
-        open={isEditGymModalVisible}
-        onCancel={handleCloseEditGymModal}
-        footer={null}
-        width={850}
-      >
-        <div style={{ display: "flex", gap: "20px" }}>
-          {/* Left Side - Gym Inputs */}
-          <div style={{ flex: "0 0 300px" }}>
-            <Input
-              name="name"
-              placeholder="Name"
-              value={gymData.name}
-              onChange={handleGymDataChange}
-              className="modal-input"
-            />
-            <AutoComplete
-              options={cityOptions.map((city) => ({
-                label: city,
-                value: city,
-              }))}
-              value={gymData.city}
-              onSearch={handleCitySearch}
-              onSelect={(value) =>
-                setGymData((prev) => ({ ...prev, city: value }))
-              }
-              onChange={(value) =>
-                setGymData((prev) => ({ ...prev, city: value }))
-              }
-              placeholder="City"
-              className="modal-input"
-              allowClear
-              filterOption={false}
-              style={{ width: "100%" }}
-            />
-            <Input.TextArea
-              name="description"
-              placeholder="Description"
-              value={gymData.description}
-              onChange={handleGymDataChange}
-              className="modal-input"
-              autoSize={{ minRows: 3, maxRows: 6 }}
-            />
-          </div>
-
-          {/* Right Side - Image Upload */}
-          <div className="modal-image-upload" style={{ flex: 1 }}>
-            <p>Upload Gym Images (Max: 5)</p>
-
-            <label className="custom-file-upload">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                disabled={gymImages.length >= 5}
-                style={{ display: "none" }}
-              />
-              <UploadOutlined style={{ fontSize: 24, cursor: "pointer" }} />
-            </label>
-
-            <div className="image-preview-container">
-              {gymImages.map((image, index) => (
-                <div key={index} className="image-preview">
-                  {/* Check if the image is a File object or a URL */}
-                  <img
-                    src={
-                      typeof image === "string"
-                        ? image
-                        : URL.createObjectURL(image)
-                    }
-                    alt={`Gym Image ${index}`}
-                  />
-                  <button
-                    onClick={() => handleRemoveImage(index)}
-                    className="remove-image-btn"
-                  >
-                    ✖
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="modal-actions"
-          style={{ marginTop: "20px", textAlign: "right" }}
-        >
-          <Button type="primary" onClick={handleUpdateGym} className="save-btn">
-            Save Changes
           </Button>
         </div>
       </Modal>
