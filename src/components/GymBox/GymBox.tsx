@@ -28,16 +28,6 @@ const GymBox: React.FC<GymBoxProps> = ({
   };
   return (
     <div className="gym-box">
-      <div className="delete-button-wrapper">
-        <Popconfirm
-          title="Are you sure you want to delete this gym?"
-          okText="Yes"
-          cancelText="No"
-          onConfirm={onDelete}
-        >
-          <DeleteOutlined className="gym-box-icon" />
-        </Popconfirm>
-      </div>
 
       <div className="gym-image-wrapper">
         <Carousel
@@ -54,8 +44,19 @@ const GymBox: React.FC<GymBoxProps> = ({
         </Carousel>
       </div>
 
-      <div className="gym-info" onClick={handleNavigate}>
-        <h3 className="gym-title">{gymName}</h3>
+      <div className="gym-info">
+        <div className="gym-title-row">
+          <h3 className="gym-title" onClick={handleNavigate}>{gymName}</h3>
+          <Popconfirm
+            title="Are you sure you want to delete this gym?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={onDelete}
+          >
+            <DeleteOutlined className="gym-box-icon-inline" />
+          </Popconfirm>
+        </div>
+
         <p className="gym-city">{city}</p>
         <p className="gym-description">
           {description.length > 120
