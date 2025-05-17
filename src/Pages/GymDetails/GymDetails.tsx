@@ -19,13 +19,13 @@ import {
 } from "antd";
 import axios from "axios";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Bar,
+  BarChart,
 } from "recharts";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
@@ -570,13 +570,12 @@ const Dashboard: React.FC = () => {
         <div style={{ width: "100%", height: 200, marginTop: 50 }}>
           <h3>Purchases in the Last 7 Days</h3>
           <ResponsiveContainer>
-            <LineChart data={chartData}>
+            <BarChart data={chartData}>
               <XAxis dataKey="date" />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-              <Line type="monotone" dataKey="count" stroke="#8884d8" strokeWidth={2} />
-            </LineChart>
+              <Bar dataKey="count" fill="#8884d8" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
 
