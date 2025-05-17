@@ -111,6 +111,7 @@ const Dashboard: React.FC = () => {
   >([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [purchaseData, setPurchaseData] = useState<{ date: string; count: number; revenue: number }[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -539,9 +540,21 @@ const Dashboard: React.FC = () => {
 
         <div className="gym-image-grid">
           {gymData.pictures.slice(0, 5).map((img: string, i: number) => (
-            <img key={i} src={img} alt={`gym-${i}`} />
+            <img
+              key={i}
+              src={img}
+              alt={`gym-${i}`}
+              onClick={() => setSelectedImage(img)}
+              className="clickable-image"
+            />
           ))}
         </div>
+
+        {selectedImage && (
+          <div className="image-modal" onClick={() => setSelectedImage(null)}>
+            <img src={selectedImage} alt="Expanded gym" />
+          </div>
+        )}
 
         {/* Action buttons */}
         <div className="gym-actions">
