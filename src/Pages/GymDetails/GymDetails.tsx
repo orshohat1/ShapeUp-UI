@@ -127,10 +127,10 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const handleIncomingMessage = (message: any) => {
       if (!message) return;
-    
+
       const isMessageRelevant =
         message.sender === selectedUser?.userId || message.sender === gymData?.owner;
-    
+
       if (isMessageRelevant && selectedUser) {
         // Show message in chat
         message.timestamp = message.timestamp || Date.now();
@@ -140,7 +140,7 @@ const Dashboard: React.FC = () => {
           );
           return exists ? prevMessages : [...prevMessages, message];
         });
-    
+
         setTimeout(() => {
           const chatContainer = document.querySelector(".chat-messages-container");
           if (chatContainer) {
@@ -156,7 +156,7 @@ const Dashboard: React.FC = () => {
         }));
       }
     };
-    
+
     socket.on("message", handleIncomingMessage);
     socket.on("update_messages", handleIncomingMessage);
 
@@ -388,16 +388,16 @@ const Dashboard: React.FC = () => {
   }) => {
     setSelectedUser(user);
     fetchChatHistory(user.userId);
-  
+
     socket.emit("mark_as_read", gymData?.owner, user.userId, gymData?.name);
-  
+
     setUnreadCounts((prev) => {
       const updated = { ...prev };
       delete updated[user.userId];
       return updated;
     });
   };
-  
+
   const fetchChatHistory = (userId: string) => {
     socket.emit(
       "get_users_chat",
@@ -425,7 +425,7 @@ const Dashboard: React.FC = () => {
             }
           });
         }, 50);
-        
+
       }
     );
   };
@@ -435,9 +435,9 @@ const Dashboard: React.FC = () => {
     setSelectedUser(null);
     setMessages([]);
     fetchChatUsers();
-  
+
     socket.emit("add_user", gymData?.owner);
-  
+
     setTimeout(() => {
       requestAnimationFrame(() => {
         const container = document.querySelector(".chat-messages-container");
@@ -447,19 +447,19 @@ const Dashboard: React.FC = () => {
       });
     }, 50);
   };
-  
+
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser || !gymData?.owner) return;
-  
+
     const outgoingMessage = {
-      sender: gymData.owner, 
+      sender: gymData.owner,
       text: newMessage,
       timestamp: Date.now(),
     };
-  
+
     setMessages((prev) => [...prev, outgoingMessage]);
-  
+
     socket.emit(
       "communicate",
       gymData.owner,
@@ -467,9 +467,9 @@ const Dashboard: React.FC = () => {
       gymData.name,
       newMessage
     );
-  
+
     setNewMessage("");
-  
+
     setTimeout(() => {
       const chatContainer = document.querySelector(".chat-messages-container");
       if (chatContainer) {
@@ -794,15 +794,17 @@ const Dashboard: React.FC = () => {
                   <div
                     key={index}
                     className={`chat-message ${msg.sender === gymData.owner
-                        ? "user-message"
-                        : "owner-message"
+                      ? "user-message"
+                      : "owner-message"
                       }`}
                   >
-                    {msg.text}
+                    <div style={{ marginBottom: 4 }}>{msg.text}</div>
+                    <div style={{ fontSize: 10, color: "#888", textAlign: "right" }}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </div>
                 ))}
               </div>
-
               {/* Chat Input Section */}
               <div className="chat-input-container">
                 <Input.TextArea
