@@ -417,6 +417,15 @@ const Dashboard: React.FC = () => {
             timestamp: msg.timestamp || Date.now(),
           }))
         );
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            const container = document.querySelector(".chat-messages-container");
+            if (container) {
+              container.scrollTop = container.scrollHeight;
+            }
+          });
+        }, 50);
+        
       }
     );
   };
@@ -426,9 +435,19 @@ const Dashboard: React.FC = () => {
     setSelectedUser(null);
     setMessages([]);
     fetchChatUsers();
-
+  
     socket.emit("add_user", gymData?.owner);
+  
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        const container = document.querySelector(".chat-messages-container");
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+    }, 50);
   };
+  
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser || !gymData?.owner) return;
