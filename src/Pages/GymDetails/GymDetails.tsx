@@ -17,6 +17,17 @@ import {
   Pagination,
   Spin,
 } from "antd";
+import axios from "axios";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
+import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { getPurchasedUsersForGym, updateGymById } from "../../api/gym-owner";
@@ -99,6 +110,49 @@ const Dashboard: React.FC = () => {
     { sender: string; text: string; timestamp: number }[]
   >([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [chartData, setChartData] = useState<{ date: string; count: number }[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://localhost:3000/purchase/getGymPurchases/${gymId}`, {
+          withCredentials: true,
+        }
+        );
+
+        const purchases = data.filteredPurchases;
+
+        const today = dayjs();
+        const past7Days = Array.from({ length: 7 }).map((_, i) =>
+          today.subtract(6 - i, "day").format("YYYY-MM-DD")
+        );
+
+        const counts: Record<string, number> = past7Days.reduce((acc, date) => {
+          acc[date] = 0;
+          return acc;
+        }, {} as Record<string, number>);
+
+        purchases.forEach((purchase: any) => {
+          const purchaseDate = dayjs(purchase.purchaseDate).format("YYYY-MM-DD");
+          if (purchaseDate in counts) {
+            counts[purchaseDate]++;
+          }
+        });
+
+        const formattedChartData = past7Days.map((date) => ({
+          date,
+          count: counts[date],
+        }));
+
+        setChartData(formattedChartData);
+      } catch (error) {
+        console.error("Failed to fetch purchases", error);
+      }
+    };
+
+    fetchData();
+  }, [gymId]);
 
   useEffect(() => {
     if (!gymId) {
@@ -513,6 +567,19 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
 
+        <div style={{ width: "100%", height: 200, marginTop: 50 }}>
+          <h3>Purchases in the Last 7 Days</h3>
+          <ResponsiveContainer>
+            <LineChart data={chartData}>
+              <XAxis dataKey="date" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="count" stroke="#8884d8" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
         {/* Price Suggestion Modal */}
         <Modal
           title="AI-Powered Pricing Suggestion"
@@ -715,11 +782,10 @@ const Dashboard: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${
-                      msg.sender === gymData.owner
-                        ? "user-message"
-                        : "owner-message"
-                    }`}
+                    className={`chat-message ${msg.sender === gymData.owner
+                      ? "user-message"
+                      : "owner-message"
+                      }`}
                   >
                     {msg.text}
                   </div>
