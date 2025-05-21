@@ -4,7 +4,6 @@ import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input, notification } from "antd";
 import { login, googleSSO } from "../../../api/auth";
-import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
 import { IUserType } from "../../../constants/enum/IUserType";
@@ -16,6 +15,8 @@ const LoginUser: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const { refreshUserProfile } = useUserProfile();
   const navigate = useNavigate();
+
+  const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
   useEffect(() => {
     form

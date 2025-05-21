@@ -18,7 +18,6 @@ import {
 } from "antd";
 import { RcFile, UploadChangeParam } from "antd/es/upload/interface";
 import { register } from "../../../api/auth";
-import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
 const { Content } = Layout;
 
@@ -29,6 +28,8 @@ const RegisterUser: React.FC = () => {
   const avatarFileRef = useRef(null);
   const navigate = useNavigate();
   const { refreshUserProfile } = useUserProfile();
+
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
   useEffect(() => {
     form

@@ -37,7 +37,7 @@ import { useParams } from "react-router-dom";
 import { askPricingSuggestion } from "../../api/chat-ai";
 import { getGymById } from "../../api/gyms";
 
-const CHAT_SERVER_URL = "http://localhost:3002";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
@@ -115,11 +115,13 @@ const Dashboard: React.FC = () => {
   const [purchaseData, setPurchaseData] = useState<{ date: string; count: number; revenue: number }[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:3000/purchase/getGymPurchases/${gymId}`, {
+          `${BACKEND_URL}/purchase/getGymPurchases/${gymId}`, {
           withCredentials: true,
         }
         );
