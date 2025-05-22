@@ -24,12 +24,11 @@ interface GymBoxProps {
 }
 
 const GymBox: React.FC<GymBoxProps> = ({
-  gymName: initialGymName,
+  gymName,
   city,
   street,
   streetNumber,
   gymId,
-  gymName,
   description,
   images,
   onDelete,
