@@ -183,7 +183,12 @@ const GymCard: React.FC<GymCardProps> = ({
           <HeartOutlined className="favorite-icon" onClick={onToggleFavorite} />
         )}
       </div>
-      <p className="gym-location">📍 {street} {streetNumber}, {city}</p>
+      <p className="gym-location">
+        📍 {" "}
+        {street && streetNumber && street != "undefined" && streetNumber != "undefined"
+          ? `${street} ${streetNumber}, ${city}`
+          : city}
+      </p>
       <p className="gym-rating">
         ⭐ {localReviewsCount > 0 ? averageRating : "No reviews yet"} (
         <span

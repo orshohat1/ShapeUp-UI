@@ -224,7 +224,7 @@ const GymBox: React.FC<GymBoxProps> = ({
         </div>
       </div>
       <p>
-        Address:{" "}
+        Address: {" "}
         {street && streetNumber && street != "undefined" && streetNumber != "undefined"
           ? `${street} ${streetNumber}, ${city}`
           : city}
