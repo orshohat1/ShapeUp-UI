@@ -1,5 +1,6 @@
 import axios from "axios";
-import { SERVER_URL } from "../../constants/api-config";
+
+const SERVER_URL = import.meta.env.VITE_BACKEND_URL;
 
 const fileRequestAxiosInstance = axios.create({
   baseURL: SERVER_URL,

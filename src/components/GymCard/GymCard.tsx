@@ -22,7 +22,7 @@ interface GymCardProps {
   ownerId?: string;
 }
 
-const CHAT_SERVER_URL = "http://localhost:3002";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {

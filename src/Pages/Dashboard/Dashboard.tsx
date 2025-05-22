@@ -43,7 +43,7 @@ ChartJS.register(
 );
 import axiosInstance from "../../api/axios-instances/axios-instance";
 
-const CHAT_SERVER_URL = "http://localhost:3002";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
 const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
@@ -76,11 +76,13 @@ const Dashboard: React.FC = () => {
     { date: string; count: number }[]
   >([]);
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
     const fetchPurchaseData = async () => {
       try {
         const res = await axiosInstance.get(
-          "http://localhost:3000/purchase/getGymOwnerPurchases",
+          `${BACKEND_URL}/purchase/getGymOwnerPurchases`,
           {
             withCredentials: true,
           }
