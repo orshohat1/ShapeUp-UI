@@ -16,6 +16,8 @@ type OpeningHours = {
 interface GymBoxProps {
   gymName: string;
   city: string;
+  street: string;
+  streetNumber: string;
   ownerId: string;
   gymId: string;
   prices: number[];
@@ -47,6 +49,8 @@ const defaultHours = {
 const GymBox: React.FC<GymBoxProps> = ({
   gymName: initialGymName,
   city,
+  street,
+  streetNumber,
   gymId,
   prices,
   openingHours,
@@ -219,7 +223,12 @@ const GymBox: React.FC<GymBoxProps> = ({
           </Popconfirm>
         </div>
       </div>
-      <p>{city}</p>
+      <p>
+        Address:{" "}
+        {street && streetNumber && street != "undefined" && streetNumber != "undefined"
+          ? `${street} ${streetNumber}, ${city}`
+          : city}
+      </p>
       <p
         onClick={openChatModal}
         style={{

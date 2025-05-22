@@ -11,6 +11,8 @@ interface GymCardProps {
   gymId: string;
   gymName: string;
   city: string;
+  street: string;
+  streetNumber: string;
   rating: string;
   reviewsCount: number;
   images: string[];
@@ -34,6 +36,8 @@ const GymCard: React.FC<GymCardProps> = ({
   gymId,
   gymName,
   city,
+  street,
+  streetNumber,
   rating,
   reviewsCount,
   images,
@@ -179,7 +183,7 @@ const GymCard: React.FC<GymCardProps> = ({
           <HeartOutlined className="favorite-icon" onClick={onToggleFavorite} />
         )}
       </div>
-      <p className="gym-location">📍 {city}</p>
+      <p className="gym-location">📍 {street} {streetNumber}, {city}</p>
       <p className="gym-rating">
         ⭐ {localReviewsCount > 0 ? averageRating : "No reviews yet"} (
         <span
