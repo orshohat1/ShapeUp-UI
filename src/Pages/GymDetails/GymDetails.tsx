@@ -1183,7 +1183,8 @@ const Dashboard: React.FC = () => {
                   <span>Last name</span>
                   <span>Email</span>
                   <span>Code</span>
-                  <span>Valid until</span>
+                  <span>Valid From</span>
+                  <span>Valid Until</span>
                 </div>
 
                 {paginatedUsers.map((user, index) => (
@@ -1193,6 +1194,9 @@ const Dashboard: React.FC = () => {
                     <span>{user.lastName}</span>
                     <span>{user.email}</span>
                     <span>{user.code}</span>
+                    <span>
+                      {new Date(user.validFrom).toLocaleDateString()}
+                    </span>
                     <span>
                       {new Date(user.validUntil).toLocaleDateString()}
                     </span>
