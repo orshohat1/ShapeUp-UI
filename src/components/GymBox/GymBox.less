@@ -1,136 +1,74 @@
-@blue-primary: #768ebd;
-@bg-light: #f3f4f6;
-@bg-white: #ffffff;
-@border-light: #e5e7eb;
-@text-gray: #6b7280;
-@shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-@user-bg: #daf5ff;
-@owner-bg: #f1f1f1;
-@modal-bg: #f7f7f7;
-
 .gym-box {
-    border: 1px solid #ddd;
-    background: @modal-bg;
-    border-radius: 20px;
-    padding: 16px;
-    max-width: 300px;
-    margin: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  background-color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
-  
-  .gym-box-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  
-  .gym-box-icons {
-    display: flex;
-    align-items: center;
-  }
-  
-  .gym-box-icon {
-    margin-left: 8px;
-    cursor: pointer;
-    font-size: 18px;
-  }
-  
-  .gym-box-button {
-    margin-top: 8px;
-    width: 100%;
-  }
-  
-  .chat-input-container {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .chat-modal {
-    .ant-modal-body {
-      display: flex;
-      flex-direction: column;
-      height: 450px; // Keeps chat window fixed & scrollable
-      padding: 10px;
-    }
-  
-    .back-button {
-      margin-bottom: 8px;
-    }
-  
-    .chat-messages-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      background-color: @bg-light;
-      border-radius: 8px;
-      max-height: 300px;
-      display: flex;
-      flex-direction: column;
-    }
-  
-    .chat-message {
-      padding: 10px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      max-width: 70%;
-      word-wrap: break-word;
-      font-size: 14px;
-    }
-  
-    .user-message {
-      align-self: flex-end;
-      background-color: @user-bg;
-      color: black;
-    }
-  
-    .owner-message {
-      align-self: flex-start;
-      background-color: @owner-bg;
-      color: black;
-    }
-  
-    .chat-input-container {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-top: 8px;
-    }
-  }
-  .trainees-table {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 14px;
-  
-    .table-header,
-    .table-row {
-      display: grid;
-      grid-template-columns: 50px 1fr 1fr 2fr 1fr 1fr;
-      align-items: center;
-      padding: 10px 16px;
-      border-radius: 6px;
-    }
-  
-    .table-header {
-      background-color: #f3f4f6;
-      font-weight: 600;
-      color: #4b5563;
-    }
-  
-    .table-row {
-      background-color: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    }
-  
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+
+  .gym-image-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+
+    .gym-image {
+      width: 100%;
+      height: 180px;
       object-fit: cover;
     }
   }
+
+  .gym-info {
+    cursor: default;
   
+    .gym-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+  
+      .gym-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        cursor: pointer;
+      }
+  
+      .gym-box-icon-inline {
+        font-size: 18px;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 5px;
+        border-radius: 50%;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+  
+        &:hover {
+          background: #f5222d;
+          color: #fff;
+        }
+      }
+    }
+  
+    .gym-city {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 8px;
+    }
+  
+    .gym-description {
+      font-size: 14px;
+      color: #4a4a4a;
+      line-height: 1.4;
+    }
+  }
+  
+}

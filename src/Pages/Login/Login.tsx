@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import "./Login.less";
 import type { FormProps } from "antd";
 import { Layout, Button, Form, Input, notification } from "antd";
-import { CLIENT_URL } from "../../constants/api-config";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../context/useUserProfile";
+import { IUserType } from "../../constants/enum/IUserType";
 const { Content } = Layout;
 
 const Login: React.FC = () => {
@@ -14,6 +14,8 @@ const Login: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const navigate = useNavigate();
   const { refreshUserProfile } = useUserProfile();
+
+  const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
   useEffect(() => {
     form
@@ -32,7 +34,7 @@ const Login: React.FC = () => {
       try {
         await login(values.email, values.password);
         const userProfile = await refreshUserProfile();
-        if (userProfile && userProfile.role !== 'gym_owner') {
+        if (userProfile && userProfile.role !== IUserType.GYM_OWNER) {
           notification.warning({
             message: "Unauthorized",
             description: "This page is only for gym owner.",

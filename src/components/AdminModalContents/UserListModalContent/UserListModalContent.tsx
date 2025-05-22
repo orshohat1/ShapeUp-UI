@@ -4,6 +4,7 @@ import { Button, Input, Pagination, Tooltip, Avatar, Spin, Modal } from "antd";
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 import { deleteUserById, filterUsers, getAllUsers } from "../../../api/users";
 import { useNavigate } from "react-router-dom";
+import { IUserType } from "../../../constants/enum/IUserType";
 
 interface UserData {
   _id: string;
@@ -81,7 +82,7 @@ const UserListModalContent: React.FC = () => {
 
   const handleDeleteUser = (userId: string, userRole: string) => {
     const extraWarning =
-      userRole === "gym_owner"
+      userRole === IUserType.GYM_OWNER
         ? " This will also delete all gyms exists under this owner's account."
         : "";
 
@@ -195,7 +196,7 @@ const UserListModalContent: React.FC = () => {
                     {user.role.replace(/_/g, " ")}
                   </div>
                   <div style={{ flex: 0.5 }}>
-                    {user.role !== "admin" && (
+                    {user.role !== IUserType.ADMIN && (
                       <Tooltip title="Delete user">
                         <Button
                           type="text"

@@ -4,9 +4,9 @@ import type { FormProps } from "antd";
 import googleLogo from "../../../assets/Logo/google.png";
 import { Layout, Button, Form, Input, notification } from "antd";
 import { login, googleSSO } from "../../../api/auth";
-import { CLIENT_URL } from "../../../constants/api-config";
 import { useUserProfile } from "../../../context/useUserProfile";
 import { useNavigate } from "react-router-dom";
+import { IUserType } from "../../../constants/enum/IUserType";
 const { Content } = Layout;
 
 const LoginUser: React.FC = () => {
@@ -15,6 +15,8 @@ const LoginUser: React.FC = () => {
   const [submittable, setSubmittable] = React.useState<boolean>(false);
   const { refreshUserProfile } = useUserProfile();
   const navigate = useNavigate();
+
+  const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
   useEffect(() => {
     form
@@ -41,7 +43,7 @@ const LoginUser: React.FC = () => {
       try {
         await login(values.email, values.password);
         const userProfile = await refreshUserProfile();
-        if (userProfile && userProfile.role !== 'user') {
+        if (userProfile && userProfile.role !== IUserType.USER) {
           notification.warning({
             message: "Unauthorized",
             description: "This page is only for users.",

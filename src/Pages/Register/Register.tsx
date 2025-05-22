@@ -17,7 +17,6 @@ import {
   message,
   Select,
 } from "antd";
-import { CLIENT_URL } from "../../constants/api-config";
 import { register } from "../../api/auth";
 import { RcFile, UploadChangeParam } from "antd/es/upload/interface";
 const { Content } = Layout;
@@ -30,6 +29,8 @@ const Register: React.FC = () => {
   const gymOwnerDocumentFileRef = useRef(null);
   const navigate = useNavigate();
   const { refreshUserProfile } = useUserProfile();
+
+  const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
   useEffect(() => {
     form
