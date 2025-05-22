@@ -278,7 +278,7 @@ const Dashboard: React.FC = () => {
       street: gym.street,
       streetNumber: gym.streetNumber,
       description: gym.description,
-      prices: gym.prices || ["", "", ""],
+      prices: gym.prices || [0, 0, 0],
     });
     setGymImages(gym.pictures);
     setIsEditGymModalVisible(true);
