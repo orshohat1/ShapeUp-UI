@@ -68,8 +68,9 @@ const DashboardAdmin: React.FC = () => {
           getRevenueByCity(),
           getRevenueByDate(),
         ]);
-        setCityRevenue(cityData);
-        setDailyRevenue(dailyData);
+
+        setCityRevenue(Array.isArray(cityData) ? cityData : []);
+        setDailyRevenue(Array.isArray(dailyData) ? dailyData : []);
       } catch (err) {
         console.error("Failed to load revenues", err);
       }
@@ -77,6 +78,7 @@ const DashboardAdmin: React.FC = () => {
 
     fetchRevenues();
   }, []);
+
 
   useEffect(() => {
     const loadCounts = async () => {

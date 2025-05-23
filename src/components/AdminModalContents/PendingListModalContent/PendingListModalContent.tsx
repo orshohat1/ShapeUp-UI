@@ -30,7 +30,8 @@ const PendingListModalContent: React.FC = () => {
     try {
       setLoading(true);
       const gymOwners = await getGymOwnersStatus();
-      setGymOwners(gymOwners || []);
+      setGymOwners(Array.isArray(gymOwners) ? gymOwners : []);
+
     } catch (err) {
       setGymOwners([]);
     } finally {
@@ -42,7 +43,7 @@ const PendingListModalContent: React.FC = () => {
     try {
       setLoading(true);
       const gymOwners = await getGymOwnersStatus(query);
-      setGymOwners(gymOwners || []);
+      setGymOwners(Array.isArray(gymOwners) ? gymOwners : []);
     } catch (err) {
       setGymOwners([]);
     } finally {
