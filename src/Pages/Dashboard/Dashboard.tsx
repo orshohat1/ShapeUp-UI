@@ -62,6 +62,8 @@ const Dashboard: React.FC = () => {
   const [gymData, setGymData] = useState({
     name: "",
     city: "",
+    street: "",
+    streetNumber: "",
     description: "",
     prices: [0, 0, 0],
   });
@@ -264,16 +266,28 @@ const Dashboard: React.FC = () => {
 
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
-    setGymData({ name: "", city: "", description: "", prices: [0, 0, 0] });
+    setGymData({ name: "", city: "", street: "", streetNumber: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
 
-
+  const handleOpenEditGymModal = (gym: any) => {
+    setSelectedGym(gym);
+    setGymData({
+      name: gym.name,
+      city: gym.city,
+      street: gym.street,
+      streetNumber: gym.streetNumber,
+      description: gym.description,
+      prices: gym.prices || [0, 0, 0],
+    });
+    setGymImages(gym.pictures);
+    setIsEditGymModalVisible(true);
+  };
 
   const handleCloseEditGymModal = () => {
     setIsEditGymModalVisible(false);
     setSelectedGym(null);
-    setGymData({ name: "", city: "", description: "", prices: [0, 0, 0] });
+    setGymData({ name: "", city: "", street:"", streetNumber: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
 
@@ -288,6 +302,8 @@ const Dashboard: React.FC = () => {
 
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
+    formData.append("street", gymData.street);
+    formData.append("streetNumber", gymData.streetNumber);
     formData.append("description", gymData.description);
 
     gymImages.forEach((image) => {
@@ -314,6 +330,8 @@ const Dashboard: React.FC = () => {
 
     formData.append("name", gymData.name);
     formData.append("city", gymData.city);
+    formData.append("street", gymData.street);
+    formData.append("streetNumber", gymData.streetNumber);
     formData.append("description", gymData.description);
 
     if (gymImages.length === 0) {
@@ -427,6 +445,11 @@ const Dashboard: React.FC = () => {
                   images={gym.pictures || []}
                   description={gym.description}
                   city={gym.city}
+                  street={gym.street}
+                  streetNumber={gym.streetNumber}
+                  ownerId={gym.owner}
+                  prices={gym.prices}
+                  openingHours={gym.openingHours}
                   onDelete={() => handleGymDelete(gym._id)}
                   hasUnread={gymsWithUnread[gym._id] === true}
                 />
@@ -473,6 +496,22 @@ const Dashboard: React.FC = () => {
               allowClear
               filterOption={false}
               style={{ width: "100%" }}
+            />
+
+            <Input
+              name="street"
+              placeholder="Street"
+              value={gymData.street}
+              onChange={handleGymDataChange}
+              className="modal-input"
+            />
+
+            <Input
+              name="streetNumber"
+              placeholder="Street Number"
+              value={gymData.streetNumber}
+              onChange={handleGymDataChange}
+              className="modal-input"
             />
 
             <Input.TextArea

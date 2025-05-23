@@ -65,6 +65,8 @@ type OpeningHours = {
 interface GymData {
   name: string;
   city: string;
+  street: string;
+  streetNumber: string;
   description: string;
   prices: number[];
   owner: string;
@@ -379,6 +381,8 @@ const Dashboard: React.FC = () => {
 
     formData.append("name", editedGymData.name);
     formData.append("city", editedGymData.city);
+    formData.append("street", editedGymData.street);
+    formData.append("streetNumber", editedGymData.streetNumber);
     formData.append("description", editedGymData.description);
 
     if (gymImages.length === 0) {
@@ -407,7 +411,12 @@ const Dashboard: React.FC = () => {
 
   const handleEditClick = () => {
     if (!gymData) return;
-    setEditedGymData(JSON.parse(JSON.stringify(gymData)));
+    const clonedData = JSON.parse(JSON.stringify(gymData));
+
+    clonedData.street = (!clonedData.street || clonedData.street === "undefined") ? "" : clonedData.street;
+    clonedData.streetNumber = (!clonedData.streetNumber || clonedData.streetNumber === "undefined") ? "" : clonedData.streetNumber;
+
+    setEditedGymData(clonedData);
     setGymImages(gymData.pictures || []);
     setIsEditGymModalVisible(true);
   };
@@ -596,6 +605,12 @@ const Dashboard: React.FC = () => {
       <div className="gym-details-page">
         <h1>{gymData.name}</h1>
         <h6 style={{ marginTop: "10px", color: "#6c7080" }}>{gymData.city}</h6>
+          {(gymData.street && gymData.street != "undefined" && gymData.streetNumber && gymData.streetNumber != "undefined") && (
+          <h6 style={{ marginTop: "6px", color: "#6c7080" }}>
+            {[gymData.street, gymData.streetNumber].filter(Boolean).join(" ")}
+          </h6>
+        )}
+
         <p style={{ marginTop: "20px", marginBottom: "50px", color: "#6c7080" }}>{gymData.description}</p>
 
         <div className="gym-image-grid">
@@ -786,6 +801,23 @@ const Dashboard: React.FC = () => {
                 filterOption={false}
                 style={{ width: "100%" }}
               />
+
+              <Input
+                name="street"
+                placeholder="Street"
+                value={editedGymData?.street}
+                onChange={handleEditedGymDataChange}
+                className="modal-input"
+              />
+
+              <Input
+                name="streetNumber"
+                placeholder="Street Number"
+                value={editedGymData?.streetNumber}
+                onChange={handleEditedGymDataChange}
+                className="modal-input"
+              />
+
               <Input.TextArea
                 name="description"
                 placeholder="Description"

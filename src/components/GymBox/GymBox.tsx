@@ -8,6 +8,15 @@ interface GymBoxProps {
   gymId: string;
   gymName: string;
   city: string;
+  street: string;
+  streetNumber: string;
+  ownerId: string;
+  prices: number[];
+  openingHours: {
+    sundayToThursday: { from: string; to: string };
+    friday: { from: string; to: string };
+    saturday: { from: string; to: string };
+  };
   description: string;
   images: string[];
   onDelete: () => void;
@@ -15,9 +24,11 @@ interface GymBoxProps {
 }
 
 const GymBox: React.FC<GymBoxProps> = ({
-  gymId,
   gymName,
   city,
+  street,
+  streetNumber,
+  gymId,
   description,
   images,
   onDelete,
@@ -58,8 +69,13 @@ const GymBox: React.FC<GymBoxProps> = ({
             <DeleteOutlined className="gym-box-icon-inline" />
           </Popconfirm>
         </div>
-
-        <p className="gym-city">{city}</p>
+      </div>
+      <p>
+        Address: {" "}
+        {street && streetNumber && street != "undefined" && streetNumber != "undefined"
+          ? `${street} ${streetNumber}, ${city}`
+          : city}
+      </p>
         <p className="gym-description">
           {description.length > 120
             ? description.slice(0, 117) + "..."
@@ -84,7 +100,6 @@ const GymBox: React.FC<GymBoxProps> = ({
           </div>
         )}
       </div>
-    </div>
   );
 };
 
