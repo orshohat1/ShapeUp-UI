@@ -286,29 +286,28 @@
   .table-header,
   .table-row {
     display: grid;
-    grid-template-columns: 50px 1fr 1fr 2fr 1fr 1fr;
+    grid-template-columns: 60px 1fr 1fr 2fr 1fr 1fr 1fr;
     align-items: center;
-    padding: 10px 16px;
-    border-radius: 6px;
+    padding: 12px 0;
+    gap: 16px;
   }
 
   .table-header {
-    background-color: #f3f4f6;
     font-weight: 600;
-    color: #4b5563;
+    background: #f9f9f9;
+    border-bottom: 2px solid #ccc;
   }
 
   .table-row {
-    background-color: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid #eee;
   }
 
   .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 }
 
 .chat-modal {
