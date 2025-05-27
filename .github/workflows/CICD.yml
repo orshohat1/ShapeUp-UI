@@ -1,0 +1,37 @@
+name: Deploy Backend
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Log in to ACR
+        run: az acr login --name orproject
+
+      - name: Build and push Docker image to ACR
+        run: |
+          IMAGE_NAME=orproject.azurecr.io/shapeup-frontend:latest
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: SSH and restart backend
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 193.106.55.90
+          username: cs114
+          password: ${{ secrets.VM_PASSWORD }}
+          script: |
+            cd /deployment
+            docker compose pull
+            docker compose up -d
