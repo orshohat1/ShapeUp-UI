@@ -32,6 +32,6 @@ jobs:
           username: cs114
           password: ${{ secrets.VM_PASSWORD }}
           script: |
-            cd /deployment
+            cd /home/cs114/deployment
             docker compose pull
             docker compose up -d
