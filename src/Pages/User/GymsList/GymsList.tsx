@@ -213,6 +213,8 @@ const GymsList: React.FC = () => {
               onReviewAdded={handleReviewAdded}
               onReviewsClick={() => openReviewsModal(gym.reviews)}
               ownerId={gym.owner}
+              street={gym.street}
+              streetNumber={gym.streetNumber}
             />
           ))}
         </div>
@@ -277,6 +279,8 @@ const GymsList: React.FC = () => {
                 onToggleFavorite={() => toggleFavorite(gym._id)}
                 onReviewAdded={handleReviewAdded}
                 onReviewsClick={() => openReviewsModal(gym.reviews)}
+                street={gym.street}
+                streetNumber={gym.streetNumber}
               />
             ))
           ) : (
