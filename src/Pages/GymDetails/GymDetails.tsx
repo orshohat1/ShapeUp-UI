@@ -334,6 +334,20 @@ const Dashboard: React.FC = () => {
     fetchStreets();
   }, [hebrewCity]);
 
+  useEffect(() => {
+    socket.on("unread_updated", ({ gymId, count }) => {
+      setUnreadCounts(prev => ({
+        ...prev,
+        [gymId]: count,
+      }));
+    });
+
+    return () => {
+      socket.off("unread_updated");
+    };
+  }, []);
+
+
   // Filter helpers
   const handleCitySearch = (input: string) => {
     if (!input || input.length < 1) {

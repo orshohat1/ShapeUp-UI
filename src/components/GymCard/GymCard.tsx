@@ -69,19 +69,18 @@ const GymCard: React.FC<GymCardProps> = ({
       try {
         const userData = await getUserProfile(false);
         setUserId(userData._id);
-        if(userData._id != null)
-        {
-        const fetchedReviews = await getGymReviews(gymId);
-        setReviews(fetchedReviews);
+        if (userData._id != null) {
+          const fetchedReviews = await getGymReviews(gymId);
+          setReviews(fetchedReviews);
 
-        setLocalReviewsCount(fetchedReviews.length);
-        if (fetchedReviews.length > 0) {
-          const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
-          setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
-        } else {
-          setAverageRating(0);
+          setLocalReviewsCount(fetchedReviews.length);
+          if (fetchedReviews.length > 0) {
+            const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
+            setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
+          } else {
+            setAverageRating(0);
+          }
         }
-      }
       } catch (error) {
         console.error("Failed to load reviews or user profile", error);
       }
@@ -94,6 +93,10 @@ const GymCard: React.FC<GymCardProps> = ({
     };
 
   }, [gymId, reviewsCount]);
+
+  useEffect(() => {
+    socket.emit("add_user", userId);
+  }, []);
 
   const fetchChatHistory = async () => {
     if (!userId) return;
@@ -118,7 +121,6 @@ const GymCard: React.FC<GymCardProps> = ({
     setChatModalOpen(true);
     setIsLoading(true);
     setInterval(() => { fetchChatHistory(); }, 1000);
-    socket.emit("add_user", userId);
   };
 
   const sendMessage = () => {
