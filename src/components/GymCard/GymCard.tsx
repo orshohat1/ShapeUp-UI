@@ -17,11 +17,13 @@ interface GymCardProps {
   reviewsCount: number;
   images: string[];
   isFavorite: boolean;
-  currentUser: { _id: string, firstName: string };
+  currentUser: { _id: string; firstName: string };
   onToggleFavorite: () => void;
   onReviewAdded: (gymId: string) => void;
   onReviewsClick?: () => void;
   ownerId?: string;
+  setUnreadCounts?: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+  unreadCounts?: Record<string, number>;
 }
 
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
@@ -46,6 +48,8 @@ const GymCard: React.FC<GymCardProps> = ({
   onToggleFavorite,
   onReviewAdded,
   onReviewsClick,
+  setUnreadCounts,
+  unreadCounts,
   ownerId
 }) => {
   const [reviews, setReviews] = useState([] as any[]);
@@ -69,19 +73,18 @@ const GymCard: React.FC<GymCardProps> = ({
       try {
         const userData = await getUserProfile(false);
         setUserId(userData._id);
-        if(userData._id != null)
-        {
-        const fetchedReviews = await getGymReviews(gymId);
-        setReviews(fetchedReviews);
+        if (userData._id != null) {
+          const fetchedReviews = await getGymReviews(gymId);
+          setReviews(fetchedReviews);
 
-        setLocalReviewsCount(fetchedReviews.length);
-        if (fetchedReviews.length > 0) {
-          const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
-          setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
-        } else {
-          setAverageRating(0);
+          setLocalReviewsCount(fetchedReviews.length);
+          if (fetchedReviews.length > 0) {
+            const totalRating = fetchedReviews.reduce((sum, review) => sum + review.rating, 0);
+            setAverageRating(parseFloat((totalRating / fetchedReviews.length).toFixed(1)));
+          } else {
+            setAverageRating(0);
+          }
         }
-      }
       } catch (error) {
         console.error("Failed to load reviews or user profile", error);
       }
@@ -117,8 +120,19 @@ const GymCard: React.FC<GymCardProps> = ({
   const openChatModal = () => {
     setChatModalOpen(true);
     setIsLoading(true);
-    setInterval(() => { fetchChatHistory(); }, 1000);
+    setInterval(() => {
+      fetchChatHistory();
+    }, 1000);
+
+    if (setUnreadCounts && unreadCounts && ownerId) {
+      setUnreadCounts((prev) => {
+        const updated = { ...prev };
+        delete updated[ownerId];
+        return updated;
+      });
+    }
   };
+
 
   const sendMessage = () => {
     if (!newMessage.trim()) return;

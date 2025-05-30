@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getGyms } from "../../../api/gyms";
 import { addFavoriteGym, getUserProfile, removeFavoriteGym } from "../../../api/users";
-import {askChatAi} from "../../../api/chat-ai";
+import { askChatAi } from "../../../api/chat-ai";
 import GymCard from "../../../components/GymCard/GymCard";
 import { Button, Pagination, Spin, Alert, Modal, List, Rate, Input } from "antd";
 import "./GymsList.less";
@@ -28,6 +28,8 @@ const GymsList: React.FC = () => {
   const [selectedGymReviews, setSelectedGymReviews] = useState<any[]>([]);
   const [modalPage, setModalPage] = useState(1);
   const [reviewsPage, setReviewsPage] = useState(1);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+
   const gymsPerPage = 6;
   const reviewsPerPage = 5;
 
@@ -187,9 +189,9 @@ const GymsList: React.FC = () => {
           </div>
           <div className="actions">
 
-          <Button onClick={openChatAIModal} disabled={isChatLoading}>
-            {isChatLoading ? <Spin /> : "Suggest Workout Plan"}
-          </Button>
+            <Button onClick={openChatAIModal} disabled={isChatLoading}>
+              {isChatLoading ? <Spin /> : "Suggest Workout Plan"}
+            </Button>
 
             <Button onClick={openFilterModal}>Filter</Button>
 
@@ -215,7 +217,9 @@ const GymsList: React.FC = () => {
               ownerId={gym.owner}
               street={gym.street}
               streetNumber={gym.streetNumber}
-            />
+              setUnreadCounts={setUnreadCounts}
+              unreadCounts={unreadCounts}
+                />
           ))}
         </div>
 
@@ -281,7 +285,9 @@ const GymsList: React.FC = () => {
                 onReviewsClick={() => openReviewsModal(gym.reviews)}
                 street={gym.street}
                 streetNumber={gym.streetNumber}
-              />
+                setUnreadCounts={setUnreadCounts}
+                unreadCounts={unreadCounts}
+                  />
             ))
           ) : (
             <p>No favorite gyms added yet!</p>
@@ -307,13 +313,13 @@ const GymsList: React.FC = () => {
         <div className="ChatAI-popup">
           {isChatLoading ? (
             <Spin size="large" />
-          ) : 
-          chatAiResponse.length ? (
-            <pre>{chatAiResponse}</pre>
-          ) : (
-            <p>Failed to retrieve workout plan from AI!</p>
-          )}
-      </div>
+          ) :
+            chatAiResponse.length ? (
+              <pre>{chatAiResponse}</pre>
+            ) : (
+              <p>Failed to retrieve workout plan from AI!</p>
+            )}
+        </div>
       </Modal>
 
 
