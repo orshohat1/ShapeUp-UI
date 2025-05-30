@@ -8,6 +8,7 @@ export const fetchDashboardCounts = async (showNotification?: boolean) => {
     const response = await axiosInstance.get(`${ADMIN_ROUTE}/dashboardCounts`, {
       withCredentials: true,
     });
+    console.log("16-admin response: ", response);
     return response?.data;
   } catch (error: any) {
     if (showNotification) {

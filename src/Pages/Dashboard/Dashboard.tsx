@@ -117,15 +117,9 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        console.log("1");
         if (userProfile?.id) {
-          console.log("2");
-          console.log("userProfile", userProfile);
           const gyms = await getGymsByOwner(userProfile.id);
-          console.log("3");
           setGyms(gyms);
-          console.log("4");
-          console.log("gyms:", gyms);
           // Check unread messages per gym
           gyms.forEach((gym: any) => {
             socket.emit(
@@ -155,13 +149,12 @@ const Dashboard: React.FC = () => {
               }
             );
           });
-          console.log("5");
           let totalRating = 0;
           let totalReviews = 0;
 
           for (const gym of gyms) {
             const reviews = await getGymReviews(gym._id);
-            console.log("6");
+            console.log("Dashboard - after getGymReviews(gym._id): ");
             if (reviews.length > 0) {
               const sum = reviews.reduce(
                 (acc, review) => acc + review.rating,
@@ -169,26 +162,21 @@ const Dashboard: React.FC = () => {
               );
               totalRating += sum;
               totalReviews += reviews.length;
-              console.log("7");
             }
           }
 
           if (totalReviews > 0) {
             setAverageRating(Number((totalRating / totalReviews).toFixed(2)));
-            console.log("8");
           } else {
             setAverageRating(null);
-            console.log("9");
           }
         }
       } catch (error: any) {
-        console.log("10");
         console.error("Error fetching gyms:", error);
         setGymsError(
           error.response?.data?.message || "Failed to load gyms data"
         );
       } finally {
-        console.log("11");
         setLoadingGyms(false);
       }
     };

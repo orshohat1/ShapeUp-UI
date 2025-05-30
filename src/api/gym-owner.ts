@@ -5,7 +5,6 @@ const GYMS_ROUTE = "/gyms";
 
 export const getGymsByOwner = async (ownerID: string) => {
   try {
-    console.log("11");
     const response = await axiosInstance.get(`${GYMS_ROUTE}`, {
       params: {
         owner: ownerID,

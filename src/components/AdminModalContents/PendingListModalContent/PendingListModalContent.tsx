@@ -30,6 +30,7 @@ const PendingListModalContent: React.FC = () => {
     try {
       setLoading(true);
       const gymOwners = await getGymOwnersStatus();
+      console.log("15-PendingListModalContent: ", gymOwners);
       setGymOwners(Array.isArray(gymOwners) ? gymOwners : []);
 
     } catch (err) {
