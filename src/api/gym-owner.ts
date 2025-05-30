@@ -13,6 +13,7 @@ export const getGymsByOwner = async (ownerID: string) => {
     });
     console.log("12");
     console.log(response.data.gyms);
+    console.log(response);
     return response.data.gyms;
   } catch (error: any) {
     console.log("13");
