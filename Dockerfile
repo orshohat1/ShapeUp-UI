@@ -23,7 +23,7 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY ssl/CBS.crt /etc/nginx/ssl/self-signed.crt
+COPY ssl/CSB.crt /etc/nginx/ssl/self-signed.crt
 COPY ssl/myserver.key /etc/nginx/ssl/self-signed.key
 
 EXPOSE 443
