@@ -557,13 +557,14 @@ const Dashboard: React.FC = () => {
     setSelectedUser(user);
     fetchChatHistory(user.userId);
 
-    socket.emit("mark_as_read", gymData?.owner, user.userId, gymData?.name);
-
-    setUnreadCounts((prev) => {
-      const updated = { ...prev };
-      delete updated[user.userId];
-      return updated;
-    });
+    if (unreadCounts[user.userId] > 0) {
+      socket.emit("mark_as_read", gymData?.owner, user.userId, gymData?.name);
+      setUnreadCounts((prev) => {
+        const updated = { ...prev };
+        updated[user.userId] = 0;
+        return updated;
+      });
+    }
   };
 
   const fetchChatHistory = (userId: string) => {
@@ -1016,8 +1017,11 @@ const Dashboard: React.FC = () => {
               : "Chat with Users"
           }
           open={isChatModalVisible}
-          onCancel={() => setChatModalVisible(false)}
-          footer={null}
+          onCancel={() => {
+            setChatModalVisible(false);
+            setSelectedUser(null);
+            setMessages([]);
+          }} footer={null}
           className="chat-modal"
         >
           {!selectedUser ? (
@@ -1038,7 +1042,7 @@ const Dashboard: React.FC = () => {
                     {user.firstName} {user.lastName}
                   </span>
 
-                  {unreadCounts[user.userId] > 0 && (
+                  {(unreadCounts[user.userId] ?? 0) > 0 && (
                     <span
                       style={{
                         backgroundColor: "#f5222d",
