@@ -338,16 +338,9 @@ const Dashboard: React.FC = () => {
       description: "",
       prices: [0, 0, 0],
     });
-    setGymImages(gym.pictures);
-    setIsEditGymModalVisible(true);
-  };
-
-  const handleCloseEditGymModal = () => {
-    setIsEditGymModalVisible(false);
-    setSelectedGym(null);
-    setGymData({ name: "", city: "", street: "", streetNumber: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
+
 
   const handleGymDataChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -418,11 +411,10 @@ const Dashboard: React.FC = () => {
             color="red"
           >
             <PlusCircleOutlined
-              className={`plus-icon ${
-                userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
-                  ? "disabled"
-                  : ""
-              }`}
+              className={`plus-icon ${userProfile?.gymOwnerStatus !== IGymOwnerStatus.APPROVED
+                ? "disabled"
+                : ""
+                }`}
               onClick={
                 userProfile?.gymOwnerStatus === IGymOwnerStatus.APPROVED
                   ? handleOpenAddGymModal

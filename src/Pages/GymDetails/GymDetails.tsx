@@ -1069,11 +1069,10 @@ const Dashboard: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${
-                      msg.sender === gymData.owner
-                        ? "user-message"
-                        : "owner-message"
-                    }`}
+                    className={`chat-message ${msg.sender === gymData.owner
+                      ? "user-message"
+                      : "owner-message"
+                      }`}
                   >
                     <div style={{ marginBottom: 4 }}>{msg.text}</div>
                     <div
