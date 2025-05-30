@@ -14,7 +14,6 @@ import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import {
   getGymsByOwner,
   addGym,
-  updateGymById,
   deleteGymById,
 } from "../../api/gym-owner";
 import { getGymReviews } from "../../api/reviews";
@@ -51,14 +50,19 @@ const socket: Socket = io(CHAT_SERVER_URL, {
   transports: ["websocket", "polling"],
 });
 
+// CKAN resource IDs
+const CITIES_RESOURCE_ID = "d4901968-dad3-4845-a9b0-a57d027f11ab";
+const STREETS_RESOURCE_ID = "a7296d1a-f8c9-4b70-96c2-6ebb4352f8e3";
+
 const Dashboard: React.FC = () => {
   const { userProfile } = useUserProfile();
-  const [gyms, setGyms] = useState<any | null>(null);
-  const [gymsWithUnread, setGymsWithUnread] = useState<Record<string, boolean>>({});
+  const [gyms, setGyms] = useState<any[] | null>(null);
+  const [gymsWithUnread, setGymsWithUnread] = useState<Record<string, boolean>>(
+    {}
+  );
   const [loadingGyms, setLoadingGyms] = useState(true);
-  const [gymsError, setGymsError] = useState(null);
+  const [gymsError, setGymsError] = useState<string | null>(null);
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
-  const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
   const [gymData, setGymData] = useState({
     name: "",
     city: "",
@@ -68,18 +72,22 @@ const Dashboard: React.FC = () => {
     prices: [0, 0, 0],
   });
   const [gymImages, setGymImages] = useState<any[]>([]);
-  const [selectedGym, setSelectedGym] = useState<any>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
-  const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
-  const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
-  const [cityOptions, setCityOptions] = useState<string[]>([]);
+  const [hebrewCity, setHebrewCity] = useState<string>("");
+  const [allCityRecords, setAllCityRecords] = useState<
+    { hebrew: string; latin: string }[]
+  >([]);
   const [allCities, setAllCities] = useState<string[]>([]);
+  const [cityOptions, setCityOptions] = useState<string[]>([]);
+  const [allStreets, setAllStreets] = useState<string[]>([]);
+  const [streetOptions, setStreetOptions] = useState<string[]>([]);
   const [purchaseStats, setPurchaseStats] = useState<
     { date: string; count: number }[]
   >([]);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  // Fetch last 7 days of purchases
   useEffect(() => {
     const fetchPurchaseData = async () => {
       try {
@@ -114,6 +122,7 @@ const Dashboard: React.FC = () => {
     fetchPurchaseData();
   }, []);
 
+  // Fetch gyms, unread chats, and calculate average rating
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -138,7 +147,10 @@ const Dashboard: React.FC = () => {
                     (count: number) => {
                       if (count > 0) {
                         hasUnread = true;
-                        setGymsWithUnread((prev) => ({ ...prev, [gym._id]: true }));
+                        setGymsWithUnread((prev) => ({
+                          ...prev,
+                          [gym._id]: true,
+                        }));
                       }
                     }
                   );
@@ -183,10 +195,6 @@ const Dashboard: React.FC = () => {
     fetchProfile();
   }, [userProfile]);
 
-  useEffect(() => {
-    fetchAllCities();
-  }, []);
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -204,47 +212,112 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchAllCities = async () => {
-    try {
-      const response = await fetch(
-        "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
-      );
-      const json = await response.json();
+  // Fetch all cities (both Hebrew and Latin) once
+  useEffect(() => {
+    const fetchAllCities = async () => {
+      try {
+        const res = await fetch(
+          `https://data.gov.il/api/3/action/datastore_search?resource_id=${CITIES_RESOURCE_ID}&limit=3200`
+        );
+        const json: any = await res.json();
+        const records = (json.result.records as any[]) || [];
+        const cityRecs = records
+          .map((r) => ({
+            hebrew: r["שם_ישוב"]?.trim(),
+            latinRaw: r["שם_ישוב_לועזי"]?.trim(),
+          }))
+          .filter((r) => r.latinRaw)
+          .map((r) => {
+            const latin = r.latinRaw
+              .replace(/-/g, " ")
+              .replace(/\s+/g, " ")
+              .split(" ")
+              .map(
+                (w: any) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+              )
+              .join(" ");
+            return { hebrew: r.hebrew, latin };
+          });
 
-      const cities = json.result.records
-        .map((r: any) => r["שם_ישוב_לועזי"])
-        .filter((name: string | undefined) => !!name && name.trim() !== "")
-        .map((name: string) =>
-          name
-            .trim()
-            .replace(/-/g, " ")
-            .replace(/\s+/g, " ")
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ")
+        // Dedupe by latin name
+        const cityMap = new Map<string, string>();
+        cityRecs.forEach(({ latin, hebrew }) => {
+          if (!cityMap.has(latin)) {
+            cityMap.set(latin, hebrew);
+          }
+        });
+
+        const uniqueCityRecs = Array.from(cityMap.entries()).map(
+          ([latin, hebrew]) => ({ latin, hebrew })
         );
 
-      const uniqueCities: string[] = Array.from(new Set(cities));
-      setAllCities(uniqueCities);
-    } catch (err) {
-      console.error("Failed to load cities:", err);
-    }
-  };
+        setAllCityRecords(uniqueCityRecs);
+        setAllCities(uniqueCityRecs.map((c) => c.latin));
+      } catch (err) {
+        console.error("Failed to load cities:", err);
+      }
+    };
+    fetchAllCities();
+  }, []);
 
+  // Fetch streets whenever Hebrew city changes
+  useEffect(() => {
+    const fetchStreets = async () => {
+      if (!hebrewCity) {
+        setAllStreets([]);
+        setStreetOptions([]);
+        return;
+      }
+      try {
+        const params = new URLSearchParams({
+          resource_id: STREETS_RESOURCE_ID,
+          q: JSON.stringify({ שם_ישוב: hebrewCity }),
+          limit: "32000",
+        });
+        const res = await fetch(
+          `https://data.gov.il/api/3/action/datastore_search?${params}`
+        );
+        const json: any = await res.json();
+        const recs = (json.result.records as Array<{ שם_רחוב: string }>) || [];
+        const streets = Array.from(
+          new Set(recs.map((r) => r["שם_רחוב"].trim()).filter((s) => s))
+        ).sort((a, b) => a.localeCompare(b, "he")) as string[];
+        setAllStreets(streets);
+        setStreetOptions(streets);
+      } catch (err) {
+        console.error("Failed to fetch streets:", err);
+      }
+    };
+    fetchStreets();
+  }, [hebrewCity]);
+
+  // Filter helpers
   const handleCitySearch = (input: string) => {
-    if (!input || input.length < 1) {
+    if (!input) {
       setCityOptions([]);
       return;
     }
-
-    const filtered = allCities.filter((city) =>
-      city.toLowerCase().includes(input.toLowerCase())
+    const filtered = allCities.filter((c) =>
+      c
+        .replace(/[^a-z]/gi, "")
+        .toLowerCase()
+        .includes(input.replace(/[^a-z]/gi, "").toLowerCase())
     );
 
     setCityOptions(filtered.slice(0, 20));
+  };
+  const handleStreetSearch = (input: string) => {
+    if (!input) {
+      setStreetOptions([]);
+      return;
+    }
+    const filtered = allStreets.filter((s) =>
+      s
+        .replace(/[^א-ת]/gi, "")
+        .toLowerCase()
+        .includes(input.replace(/[^א-ת]/gi, "").toLowerCase())
+    );
+    setStreetOptions(filtered.slice(0, 20));
   };
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
@@ -255,42 +328,19 @@ const Dashboard: React.FC = () => {
 
   const handleOpenAddGymModal = () => setIsAddGymModalVisible(true);
 
-  const handleOpenPriceModal = (gym: any) => {
-    setPriceUpdateTargetGym(gym);
-    setIsPriceModalVisible(true);
-  };
-
-  const handleClosePriceModal = () => {
-    setIsPriceModalVisible(false);
-    setPriceUpdateTargetGym(null);
-  };
-
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
-    setGymData({ name: "", city: "", street: "", streetNumber: "", description: "", prices: [0, 0, 0] });
-    setGymImages([]);
-  };
-
-  const handleOpenEditGymModal = (gym: any) => {
-    setSelectedGym(gym);
     setGymData({
-      name: gym.name,
-      city: gym.city,
-      street: gym.street,
-      streetNumber: gym.streetNumber,
-      description: gym.description,
-      prices: gym.prices || [0, 0, 0],
+      name: "",
+      city: "",
+      street: "",
+      streetNumber: "",
+      description: "",
+      prices: [0, 0, 0],
     });
-    setGymImages(gym.pictures);
-    setIsEditGymModalVisible(true);
-  };
-
-  const handleCloseEditGymModal = () => {
-    setIsEditGymModalVisible(false);
-    setSelectedGym(null);
-    setGymData({ name: "", city: "", street: "", streetNumber: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
+
 
   const handleGymDataChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -325,68 +375,6 @@ const Dashboard: React.FC = () => {
       console.error("Error saving gym:", error);
     }
   };
-
-  const handleUpdateGym = async () => {
-    const formData = new FormData();
-
-    formData.append("name", gymData.name);
-    formData.append("city", gymData.city);
-    formData.append("street", gymData.street);
-    formData.append("streetNumber", gymData.streetNumber);
-    formData.append("description", gymData.description);
-
-    if (gymImages.length === 0) {
-      notification.warning({
-        message: "Image Upload Minimum",
-        description: "At least one picture is required",
-        placement: "top",
-        duration: 3,
-      });
-      handleCloseEditGymModal();
-      return;
-    }
-
-    gymImages.forEach((image) => {
-      formData.append("pictures[]", image);
-    });
-
-    try {
-      if (!selectedGym) {
-        throw new Error("No gym selected for update");
-      }
-
-      const updatedGym = await updateGymById(formData, selectedGym._id);
-
-      if (selectedGym.name !== gymData.name) {
-        socket.emit(
-          "update_gym_name",
-          userProfile?.id,
-          selectedGym.name,
-          gymData.name,
-          (response: any) => {
-            if (!response.success) {
-              notification.warning({
-                message: "No Chats Found",
-                description: response.message,
-                placement: "top",
-              });
-            }
-          }
-        );
-      }
-
-      setGyms((prevGyms: any) =>
-        prevGyms.map((gym: any) =>
-          gym._id === selectedGym._id ? updatedGym : gym
-        )
-      );
-
-      handleCloseEditGymModal();
-    } catch (error) {
-      console.error("Error updating gym:", error);
-    }
-  };
-
 
   const handleGymDelete = async (gymId: string) => {
     try {
@@ -486,12 +474,12 @@ const Dashboard: React.FC = () => {
               }))}
               value={gymData.city}
               onSearch={handleCitySearch}
-              onSelect={(value) =>
-                setGymData((prev) => ({ ...prev, city: value }))
-              }
-              onChange={(value) =>
-                setGymData((prev) => ({ ...prev, city: value }))
-              }
+              onSelect={(val) => {
+                setGymData({ ...gymData, city: val });
+                const match = allCityRecords.find((r) => r.latin === val);
+                setHebrewCity(match?.hebrew || "");
+              }}
+              onChange={(val) => setGymData({ ...gymData, city: val })}
               placeholder="City"
               className="modal-input"
               allowClear
@@ -499,12 +487,20 @@ const Dashboard: React.FC = () => {
               style={{ width: "100%" }}
             />
 
-            <Input
-              name="street"
-              placeholder="Street"
+            <AutoComplete
+              options={streetOptions.map((street) => ({
+                label: street,
+                value: street,
+              }))}
               value={gymData.street}
-              onChange={handleGymDataChange}
+              onSearch={handleStreetSearch}
+              onSelect={(val) => setGymData({ ...gymData, street: val })}
+              onChange={(val) => setGymData({ ...gymData, street: val })}
+              placeholder="Street"
               className="modal-input"
+              allowClear
+              filterOption={false}
+              style={{ width: "100%" }}
             />
 
             <Input
