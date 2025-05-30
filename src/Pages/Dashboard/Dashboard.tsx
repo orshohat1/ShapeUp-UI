@@ -14,7 +14,6 @@ import LoadingOverlay from "../../components/LoadingOverlay/LoadingOverlay";
 import {
   getGymsByOwner,
   addGym,
-  updateGymById,
   deleteGymById,
 } from "../../api/gym-owner";
 import { getGymReviews } from "../../api/reviews";
@@ -63,10 +62,7 @@ const Dashboard: React.FC = () => {
   );
   const [loadingGyms, setLoadingGyms] = useState(true);
   const [gymsError, setGymsError] = useState<string | null>(null);
-
   const [isAddGymModalVisible, setIsAddGymModalVisible] = useState(false);
-  const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
-
   const [gymData, setGymData] = useState({
     name: "",
     city: "",
@@ -76,10 +72,7 @@ const Dashboard: React.FC = () => {
     prices: [0, 0, 0],
   });
   const [gymImages, setGymImages] = useState<any[]>([]);
-  const [selectedGym, setSelectedGym] = useState<any>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
-  const [isPriceModalVisible, setIsPriceModalVisible] = useState(false);
-  const [priceUpdateTargetGym, setPriceUpdateTargetGym] = useState<any>(null);
   const [hebrewCity, setHebrewCity] = useState<string>("");
   const [allCityRecords, setAllCityRecords] = useState<
     { hebrew: string; latin: string }[]
@@ -334,46 +327,8 @@ const Dashboard: React.FC = () => {
 
   const handleOpenAddGymModal = () => setIsAddGymModalVisible(true);
 
-  const handleOpenPriceModal = (gym: any) => {
-    setPriceUpdateTargetGym(gym);
-    setIsPriceModalVisible(true);
-  };
-
-  const handleClosePriceModal = () => {
-    setIsPriceModalVisible(false);
-    setPriceUpdateTargetGym(null);
-  };
-
   const handleCloseAddGymModal = () => {
     setIsAddGymModalVisible(false);
-    setGymData({
-      name: "",
-      city: "",
-      street: "",
-      streetNumber: "",
-      description: "",
-      prices: [0, 0, 0],
-    });
-    setGymImages([]);
-  };
-
-  const handleOpenEditGymModal = (gym: any) => {
-    setSelectedGym(gym);
-    setGymData({
-      name: gym.name,
-      city: gym.city,
-      street: gym.street,
-      streetNumber: gym.streetNumber,
-      description: gym.description,
-      prices: gym.prices || [0, 0, 0],
-    });
-    setGymImages(gym.pictures);
-    setIsEditGymModalVisible(true);
-  };
-
-  const handleCloseEditGymModal = () => {
-    setIsEditGymModalVisible(false);
-    setSelectedGym(null);
     setGymData({
       name: "",
       city: "",
@@ -416,67 +371,6 @@ const Dashboard: React.FC = () => {
       handleCloseAddGymModal();
     } catch (error) {
       console.error("Error saving gym:", error);
-    }
-  };
-
-  const handleUpdateGym = async () => {
-    const formData = new FormData();
-
-    formData.append("name", gymData.name);
-    formData.append("city", gymData.city);
-    formData.append("street", gymData.street);
-    formData.append("streetNumber", gymData.streetNumber);
-    formData.append("description", gymData.description);
-
-    if (gymImages.length === 0) {
-      notification.warning({
-        message: "Image Upload Minimum",
-        description: "At least one picture is required",
-        placement: "top",
-        duration: 3,
-      });
-      handleCloseEditGymModal();
-      return;
-    }
-
-    gymImages.forEach((image) => {
-      formData.append("pictures[]", image);
-    });
-
-    try {
-      if (!selectedGym) {
-        throw new Error("No gym selected for update");
-      }
-
-      const updatedGym = await updateGymById(formData, selectedGym._id);
-
-      if (selectedGym.name !== gymData.name) {
-        socket.emit(
-          "update_gym_name",
-          userProfile?.id,
-          selectedGym.name,
-          gymData.name,
-          (response: any) => {
-            if (!response.success) {
-              notification.warning({
-                message: "No Chats Found",
-                description: response.message,
-                placement: "top",
-              });
-            }
-          }
-        );
-      }
-
-      setGyms((prevGyms: any) =>
-        prevGyms.map((gym: any) =>
-          gym._id === selectedGym._id ? updatedGym : gym
-        )
-      );
-
-      handleCloseEditGymModal();
-    } catch (error) {
-      console.error("Error updating gym:", error);
     }
   };
 
