@@ -25,11 +25,10 @@ interface GymCardProps {
 }
 
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
-const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH,
-  transports: ["websocket", "polling"],
+  path: "/users-chat/socket.io",
+   transports: ["websocket"],
 });
 
 const GymCard: React.FC<GymCardProps> = ({

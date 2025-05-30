@@ -43,13 +43,11 @@ ChartJS.register(
 import axiosInstance from "../../api/axios-instances/axios-instance";
 
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
-const PATH = "/users-chat";
 
 const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH,
-  transports: ["websocket", "polling"],
+  path: "/users-chat/socket.io",
+   transports: ["websocket"],
 });
-
 // CKAN resource IDs
 const CITIES_RESOURCE_ID = "d4901968-dad3-4845-a9b0-a57d027f11ab";
 const STREETS_RESOURCE_ID = "a7296d1a-f8c9-4b70-96c2-6ebb4352f8e3";
