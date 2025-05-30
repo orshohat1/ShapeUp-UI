@@ -11,6 +11,7 @@ interface Review {
 export const getGymReviews = async (gymId: string): Promise<Review[]> => {
   try {
     const response = await axiosInstance.get(`${REVIEWS_ROUTE}/gym/${gymId}`, { withCredentials: true });
+    console.log(response);
     return response.data.reviews || [];
   } catch (error: any) {
     notification.error({
