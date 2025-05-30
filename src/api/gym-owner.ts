@@ -11,12 +11,10 @@ export const getGymsByOwner = async (ownerID: string) => {
         owner: ownerID,
       },
     });
-    console.log("12");
-    console.log(response.data.gyms);
-    console.log(response);
+    console.log("12-gym-owner response: ", response);
+    console.log("13-gym-owner response.data.gyms: ", response.data.gyms);
     return response.data.gyms;
   } catch (error: any) {
-    console.log("13");
     notification.error({
       message: "Fetching Gyms Failed",
       description:
