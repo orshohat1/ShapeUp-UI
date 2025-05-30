@@ -10,8 +10,6 @@ export const getGymsByOwner = async (ownerID: string) => {
         owner: ownerID,
       },
     });
-    console.log("12-gym-owner response: ", response);
-    console.log("13-gym-owner response.data.gyms: ", response.data.gyms);
     return response.data.gyms;
   } catch (error: any) {
     notification.error({

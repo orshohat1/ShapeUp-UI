@@ -154,7 +154,6 @@ const Dashboard: React.FC = () => {
 
           for (const gym of gyms) {
             const reviews = await getGymReviews(gym._id);
-            console.log("17-Dashboard - after getGymReviews(gym._id): ");
             if (reviews.length > 0) {
               const sum = reviews.reduce(
                 (acc, review) => acc + review.rating,
@@ -172,7 +171,7 @@ const Dashboard: React.FC = () => {
           }
         }
       } catch (error: any) {
-        console.error("Error fetching gyms:", error);
+        console.error("Error fetching gyms: ", error);
         setGymsError(
           error.response?.data?.message || "Failed to load gyms data"
         );
