@@ -171,6 +171,7 @@ const Dashboard: React.FC = () => {
           }
         }
       } catch (error: any) {
+        console.error("Error fetching gyms: ", error);
         setGymsError(
           error.response?.data?.message || "Failed to load gyms data"
         );
@@ -287,7 +288,7 @@ const Dashboard: React.FC = () => {
   const handleCloseEditGymModal = () => {
     setIsEditGymModalVisible(false);
     setSelectedGym(null);
-    setGymData({ name: "", city: "", street:"", streetNumber: "", description: "", prices: [0, 0, 0] });
+    setGymData({ name: "", city: "", street: "", streetNumber: "", description: "", prices: [0, 0, 0] });
     setGymImages([]);
   };
 
