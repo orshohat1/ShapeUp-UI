@@ -118,7 +118,6 @@ const GymCard: React.FC<GymCardProps> = ({
     setChatModalOpen(true);
     setIsLoading(true);
     setInterval(() => { fetchChatHistory(); }, 1000);
-    socket.emit("add_user", userId);
   };
 
   const sendMessage = () => {

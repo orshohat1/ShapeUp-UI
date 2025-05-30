@@ -238,6 +238,24 @@ const Dashboard: React.FC = () => {
     };
   }, [selectedUser, gymData?.owner]);
 
+  useEffect(() => {
+    if (!gymData?.owner) return;
+    socket.emit("add_user", gymData.owner);
+
+    socket.on("message", (message) => {
+      const sender = message.sender as string;
+      setUnreadCounts(prev => ({
+        ...prev,
+        [sender]: (prev[sender] || 0) + 1
+      }));
+    });
+
+    return () => {
+      socket.off("message");
+    };
+  }, [gymData?.owner]);
+
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
