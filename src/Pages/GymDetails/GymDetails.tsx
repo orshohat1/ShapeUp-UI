@@ -535,7 +535,7 @@ const Dashboard: React.FC = () => {
             socket.emit(
               "get_unread_count",
               gymData?.owner,
-              gymData?._id,
+              user.userId,
               gymData?.name,
               (count: number) => {
                 setUnreadCounts((prev) => ({ ...prev, [user.userId]: count }));
