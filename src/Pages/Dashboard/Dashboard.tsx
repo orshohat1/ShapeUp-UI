@@ -125,6 +125,7 @@ const Dashboard: React.FC = () => {
           console.log("3");
           setGyms(gyms);
           console.log("4");
+          console.log("gyms:", gyms);
           // Check unread messages per gym
           gyms.forEach((gym: any) => {
             socket.emit(

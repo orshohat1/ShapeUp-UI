@@ -5,13 +5,17 @@ const GYMS_ROUTE = "/gyms";
 
 export const getGymsByOwner = async (ownerID: string) => {
   try {
+    console.log("11");
     const response = await axiosInstance.get(`${GYMS_ROUTE}`, {
       params: {
         owner: ownerID,
       },
     });
+    console.log("12");
+    console.log(response.data.gyms);
     return response.data.gyms;
   } catch (error: any) {
+    console.log("13");
     notification.error({
       message: "Fetching Gyms Failed",
       description:
