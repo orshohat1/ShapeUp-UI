@@ -75,6 +75,10 @@ interface GymData {
   openingHours: OpeningHours;
 }
 
+// CKAN resource IDs
+const CITIES_RESOURCE_ID = "d4901968-dad3-4845-a9b0-a57d027f11ab";
+const STREETS_RESOURCE_ID = "a7296d1a-f8c9-4b70-96c2-6ebb4352f8e3";
+
 const Dashboard: React.FC = () => {
   const { gymId } = useParams<{ gymId: string }>();
   const [isEditGymModalVisible, setIsEditGymModalVisible] = useState(false);
@@ -90,8 +94,12 @@ const Dashboard: React.FC = () => {
   const [isSuggestModalVisible, setSuggestModalVisible] = useState(false);
   const [suggestedPricing, setSuggestedPricing] = useState<string | null>(null);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-
-
+  const [hebrewCity, setHebrewCity] = useState<string>("");
+  const [allCityRecords, setAllCityRecords] = useState<
+    { hebrew: string; latin: string }[]
+  >([]);
+  const [allStreets, setAllStreets] = useState<string[]>([]);
+  const [streetOptions, setStreetOptions] = useState<string[]>([]);
   const [purchasedUsers, setPurchasedUsers] = useState<any[]>([]);
   const [isTraineesModalVisible, setTraineesModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -114,7 +122,9 @@ const Dashboard: React.FC = () => {
     { sender: string; text: string; timestamp: number }[]
   >([]);
   const [newMessage, setNewMessage] = useState<string>("");
-  const [purchaseData, setPurchaseData] = useState<{ date: string; count: number; revenue: number }[]>([]);
+  const [purchaseData, setPurchaseData] = useState<
+    { date: string; count: number; revenue: number }[]
+  >([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -123,9 +133,10 @@ const Dashboard: React.FC = () => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(
-          `${BACKEND_URL}/purchase/getGymPurchases/${gymId}`, {
-          withCredentials: true,
-        }
+          `${BACKEND_URL}/purchase/getGymPurchases/${gymId}`,
+          {
+            withCredentials: true,
+          }
         );
 
         const purchases = data.filteredPurchases;
@@ -136,13 +147,11 @@ const Dashboard: React.FC = () => {
         );
 
         // Initialize counters
-        const summary: Record<string, { count: number; revenue: number }> = past7Days.reduce(
-          (acc, date) => {
+        const summary: Record<string, { count: number; revenue: number }> =
+          past7Days.reduce((acc, date) => {
             acc[date] = { count: 0, revenue: 0 };
             return acc;
-          },
-          {} as Record<string, { count: number; revenue: number }>
-        );
+          }, {} as Record<string, { count: number; revenue: number }>);
 
         purchases.forEach((purchase: any) => {
           const date = dayjs(purchase.purchaseDate).format("YYYY-MM-DD");
@@ -186,15 +195,12 @@ const Dashboard: React.FC = () => {
   }, [gymId]);
 
   useEffect(() => {
-    fetchAllCities();
-  }, []);
-
-  useEffect(() => {
     const handleIncomingMessage = (message: any) => {
       if (!message) return;
 
       const isMessageRelevant =
-        message.sender === selectedUser?.userId || message.sender === gymData?.owner;
+        message.sender === selectedUser?.userId ||
+        message.sender === gymData?.owner;
 
       if (isMessageRelevant && selectedUser) {
         // Show message in chat
@@ -207,7 +213,9 @@ const Dashboard: React.FC = () => {
         });
 
         setTimeout(() => {
-          const chatContainer = document.querySelector(".chat-messages-container");
+          const chatContainer = document.querySelector(
+            ".chat-messages-container"
+          );
           if (chatContainer) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
           }
@@ -248,47 +256,112 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchAllCities = async () => {
-    try {
-      const response = await fetch(
-        "https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3200"
-      );
-      const json = await response.json();
+  // Fetch all cities (both Hebrew and Latin) once
+  useEffect(() => {
+    const fetchAllCities = async () => {
+      try {
+        const res = await fetch(
+          `https://data.gov.il/api/3/action/datastore_search?resource_id=${CITIES_RESOURCE_ID}&limit=3200`
+        );
+        const json: any = await res.json();
+        const records = (json.result.records as any[]) || [];
+        const cityRecs = records
+          .map((r) => ({
+            hebrew: r["שם_ישוב"]?.trim(),
+            latinRaw: r["שם_ישוב_לועזי"]?.trim(),
+          }))
+          .filter((r) => r.latinRaw)
+          .map((r) => {
+            const latin = r.latinRaw
+              .replace(/-/g, " ")
+              .replace(/\s+/g, " ")
+              .split(" ")
+              .map(
+                (w: any) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+              )
+              .join(" ");
+            return { hebrew: r.hebrew, latin };
+          });
 
-      const cities = json.result.records
-        .map((r: any) => r["שם_ישוב_לועזי"])
-        .filter((name: string | undefined) => !!name && name.trim() !== "")
-        .map((name: string) =>
-          name
-            .trim()
-            .replace(/-/g, " ")
-            .replace(/\s+/g, " ")
-            .split(" ")
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ")
+        // Dedupe by latin name
+        const cityMap = new Map<string, string>();
+        cityRecs.forEach(({ latin, hebrew }) => {
+          if (!cityMap.has(latin)) {
+            cityMap.set(latin, hebrew);
+          }
+        });
+
+        const uniqueCityRecs = Array.from(cityMap.entries()).map(
+          ([latin, hebrew]) => ({ latin, hebrew })
         );
 
-      const uniqueCities: string[] = Array.from(new Set(cities));
-      setAllCities(uniqueCities);
-    } catch (err) {
-      console.error("Failed to load cities:", err);
-    }
-  };
+        setAllCityRecords(uniqueCityRecs);
+        setAllCities(uniqueCityRecs.map((c) => c.latin));
+      } catch (err) {
+        console.error("Failed to load cities:", err);
+      }
+    };
+    fetchAllCities();
+  }, []);
 
+  // Fetch streets whenever Hebrew city changes
+  useEffect(() => {
+    const fetchStreets = async () => {
+      if (!hebrewCity) {
+        setAllStreets([]);
+        setStreetOptions([]);
+        return;
+      }
+      try {
+        const params = new URLSearchParams({
+          resource_id: STREETS_RESOURCE_ID,
+          q: JSON.stringify({ שם_ישוב: hebrewCity }),
+          limit: "32000",
+        });
+        const res = await fetch(
+          `https://data.gov.il/api/3/action/datastore_search?${params}`
+        );
+        const json: any = await res.json();
+        const recs = (json.result.records as Array<{ שם_רחוב: string }>) || [];
+        const streets = Array.from(
+          new Set(recs.map((r) => r["שם_רחוב"].trim()).filter((s) => s))
+        ).sort((a, b) => a.localeCompare(b, "he")) as string[];
+        setAllStreets(streets);
+        setStreetOptions(streets);
+      } catch (err) {
+        console.error("Failed to fetch streets:", err);
+      }
+    };
+    fetchStreets();
+  }, [hebrewCity]);
+
+  // Filter helpers
   const handleCitySearch = (input: string) => {
     if (!input || input.length < 1) {
       setCityOptions([]);
       return;
     }
-
-    const filtered = allCities.filter((city) =>
-      city.toLowerCase().includes(input.toLowerCase())
+    const filtered = allCities.filter((c) =>
+      c
+        .replace(/[^a-z]/gi, "")
+        .toLowerCase()
+        .includes(input.replace(/[^a-z]/gi, "").toLowerCase())
     );
-
     setCityOptions(filtered.slice(0, 20));
+  };
+
+  const handleStreetSearch = (input: string) => {
+    if (!input) {
+      setStreetOptions([]);
+      return;
+    }
+    const filtered = allStreets.filter((s) =>
+      s
+        .replace(/[^א-ת]/gi, "")
+        .toLowerCase()
+        .includes(input.replace(/[^א-ת]/gi, "").toLowerCase())
+    );
+    setStreetOptions(filtered.slice(0, 20));
   };
 
   const handleRemoveImage = (imageIndexToDelete: number) => {
@@ -409,12 +482,23 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleLatinCitySelected = (latinCity: string) => {
+    const match = allCityRecords.find(r => r.latin === latinCity);
+    setHebrewCity(match?.hebrew || "");
+  }
+
   const handleEditClick = () => {
     if (!gymData) return;
     const clonedData = JSON.parse(JSON.stringify(gymData));
-
-    clonedData.street = (!clonedData.street || clonedData.street === "undefined") ? "" : clonedData.street;
-    clonedData.streetNumber = (!clonedData.streetNumber || clonedData.streetNumber === "undefined") ? "" : clonedData.streetNumber;
+    handleLatinCitySelected(clonedData.city);
+    clonedData.street =
+      !clonedData.street || clonedData.street === "undefined"
+        ? ""
+        : clonedData.street;
+    clonedData.streetNumber =
+      !clonedData.streetNumber || clonedData.streetNumber === "undefined"
+        ? ""
+        : clonedData.streetNumber;
 
     setEditedGymData(clonedData);
     setGymImages(gymData.pictures || []);
@@ -422,35 +506,41 @@ const Dashboard: React.FC = () => {
   };
 
   const fetchChatUsers = () => {
-    socket.emit("get_gym_chats", gymData?.owner, gymData?.name, (chatData: any) => {
-      if (chatData) {
-        const uniqueUsers = Array.from(
-          new Map(chatData.map((user: any) => [user.userId, user])).values()
-        );
-
-        setChatUsers(uniqueUsers.map((user: any) => ({
-          userId: user.userId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        })));
-
-        // Fetch unread count for each user
-        uniqueUsers.forEach((user: any) => {
-          socket.emit(
-            "get_unread_count",
-            gymData?.owner,
-            gymData?._id,
-            gymData?.name,
-            (count: number) => {
-              setUnreadCounts(prev => ({ ...prev, [user.userId]: count }));
-            }
+    socket.emit(
+      "get_gym_chats",
+      gymData?.owner,
+      gymData?.name,
+      (chatData: any) => {
+        if (chatData) {
+          const uniqueUsers = Array.from(
+            new Map(chatData.map((user: any) => [user.userId, user])).values()
           );
-        });
 
-      } else {
-        notification.error({ message: "Failed to load chat users." });
+          setChatUsers(
+            uniqueUsers.map((user: any) => ({
+              userId: user.userId,
+              firstName: user.firstName,
+              lastName: user.lastName,
+            }))
+          );
+
+          // Fetch unread count for each user
+          uniqueUsers.forEach((user: any) => {
+            socket.emit(
+              "get_unread_count",
+              gymData?.owner,
+              gymData?._id,
+              gymData?.name,
+              (count: number) => {
+                setUnreadCounts((prev) => ({ ...prev, [user.userId]: count }));
+              }
+            );
+          });
+        } else {
+          notification.error({ message: "Failed to load chat users." });
+        }
       }
-    });
+    );
   };
 
   const selectUser = (user: {
@@ -491,13 +581,14 @@ const Dashboard: React.FC = () => {
         );
         setTimeout(() => {
           requestAnimationFrame(() => {
-            const container = document.querySelector(".chat-messages-container");
+            const container = document.querySelector(
+              ".chat-messages-container"
+            );
             if (container) {
               container.scrollTop = container.scrollHeight;
             }
           });
         }, 50);
-
       }
     );
   };
@@ -519,7 +610,6 @@ const Dashboard: React.FC = () => {
       });
     }, 50);
   };
-
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser || !gymData?.owner) return;
@@ -605,13 +695,20 @@ const Dashboard: React.FC = () => {
       <div className="gym-details-page">
         <h1>{gymData.name}</h1>
         <h6 style={{ marginTop: "10px", color: "#6c7080" }}>{gymData.city}</h6>
-          {(gymData.street && gymData.street != "undefined" && gymData.streetNumber && gymData.streetNumber != "undefined") && (
-          <h6 style={{ marginTop: "6px", color: "#6c7080" }}>
-            {[gymData.street, gymData.streetNumber].filter(Boolean).join(" ")}
-          </h6>
-        )}
+        {gymData.street &&
+          gymData.street != "undefined" &&
+          gymData.streetNumber &&
+          gymData.streetNumber != "undefined" && (
+            <h6 style={{ marginTop: "6px", color: "#6c7080" }}>
+              {[gymData.street, gymData.streetNumber].filter(Boolean).join(" ")}
+            </h6>
+          )}
 
-        <p style={{ marginTop: "20px", marginBottom: "50px", color: "#6c7080" }}>{gymData.description}</p>
+        <p
+          style={{ marginTop: "20px", marginBottom: "50px", color: "#6c7080" }}
+        >
+          {gymData.description}
+        </p>
 
         <div className="gym-image-grid">
           {gymData.pictures.slice(0, 5).map((img: string, i: number) => (
@@ -666,7 +763,10 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer>
             <BarChart data={purchaseData}>
               <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 12 }} />
-              <YAxis allowDecimals={false} tick={{ fill: "#6b7280", fontSize: 12 }} />
+              <YAxis
+                allowDecimals={false}
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+              />
               <Tooltip
                 contentStyle={{ borderRadius: 10, fontSize: 13 }}
                 formatter={(value) => [`${value}`, "Purchases"]}
@@ -776,6 +876,7 @@ const Dashboard: React.FC = () => {
                 onChange={handleEditedGymDataChange}
                 className="modal-input"
               />
+
               <AutoComplete
                 options={cityOptions.map((city) => ({
                   label: city,
@@ -783,12 +884,13 @@ const Dashboard: React.FC = () => {
                 }))}
                 value={editedGymData?.city}
                 onSearch={handleCitySearch}
-                onSelect={(value) =>
+                onSelect={(value) => {
                   setEditedGymData((prev) => {
                     if (!prev) return prev;
                     return { ...prev, city: value };
-                  })
-                }
+                  });
+                  handleLatinCitySelected(value);
+                }}
                 onChange={(value) =>
                   setEditedGymData((prev) => {
                     if (!prev) return prev;
@@ -802,12 +904,30 @@ const Dashboard: React.FC = () => {
                 style={{ width: "100%" }}
               />
 
-              <Input
-                name="street"
-                placeholder="Street"
+              <AutoComplete
+                options={streetOptions.map((street) => ({
+                  label: street,
+                  value: street,
+                }))}
                 value={editedGymData?.street}
-                onChange={handleEditedGymDataChange}
+                onSearch={handleStreetSearch}
+                onSelect={(value) =>
+                  setEditedGymData((prev) => {
+                    if (!prev) return prev;
+                    return { ...prev, street: value };
+                  })
+                }
+                onChange={(value) =>
+                  setEditedGymData((prev) => {
+                    if (!prev) return prev;
+                    return { ...prev, street: value };
+                  })
+                }
+                placeholder="Street"
                 className="modal-input"
+                allowClear
+                filterOption={false}
+                style={{ width: "100%" }}
               />
 
               <Input
@@ -901,9 +1021,16 @@ const Dashboard: React.FC = () => {
               renderItem={(user) => (
                 <List.Item
                   onClick={() => selectUser(user)}
-                  style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
                 >
-                  <span>{user.firstName} {user.lastName}</span>
+                  <span>
+                    {user.firstName} {user.lastName}
+                  </span>
 
                   {unreadCounts[user.userId] > 0 && (
                     <span
@@ -943,14 +1070,24 @@ const Dashboard: React.FC = () => {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${msg.sender === gymData.owner
-                      ? "user-message"
-                      : "owner-message"
-                      }`}
+                    className={`chat-message ${
+                      msg.sender === gymData.owner
+                        ? "user-message"
+                        : "owner-message"
+                    }`}
                   >
                     <div style={{ marginBottom: 4 }}>{msg.text}</div>
-                    <div style={{ fontSize: 10, color: "#888", textAlign: "right" }}>
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div
+                      style={{
+                        fontSize: 10,
+                        color: "#888",
+                        textAlign: "right",
+                      }}
+                    >
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
                   </div>
                 ))}
@@ -1226,9 +1363,7 @@ const Dashboard: React.FC = () => {
                     <span>{user.lastName}</span>
                     <span>{user.email}</span>
                     <span>{user.code}</span>
-                    <span>
-                      {new Date(user.validFrom).toLocaleDateString()}
-                    </span>
+                    <span>{new Date(user.validFrom).toLocaleDateString()}</span>
                     <span>
                       {new Date(user.validUntil).toLocaleDateString()}
                     </span>
