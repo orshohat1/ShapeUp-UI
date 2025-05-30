@@ -182,12 +182,18 @@ const Dashboard: React.FC = () => {
     }
 
     const fetchGym = async () => {
-      setGymDataLoading(true);
-      const gymData = await getGymById(gymId);
-      setGymData(gymData);
-      setGymImages(gymData.pictures || []);
-      setHours(gymData.openingHours || defaultHours);
-      setGymDataLoading(false);
+      try {
+        setGymDataLoading(true);
+        const gymData = await getGymById(gymId);
+        setGymData(gymData);
+        setGymImages(gymData.pictures || []);
+        setHours(gymData.openingHours || defaultHours);
+      } catch (error) {
+        console.error("Failed to fetch gym data:", error);
+        notification.error({ message: "Failed to load gym data" });
+      } finally {
+        setGymDataLoading(false);
+      }
     };
 
     fetchGym();
