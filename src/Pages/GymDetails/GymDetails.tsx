@@ -28,21 +28,14 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
 import { getPurchasedUsersForGym, updateGymById } from "../../api/gym-owner";
 import "./GymDetails.less";
 
 import { useParams } from "react-router-dom";
 import { askPricingSuggestion } from "../../api/chat-ai";
 import { getGymById } from "../../api/gyms";
+import { socket } from "../../socket/socketClient";
 
-const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
-const PATH = "/users-chat";
-
-const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH,
-  transports: ["websocket", "polling"],
-});
 
 const defaultHours = {
   sundayToThursday: { from: "", to: "" },

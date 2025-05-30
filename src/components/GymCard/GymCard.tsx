@@ -3,9 +3,10 @@ import { getGymReviews, addReview } from "../../api/reviews";
 import { getUserProfile } from "../../api/users";
 import { List, Rate, Modal, Avatar, Button, Input, Form, notification, Pagination, Spin } from "antd";
 import { HeartFilled, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { io, Socket } from "socket.io-client";
 import "./GymCard.less";
 import { useUserProfile } from "../../context/useUserProfile";
+import { socket } from "../../socket/socketClient";
+
 
 interface GymCardProps {
   gymId: string;
@@ -23,14 +24,6 @@ interface GymCardProps {
   onReviewsClick?: () => void;
   ownerId?: string;
 }
-
-const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
-const PATH = "/users-chat";
-
-const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH,
-  transports: ["websocket", "polling"],
-});
 
 const GymCard: React.FC<GymCardProps> = ({
   gymId,

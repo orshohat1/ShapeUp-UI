@@ -18,7 +18,6 @@ import {
 } from "../../api/gym-owner";
 import { getGymReviews } from "../../api/reviews";
 import GymBox from "../../components/GymBox/GymBox";
-import { io, Socket } from "socket.io-client";
 import { IGymOwnerStatus } from "../../constants/enum/IGymOwnerStatus";
 import { Line } from "react-chartjs-2";
 import {
@@ -41,14 +40,7 @@ ChartJS.register(
   Legend
 );
 import axiosInstance from "../../api/axios-instances/axios-instance";
-
-const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
-const PATH = "/users-chat";
-
-const socket: Socket = io(CHAT_SERVER_URL, {
-  path: PATH,
-  transports: ["websocket", "polling"],
-});
+import { socket } from "../../socket/socketClient";
 
 // CKAN resource IDs
 const CITIES_RESOURCE_ID = "d4901968-dad3-4845-a9b0-a57d027f11ab";
@@ -86,6 +78,16 @@ const Dashboard: React.FC = () => {
   >([]);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+  function DashboardLayout({ ownerId }: { ownerId: string }) {
+    useEffect(() => {
+      if (ownerId) {
+        socket.emit("add_user", ownerId);
+      }
+    }, [ownerId
+    ]);
+  }
+  
 
   // Fetch last 7 days of purchases
   useEffect(() => {
