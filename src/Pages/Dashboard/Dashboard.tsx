@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
 
           for (const gym of gyms) {
             const reviews = await getGymReviews(gym._id);
-            console.log("Dashboard - after getGymReviews(gym._id): ");
+            console.log("17-Dashboard - after getGymReviews(gym._id): ");
             if (reviews.length > 0) {
               const sum = reviews.reduce(
                 (acc, review) => acc + review.rating,

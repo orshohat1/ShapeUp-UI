@@ -66,6 +66,7 @@ export const getGymOwnersStatus = async (
         params: query ? { search: query } : {},
       }
     );
+    console.log("18-admin getGymOwnersStatus response: ", response);
     return response?.data;
   } catch (error: any) {
     if (showNotification) {
