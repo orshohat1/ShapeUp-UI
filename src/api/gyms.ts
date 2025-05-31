@@ -61,9 +61,12 @@ export const getGyms = async () => {
 
 export const getGymById = async (gymId: string) => {
   try {
+    console.log("1-Fetching gym details for ID:", gymId)
     const response = await axiosInstance.get(`${GYMS_ROUTE}/${gymId}`, {
       withCredentials: true,
     });
+    console.log("2-response", response);
+    console.log("3-response.data.gym", response.data.gym);
     return response.data.gym;
   } catch (error: any) {
     notification.error({
