@@ -37,7 +37,7 @@ const GymBox: React.FC<GymBoxProps> = ({
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(`/gyms/${gymId}`);
+    navigate(`/gyms/apis/${gymId}`);
   };
   return (
     <div className="gym-box">

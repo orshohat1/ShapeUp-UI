@@ -52,7 +52,7 @@ const LoginUser: React.FC = () => {
           return;
         }
 
-        navigate("/gyms");
+        navigate("/allGyms");
       } catch (error) {
         console.error("Login error:", error);
       }
