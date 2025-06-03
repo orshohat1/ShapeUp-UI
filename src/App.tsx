@@ -61,7 +61,7 @@ const AppContent = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user/login" element={<LoginUser />} />
           <Route path="/user/register" element={<RegisterUser />} />
-          <Route path="/allGyms" element={<GymsList />} />
+          <Route path="/gyms" element={<GymsList />} />
           <Route path="/gyms/apis/:gymId" element={<GymDetails />} />
           <Route path="/admin/login" element={<LoginAdmin />} />
           <Route path="/admin/dashboard" element={<DashboardAdmin />} />

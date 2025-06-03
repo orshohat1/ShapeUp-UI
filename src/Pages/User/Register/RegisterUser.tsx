@@ -80,7 +80,7 @@ const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
         );
         refreshUserProfile();
         message.success("Registration successful");
-        navigate("/allGyms");
+        navigate("/gyms");
       } catch (error: any) {
         const errorMsg = error?.response?.data?.message || error?.message;
         message.error("Registration failed: " + errorMsg);
