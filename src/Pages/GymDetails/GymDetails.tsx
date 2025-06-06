@@ -383,10 +383,8 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      const suggestion = await askPricingSuggestion(
-        gymData?.owner,
-        gymData?.prices
-      );
+      const suggestion = await askPricingSuggestion(gymData._id);
+
       setSuggestedPricing(suggestion);
     } catch (err) {
       setSuggestedPricing("Could not fetch suggestion.");
