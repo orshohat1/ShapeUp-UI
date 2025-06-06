@@ -6,6 +6,7 @@ import {
   OpenAIOutlined,
   UnorderedListOutlined,
   UploadOutlined,
+  CopyOutlined
 } from "@ant-design/icons";
 import {
   AutoComplete,
@@ -30,6 +31,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { getPurchasedUsersForGym, updateGymById } from "../../api/gym-owner";
+
 import "./GymDetails.less";
 
 import { useParams } from "react-router-dom";
@@ -807,13 +809,15 @@ const Dashboard: React.FC = () => {
           open={isSuggestModalVisible}
           onCancel={() => setSuggestModalVisible(false)}
           footer={null}
+          styles={{
+            body: {
+              maxHeight: "400px",
+              overflowY: "auto",
+              padding: "20px",
+            },
+          }}
         >
-          <div
-            style={{
-              padding: "10px 5px",
-              fontFamily: "'Segoe UI', sans-serif",
-            }}
-          >
+          <div style={{ fontFamily: "'Segoe UI', sans-serif", position: "relative" }}>
             <div
               style={{
                 display: "flex",
@@ -822,29 +826,19 @@ const Dashboard: React.FC = () => {
                 marginBottom: "12px",
               }}
             >
-              {/* <img
-              src={ChatAILogo}
-              alt="ChatGPT"
-              style={{ width: "20px", height: "20px" }}
-            /> */}
               <span style={{ fontWeight: 600, fontSize: "15px" }}>Chat AI</span>
             </div>
 
             {suggestedPricing ? (
               <div
-                style={{ lineHeight: "1.6", color: "#333", fontSize: "15px" }}
+                style={{
+                  fontSize: "15px",
+                  color: "#333",
+                  lineHeight: "1.6",
+                  whiteSpace: "pre-line",
+                }}
               >
-                <p style={{ marginBottom: "12px" }}>
-                  {suggestedPricing.split("\n").slice(0, 1)}
-                </p>
-
-                <ul style={{ paddingLeft: "20px", marginBottom: "12px" }}>
-                  {suggestedPricing.match(/•.*?\$[\d.]+/g)?.map((line, i) => (
-                    <li key={i}>{line.replace(/^•\s*/, "")}</li>
-                  ))}
-                </ul>
-
-                <p>{suggestedPricing.split("\n").slice(-1)}</p>
+                {suggestedPricing}
               </div>
             ) : (
               <div style={{ textAlign: "center" }}>
