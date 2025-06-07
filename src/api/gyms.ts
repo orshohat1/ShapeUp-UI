@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instances/axios-instance";
 import { notification } from "antd";
 
-const GYMS_ROUTE = "/gyms";
+const GYMS_ROUTE = "/gyms/data";
 const REVIEWS_ROUTE = "/reviews";
 
 interface Review {
