@@ -61,7 +61,7 @@ export const getGyms = async () => {
 
 export const getGymById = async (gymId: string) => {
   try {
-    const response = await axiosInstance.get(`${GYMS_ROUTE}/${gymId}`, {
+    const response = await axiosInstance.get(`${GYMS_ROUTE}/data/${gymId}`, {
       withCredentials: true,
     });
     return response.data.gym;
