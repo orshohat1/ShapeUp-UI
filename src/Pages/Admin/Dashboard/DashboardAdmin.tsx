@@ -275,11 +275,7 @@ const DashboardAdmin: React.FC = () => {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={[...cityRevenue].sort((a, b) => (a.city > b.city ? 1 : -1))}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="city"
-                  interval={0}
-                  textAnchor="end"
-                />
+                <XAxis dataKey="city" tick={false} axisLine={false} />
                 <YAxis />
                 <RechartsTooltip
                   formatter={(value: number) => [`${value.toFixed(2)}$`, "Revenue"]}
